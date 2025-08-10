@@ -4,6 +4,14 @@
     <meta name=”robots” content=”noindex”>
     <meta name=”robots” content=”nofollow”>
     <meta charset="UTF-8">
+    <script>
+      function calc() {
+        let h = document.getElementById("sincho").value;
+        let w = document.getElementById("taiju").value;
+        let bmi = w / (h * h);
+        document.getElementById("bmi").textContent = bmi;
+      }
+    </script>
     <title>Study Tool</title>
   </head>
   <body>
@@ -11,5 +19,10 @@
     <p>
       計算
     </p>
+    身長:<input id="sincho" value="1"> 
+    体重:<input id="taiju" value="30">
+    <button onclick="calc()">check</button>
+    <p id="bmi"></p>
+
   </body>
 </html>
