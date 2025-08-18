@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <title>Study Tool</title>
+  <link type="text/css" rel="stylesheet" href="./sum_pair.css">
+  <script type="text/javascript" rel="script" src="sum_pair.js"></script>
+</head>
+
+<body onload="init()">
+  <div>
+    足して
+    <select name="sum_value" id="sum_value">
+      <option value="10">10</option>
+      <option value="50">50</option>
+      <option value="100" selected>100</option>
+      <option value="500">500</option>
+      <option value="1000">1000</option>
+    </select>
+    になるペアを作る
+  </div>
+  <div>
+    マスの数
+    <select name="num_tile" id="num_tile">
+      <option value="2">2✕2</option>
+      <option value="4">4✕4</option>
+      <option value="6">6✕6</option>
+      <option value="8" selected>8✕8</option>
+      <option value="10">10✕10</option>
+    </select>
+    　
+    <label><input type="checkbox" id="sound" checked>音</label>
+  </div>
+  <div>
+    <input type="button" class="toggle_button" value="" onclick="onToggleButton();">
+    <input type="button" class="clear_best_button" value="記録クリア" onclick="onClearBestTimeButton();">
+  </div>
+  <div>
+    最高記録: <span id="best_time">0.0</span>秒
+  </div>
+  <div>
+    <span id="record">0.0</span>秒 <span id="new_record"></span>
+  </div>
+  <table id="table"></table>
+  <audio id="correct_sound">
+    <source src="./correct.mp3" type="audio/mp3">
+    <audio id="wrong_sound">
+      <source src="./wrong.mp3" type="audio/mp3">
+    </audio>
+</body>
+
+</html>
