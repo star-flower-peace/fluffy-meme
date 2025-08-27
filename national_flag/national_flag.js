@@ -370,7 +370,7 @@ function resetAnswers() {
                     } else {
                         ele.type = "image";
                         ele.className = "answer_flag";
-                        ele.src = `./img/${flags[i].name}.png`;
+                        ele.src = encodeURI(`./img/${flags[i].name}.png`);
                     }
                     setButtonColor(ele, area);
                     ele.country = flags[i].name;
@@ -473,7 +473,7 @@ function prepareQuestions() {
 
 function showNextQuestion() {
     if (ele_modes[MODE_FLAG].checked) {
-        ele_question_flag.src = `./img/${questions[currentQuestion].name}.png`
+        ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`)
         ele_question_name.textContent = "";
     } else {
         ele_question_flag.src = "";
@@ -640,7 +640,7 @@ function onGiveupButton() {
         ele_question_name.textContent = questions[currentQuestion].name;
         setButtonColor(ele_question_name, questions[currentQuestion].area);
     } else {
-        ele_question_flag.src = `./img/${questions[currentQuestion].name}.png`;
+        ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`);
     }
     penaltyTime += GIVEUP_PENALTY_TIME;
 }
