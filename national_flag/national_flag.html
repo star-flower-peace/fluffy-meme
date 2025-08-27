@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <title>Study Tool</title>
+  <link type="text/css" rel="stylesheet" href="./national_flag.css">
+  <script type="text/javascript" rel="script" src="national_flag.js"></script>
+</head>
+
+<body onload="init()">
+  <div>地域
+    <input type="button" class="allcheck_button" value="すべてチェック" onclick="onAllAreaButton();">
+    <span>　　　　　　</span><label><input type="checkbox" id="sound" checked />音</label>
+  </div>
+  <div>
+    <!-- 順番はjsのconst ASIA等の並びと合わせる（配列にするので） -->
+    <label><input type="checkbox" name="area" checked/>アジア</label>
+    <label><input type="checkbox" name="area" />ヨーロッパ</label>
+    <label><input type="checkbox" name="area" />北アメリカ</label>
+    <label><input type="checkbox" name="area" />南アメリカ</label>
+    <label><input type="checkbox" name="area" />アフリカ</label>
+    <label><input type="checkbox" name="area" />オセアニア</label>
+  </div>
+  <br>
+  <table width="100%">
+    <tr>
+      <td>
+        <div>
+          <input type="radio" name="mode" value="国旗→名前" checked>国旗→名前
+          <input type="radio" name="mode" value="名前→国旗">国旗→名前<br><br>
+          <input type="button" class="toggle_button" value="" onclick="onToggleButton();">
+          <input type="button" class="clear_best_button" value="記録クリア" onclick="onClearBestTimeButton();">
+        </div>
+        <div class="best">
+          <span id="record">0.0</span>秒
+          (最高記録: <span id="best_time">0.0</span>秒)
+        </div>
+      </td>
+      <td>
+        <span id="question_name"></span><br>
+        <img id="question_flag" class="question_flag" src="">
+      </td>
+      <td>
+        <input type="button" id="giveup_button" class="giveup" value="答えを見る" onclick="onGiveupButton();">
+        <span class="giveup_second">(+10秒)</span>
+      </td>
+    </tr>
+  </table>
+
+  <div id="buttons"></div>
+
+  <audio id="correct_sound">
+    <source src="./correct.mp3" type="audio/mp3">
+  </audio>
+  <audio id="wrong_sound">
+    <source src="./wrong.mp3" type="audio/mp3">
+  </audio>
+</body>
+
+</html>
