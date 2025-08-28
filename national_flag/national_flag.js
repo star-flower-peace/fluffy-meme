@@ -11,6 +11,7 @@ const OCEANIA = 5;
 // name: ファイル名はname.imgとする。ボタンにもこの名前が表示される。
 // finderから国名をコピペしているが、おそらく文字コードの違いがありバグ
 // となるので、initで正規化している。
+// '='は使えないので注意
 const flags = [
     { name: "UAE", area: ASIA },
     { name: "アイスランド", area: EUROPE },
@@ -101,7 +102,7 @@ const flags = [
     { name: "セーシェル", area: AFRICA },
     { name: "セネガル", area: AFRICA },
     { name: "セルビア", area: EUROPE },
-    { name: "セントクリストファー＝ネービス", area: NORTH_AMERICA },
+    { name: "セントクリストファー・ネービス", area: NORTH_AMERICA },
     { name: "セントビンセント", area: NORTH_AMERICA },
     { name: "セントルシア", area: NORTH_AMERICA },
     { name: "ソマリア", area: AFRICA },
