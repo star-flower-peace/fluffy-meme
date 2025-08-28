@@ -375,12 +375,13 @@ function resetAnswers() {
                         ele.type = "button";
                         ele.className = "country_button";
                         ele.value = flags[i].name;
+                        setElementColor(ele, area, false);
                     } else {
                         ele.type = "image";
                         ele.className = "answer_flag";
                         ele.src = encodeURI(`./img/${flags[i].name}.png`);
+                        setElementColor(ele, area, true);
                     }
-                    setButtonColor(ele, area);
                     ele.country = flags[i].name;
                     if (window.ontouchstart === undefined) {
                         ele.onclick = onAnswer; // クリック時
@@ -396,23 +397,9 @@ function resetAnswers() {
     updateBestTime();
 }
 
-// ボタンカラーをセット
-function setButtonColor(ele, area) {
-    if (ele_modes[MODE_FLAG].checked) {
-        if (area == ASIA) {
-            ele.style.color = 'brown';
-        } else if (area == EUROPE) {
-            ele.style.color = 'cornflowerblue';
-        } else if (area == NORTH_AMERICA) {
-            ele.style.color = 'orangered';
-        } else if (area == SOUTH_AMERICA) {
-            ele.style.color = 'darkolivegreen';
-        } else if (area == AFRICA) {
-            ele.style.color = 'chocolate';
-        } else { // OCEANIA
-            ele.style.color = 'darkblue';
-        }
-    } else {
+// カラーをセット
+function setElementColor(ele, area, isImg) {
+    if (isImg) {
         if (area == ASIA) {
             ele.style.border = "5px solid brown";
         } else if (area == EUROPE) {
@@ -425,6 +412,20 @@ function setButtonColor(ele, area) {
             ele.style.border = "5px solid chocolate";
         } else { // OCEANIA
             ele.style.border = "5px solid darkblue";
+        }
+    } else {
+        if (area == ASIA) {
+            ele.style.color = 'brown';
+        } else if (area == EUROPE) {
+            ele.style.color = 'cornflowerblue';
+        } else if (area == NORTH_AMERICA) {
+            ele.style.color = 'orangered';
+        } else if (area == SOUTH_AMERICA) {
+            ele.style.color = 'darkolivegreen';
+        } else if (area == AFRICA) {
+            ele.style.color = 'chocolate';
+        } else { // OCEANIA
+            ele.style.color = 'darkblue';
         }
     }
 }
@@ -649,10 +650,10 @@ function onAnswer(e) {
 function onGiveupButton() {
     if (ele_modes[MODE_FLAG].checked) {
         ele_question_name.textContent = questions[currentQuestion].name;
-        setButtonColor(ele_question_name, questions[currentQuestion].area);
     } else {
         ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`);
     }
+    setElementColor(ele_question_name, questions[currentQuestion].area, false);
     penaltyTime += GIVEUP_PENALTY_TIME;
 }
 
