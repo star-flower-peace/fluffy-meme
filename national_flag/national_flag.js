@@ -216,10 +216,13 @@ const flags = [
 
 let ele_buttons = null;
 let ele_check_areas = null;
-let ele_check_sound = null;
+//let ele_check_sound = null;
+//let ele_sound = null;
+//let ele_correct_sound = null;
+//let ele_wrong_sound = null;
+let ele_wrong_text = null;
 let ele_question_flag = null;
 let ele_question_name = null;
-let ele_sound = null;
 let ele_modes = null;
 let allcheckButton = null;
 let toggleBtn = null;
@@ -227,8 +230,6 @@ let clearButton = null;
 let giveupButton = null;
 let ele_giveup_second = null;
 let ele_best_time = null;
-let ele_correct_sound = null;
-let ele_wrong_sound = null;
 let bestTime = null; // 最高記録。無いときはnull
 let numCorrect = 0; // 正解数
 let currentQuestion = 0; // 現在の問題番号
@@ -265,10 +266,10 @@ function saveSettings() {
     let south_america = ele_check_areas[SOUTH_AMERICA].checked ? 1 : 0;
     let africa = ele_check_areas[AFRICA].checked ? 1 : 0;
     let oceania = ele_check_areas[OCEANIA].checked ? 1 : 0;
-    let sound = ele_check_sound.checked ? 1 : 0;
+    // let sound = ele_check_sound.checked ? 1 : 0;
     // let mode_flag = ele_modes[MODE_FLAG].checked ? 1 : 0;
     // let mode_name = ele_modes[MODE_NAME].checked ? 1 : 0;
-    localStorage.setItem(SETTINGS_KEY_NAME, `${asia}_${europe}_${north_america}_${south_america}_${africa}_${oceania}_${sound}`);
+    localStorage.setItem(SETTINGS_KEY_NAME, `${asia}_${europe}_${north_america}_${south_america}_${africa}_${oceania}`);
     //localStorage.setItem(SETTINGS_KEY_NAME, `${asia}_${europe}_${north_america}_${south_america}_${africa}_${oceania}_${sound}_${mode_flag}_${mode_name}`);
 }
 
@@ -283,7 +284,7 @@ function loadSettings() {
         ele_check_areas[SOUTH_AMERICA].checked = settings[3] == '1' ? true : false;
         ele_check_areas[AFRICA].checked = settings[4] == '1' ? true : false;
         ele_check_areas[OCEANIA].checked = settings[5] == '1' ? true : false;
-        ele_check_sound.checked = settings[6] == '1' ? true : false;
+        //ele_check_sound.checked = settings[6] == '1' ? true : false;
         //ele_modes[MODE_FLAG].checked = settings[7] == '1' ? true : false;
         //ele_modes[MODE_NAME].checked = settings[8] == '1' ? true : false;
     }
@@ -305,19 +306,20 @@ Array.prototype.shuffle = function () {
 function init() {
     ele_buttons = document.getElementById("buttons");
     ele_check_areas = document.getElementsByName("area");
-    ele_check_sound = document.getElementById("sound");
+    //ele_check_sound = document.getElementById("sound");
+    //ele_sound = document.getElementById("sound");
+    //ele_correct_sound = document.getElementById('correct_sound');
+    //ele_wrong_sound = document.getElementById('wrong_sound');
+    ele_wrong_text = document.querySelector('.wrong_text');
     ele_question_flag = document.getElementById("question_flag");
     ele_question_name = document.getElementById("question_name");
     ele_best_time = document.getElementById("best_time");
-    ele_sound = document.getElementById("sound");
     ele_modes = document.getElementsByName("mode");
     allcheckButton = document.querySelector('.allcheck_button');
     toggleBtn = document.querySelector('.toggle_button');
     clearButton = document.querySelector('.clear_best_button');
     giveupButton = document.getElementById("giveup_button");
     ele_giveup_second = document.querySelector('.giveup_second');
-    ele_correct_sound = document.getElementById('correct_sound');
-    ele_wrong_sound = document.getElementById('wrong_sound');
 
     // 濁点カタカナの文字コードに不備が出るので統一して正規化しておく。
     for (let i = 0; i < flags.length; i++) {
@@ -350,10 +352,12 @@ function init() {
         });
     }
 
+    /*
     // 音チェックボックスイベントハンドラ
     ele_check_sound.addEventListener('change', (e) => {
         saveSettings(); // 設定を保存
     });
+    */
 }
 
 // 回答ボタンをセット
@@ -510,6 +514,7 @@ function gameStart() {
 function gameStop() {
     resetRecord();
     setButtonsState(false);
+    ele_wrong_text.textContent = "";
 }
 
 // 終了
@@ -528,6 +533,7 @@ function gameEnd() {
     setButtonsState(false);
 
     toggleBtn.value = START_CAPTION;
+    ele_wrong_text.textContent = "";
 }
 //
 //++開始・終了関連
@@ -631,7 +637,7 @@ function onAnswer(e) {
 
     if (answer.country == questions[currentQuestion].name) {
         // 正解
-        correctSound();
+        // correctSound();
         setButtonPushed(answer);
         currentQuestion += 1;
         if (currentQuestion == questions.length) {
@@ -642,7 +648,8 @@ function onAnswer(e) {
         }
     } else {
         // 不正解
-        wrongSound();
+        // wrongSound();
+        ele_wrong_text.textContent = "☓";
     }
 }
 
@@ -654,6 +661,7 @@ function onGiveupButton() {
         ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`);
     }
     setElementColor(ele_question_name, questions[currentQuestion].area, false);
+    ele_wrong_text.textContent = "";
     penaltyTime += GIVEUP_PENALTY_TIME;
 }
 
@@ -664,6 +672,7 @@ function onGiveupButton() {
 ////////////////////
 //++効果音
 //
+/*
 function correctSound() {
     if (ele_sound.checked) {
         ele_correct_sound.currentTime = 0;
@@ -677,7 +686,7 @@ function wrongSound() {
         ele_wrong_sound.play();
     }
 }
-
+*/
 //
 //--効果音
 ////////////////////

@@ -53,6 +53,11 @@ div {
   font-size: 30px;
 }
 
+.wrong_text {
+  font-size: 30px; /*question_nameと同じにする*/
+  color: red;
+}
+
 .best {
   font-size: 34px;  
 }

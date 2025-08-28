@@ -13,7 +13,7 @@
 <body onload="init()">
   <div>地域
     <input type="button" class="allcheck_button" value="すべてチェック" onclick="onAllAreaButton();">
-    <span>　　　　　　</span><label><input type="checkbox" id="sound" checked />音</label>
+    <!-- <span>　　　　　　</span><label><input type="checkbox" id="sound" checked />音</label> -->
   </div>
   <div>
     <!-- 順番はjsのconst ASIA等の並びと合わせる（配列にするので） -->
@@ -40,7 +40,7 @@
         </div>
       </td>
       <td>
-        <span id="question_name"></span><br>
+        <span id="question_name"></span><span class="wrong_text"></span><br>
         <img id="question_flag" class="question_flag" src="">
       </td>
       <td>
@@ -51,13 +51,14 @@
   </table>
 
   <div id="buttons"></div>
-
+<!--
   <audio id="correct_sound">
     <source src="./correct.mp3" type="audio/mp3">
   </audio>
   <audio id="wrong_sound">
     <source src="./wrong.mp3" type="audio/mp3">
   </audio>
+-->
 </body>
 
 </html>
