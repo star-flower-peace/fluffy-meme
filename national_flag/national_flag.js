@@ -9,6 +9,8 @@ const AFRICA = 4;
 const OCEANIA = 5;
 
 // name: ファイル名はname.imgとする。ボタンにもこの名前が表示される。
+// finderから国名をコピペしているが、おそらく文字コードの違いがありバグ
+// となるので、initで正規化している。
 const flags = [
     { name: "UAE", area: ASIA },
     { name: "アイスランド", area: EUROPE },
@@ -316,6 +318,11 @@ function init() {
     ele_correct_sound = document.getElementById('correct_sound');
     ele_wrong_sound = document.getElementById('wrong_sound');
 
+    // 濁点カタカナの文字コードに不備が出るので統一して正規化しておく。
+    for (let i = 0; i < flags.length; i++) {
+        flags[i].name = flags[i].name.normalize('NFKC');
+    }
+
     loadSettings(); // 設定を読み出しておく
 
     resetAnswers();
@@ -457,8 +464,11 @@ function prepareQuestions() {
     for (let i = 0; i < flags.length; i++) {
         if (ele_check_areas[flags[i].area].checked) {
             // for Debug 短く試すとき用
-            //if (flags[i].name != "タイ" && flags[i].name != "イラン") { 
+            // if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
+            //if (flags[i].name != "モンゴル") { 
             //    continue;
+            //} else {
+            //    console.log(flags[i].name);
             //}
 
             questions.push(flags[i]);
@@ -473,7 +483,7 @@ function prepareQuestions() {
 
 function showNextQuestion() {
     if (ele_modes[MODE_FLAG].checked) {
-        ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`)
+        ele_question_flag.src = encodeURI(`./img/${questions[currentQuestion].name}.png`);
         ele_question_name.textContent = "";
     } else {
         ele_question_flag.src = "";
