@@ -450,7 +450,8 @@ function updateBestTime() {
 function setButtonPushed(ele) {
     if (ele_modes[MODE_FLAG].checked) {
         // ボタン
-        ele.style.opacity = "0"; // その場にありながら透明（消す）
+        // ele.style.opacity = "0"; // その場にありながら透明（消す）
+        ele.style.color = "white";
     } else {
         // イメージ
         ele.src = "./dummy_flag.png";
