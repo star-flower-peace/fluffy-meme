@@ -436,11 +436,11 @@ function updateBestTime() {
     if (null != bestTime) {
         ele_best_time.textContent = timeToTextContent(bestTime);
     } else {
-        ele_best_time.textContent = "0.0";
+        ele_best_time.textContent = "0";
     }
 
     // 現在記録リセット
-    document.getElementById("record").textContent = "0.0";
+    document.getElementById("record").textContent = "0";
 }
 
 function setButtonPushed(ele) {
@@ -699,7 +699,7 @@ function resetRecord() {
     clearInterval(intervalTimer);
     elapsedTime = 0;
     penaltyTime = 0;
-    document.getElementById("record").textContent = "0.0";
+    document.getElementById("record").textContent = "0";
 }
 
 function stopRecord() {
@@ -710,14 +710,17 @@ function timerStart() {
     intervalTimer = setInterval(function () {
         elapsedTime = Date.now() - startTime + penaltyTime;
         document.getElementById("record").textContent = timeToTextContent(elapsedTime);
-    }, 100);
+    }, 100); // 秒
+//    }, 100); // 10分の1秒
 }
 
-// 0.0の形式の文字列に変換
 function timeToTextContent(time) {
     let seconds = Math.floor(time / 1000);
-    let tenth_of_a_second = Math.floor((time % 1000) / 100);
-    return `${seconds}.${tenth_of_a_second}`;
+    // 秒に変換
+    return `${seconds}`;
+    // 0.0の形式の文字列に変換
+    //let tenth_of_a_second = Math.floor((time % 1000) / 100);
+    //return `${seconds}.${tenth_of_a_second}`;
 }
 
 //
