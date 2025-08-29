@@ -225,6 +225,7 @@ let ele_question_flag = null;
 let ele_question_name = null;
 let ele_modes = null;
 let allcheckButton = null;
+let allclearButton = null;
 let toggleBtn = null;
 let clearButton = null;
 let giveupButton = null;
@@ -315,7 +316,8 @@ function init() {
     ele_question_name = document.getElementById("question_name");
     ele_best_time = document.getElementById("best_time");
     ele_modes = document.getElementsByName("mode");
-    allcheckButton = document.querySelector('.allcheck_button');
+    allcheckButton = document.getElementsByName('allcheckbtn');
+    allclearButton = document.getElementsByName('allclearbtn');
     toggleBtn = document.querySelector('.toggle_button');
     clearButton = document.querySelector('.clear_best_button');
     giveupButton = document.getElementById("giveup_button");
@@ -471,12 +473,12 @@ function prepareQuestions() {
     for (let i = 0; i < flags.length; i++) {
         if (ele_check_areas[flags[i].area].checked) {
             // for Debug 短く試すとき用
-             if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
+            // if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
             //if (flags[i].name != "モンゴル") { 
-                continue;
-            } else {
-                console.log(flags[i].name);
-            }
+            //    continue;
+            //} else {
+            //    console.log(flags[i].name);
+            //}
 
             questions.push(flags[i]);
         }
@@ -551,6 +553,8 @@ function gameEnd() {
 function setButtonsState(isStart) {
     // すべてチェックボタン
     allcheckButton.disabled = isStart ? true : false;
+    // すべてはずすボタン
+    allclearButton.disabled = isStart ? true : false;
 
     // 地域チェックボックス
     for (let area = 0; area < NUM_AREA; area++) {
@@ -596,6 +600,16 @@ function setButtonsState(isStart) {
 function onAllAreaButton() {
     for (let area = 0; area < NUM_AREA; area++) {
         ele_check_areas[area].checked = true;
+    }
+    resetAnswers();
+    setButtonsState(false);
+    saveSettings(); // 設定を保存
+}
+
+// (地域)すべてはずすボタン
+function onAllClearButton() {
+    for (let area = 0; area < NUM_AREA; area++) {
+        ele_check_areas[area].checked = false;
     }
     resetAnswers();
     setButtonsState(false);
