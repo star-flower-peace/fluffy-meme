@@ -471,12 +471,12 @@ function prepareQuestions() {
     for (let i = 0; i < flags.length; i++) {
         if (ele_check_areas[flags[i].area].checked) {
             // for Debug 短く試すとき用
-            // if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
+             if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
             //if (flags[i].name != "モンゴル") { 
-            //    continue;
-            //} else {
-            //    console.log(flags[i].name);
-            //}
+                continue;
+            } else {
+                console.log(flags[i].name);
+            }
 
             questions.push(flags[i]);
         }
@@ -497,6 +497,7 @@ function showNextQuestion() {
         ele_question_name.textContent = questions[currentQuestion].name;
     }
     ele_question_name.style.color = 'black';
+    ele_wrong_text.textContent = "";
 }
 
 ////////////////////
@@ -525,12 +526,15 @@ function gameEnd() {
         // 記録更新
         bestTime = elapsedTime;
         localStorage.setItem(getBestTimeKeyName(), bestTime.toString());
-        window.alert("新記録達成！");
+        window.alert(`新記録達成!! : ${timeToTextContent(elapsedTime)}秒`);
         updateBestTime();
+    } else {
+        window.alert(`記録 : ${timeToTextContent(elapsedTime)}秒`);
     }
 
     stopRecord();
 
+    resetAnswers();
     setButtonsState(false);
 
     toggleBtn.value = START_CAPTION;
