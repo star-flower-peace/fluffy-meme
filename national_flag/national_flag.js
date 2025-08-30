@@ -578,7 +578,7 @@ function gameStop() {
 // 終了
 function gameEnd() {
 
-    if ((null == bestTime) || (bestTime > elapsedTime)) {
+    if (!ele_nigateonly.checked && ((null == bestTime) || (bestTime > elapsedTime))) {
         // 記録更新
         bestTime = elapsedTime;
         localStorage.setItem(getBestTimeKeyName(), bestTime.toString());
