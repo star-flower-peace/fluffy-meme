@@ -31,7 +31,9 @@
       <td>
         <div>
           <label><input type="radio" name="mode" value="国旗→名前" checked>国旗→名前</label>
-          <label><input type="radio" name="mode" value="名前→国旗">名前→国旗</label><br><br>
+          <label><input type="radio" name="mode" value="名前→国旗">名前→国旗</label>
+          　<label><input type="checkbox" name="nigateonly">にがてのみ</label>
+          <input type="button" class="clear_nigateonly_button" value="にがてクリア" onclick="onClearNigateOnlyButton();"><br><br>
           <input type="button" class="toggle_button" value="" onclick="onToggleButton();">
           <input type="button" class="clear_best_button" value="記録クリア" onclick="onClearBestTimeButton();">
         </div>
@@ -46,7 +48,8 @@
       </td>
       <td>
         <input type="button" id="giveup_button" class="giveup" value="答えを見る" onclick="onGiveupButton();">
-        <span class="giveup_second">(+10秒)</span>
+        <span class="giveup_second">(+10秒)</span><br>
+        <label id = "nigate_label"><input type="checkbox" name="nigate_check">にがて</label>
       </td>
     </tr>
   </table>

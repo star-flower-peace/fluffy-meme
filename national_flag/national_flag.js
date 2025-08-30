@@ -13,203 +13,203 @@ const OCEANIA = 5;
 // となるので、initで正規化している。
 // '='は使えないので注意
 const flags = [
-    { name: "UAE", area: ASIA },
-    { name: "アイスランド", area: EUROPE },
-    { name: "アイルランド", area: EUROPE },
-    { name: "アゼルバイジャン", area: ASIA },
-    { name: "アフガニスタン", area: ASIA },
-    { name: "アメリカ", area: NORTH_AMERICA },
-    { name: "アルジェリア", area: AFRICA },
-    { name: "アルゼンチン", area: SOUTH_AMERICA },
-    { name: "アルバニア", area: EUROPE },
-    { name: "アルメニア", area: ASIA },
-    { name: "アンゴラ", area: AFRICA },
-    { name: "アンティグア・バーブーダ", area: NORTH_AMERICA },
-    { name: "アンドラ", area: EUROPE },
-    { name: "イエメン", area: ASIA },
-    { name: "イギリス", area: EUROPE },
-    { name: "イスラエル", area: ASIA },
-    { name: "イタリア", area: EUROPE },
-    { name: "イラク", area: ASIA },
-    { name: "イラン", area: ASIA },
-    { name: "インド", area: ASIA },
-    { name: "インドネシア", area: ASIA },
-    { name: "ウガンダ", area: AFRICA },
-    { name: "ウクライナ", area: EUROPE },
-    { name: "ウズベキスタン", area: ASIA },
-    { name: "ウルグアイ", area: NORTH_AMERICA },
-    { name: "エクアドル", area: NORTH_AMERICA },
-    { name: "エジプト", area: AFRICA },
-    { name: "エストニア", area: EUROPE },
-    { name: "エスワティニ", area: AFRICA },
-    { name: "エチオピア", area: AFRICA },
-    { name: "エリトリア", area: AFRICA },
-    { name: "エルサルバドル", area: NORTH_AMERICA },
-    { name: "オーストラリア", area: OCEANIA },
-    { name: "オーストリア", area: EUROPE },
-    { name: "オマーン", area: ASIA },
-    { name: "オランダ", area: EUROPE },
-    { name: "ガーナ", area: AFRICA },
-    { name: "カーボベルデ", area: AFRICA },
-    { name: "ガイアナ", area: NORTH_AMERICA },
-    { name: "カザフスタン", area: ASIA },
-    { name: "カタール", area: ASIA },
-    { name: "カナダ", area: NORTH_AMERICA },
-    { name: "ガボン", area: AFRICA },
-    { name: "カメルーン", area: AFRICA },
-    { name: "ガンビア", area: AFRICA },
-    { name: "カンボジア", area: ASIA },
-    { name: "ギニア", area: AFRICA },
-    { name: "ギニアビサウ", area: AFRICA },
-    { name: "キプロス", area: EUROPE },
-    { name: "キューバ", area: NORTH_AMERICA },
-    { name: "ギリシャ", area: EUROPE },
-    { name: "キリバス", area: OCEANIA },
-    { name: "キルギス", area: ASIA },
-    { name: "グアテマラ", area: NORTH_AMERICA },
-    { name: "クウェート", area: ASIA },
-    { name: "クック諸島", area: OCEANIA },
-    { name: "グレナダ", area: NORTH_AMERICA },
-    { name: "クロアチア", area: EUROPE },
-    { name: "ケニア", area: AFRICA },
-    { name: "コートジボワール", area: AFRICA },
-    { name: "コスタリカ", area: NORTH_AMERICA },
-    { name: "コソボ", area: EUROPE },
-    { name: "コモロ", area: AFRICA },
-    { name: "コロンビア", area: SOUTH_AMERICA },
-    { name: "コンゴ共和国", area: AFRICA },
-    { name: "コンゴ民主共和国", area: AFRICA },
-    { name: "サウジアラビア", area: ASIA },
-    { name: "サモア", area: OCEANIA },
-    { name: "サントメ・プリンシペ", area: AFRICA },
-    { name: "ザンビア", area: AFRICA },
-    { name: "サンマリノ", area: EUROPE },
-    { name: "シエラレオネ", area: AFRICA },
-    { name: "ジブチ", area: AFRICA },
-    { name: "ジャマイカ", area: NORTH_AMERICA },
-    { name: "ジョージア", area: EUROPE },
-    { name: "シリア", area: ASIA },
-    { name: "シンガポール", area: ASIA },
-    { name: "ジンバブエ", area: AFRICA },
-    { name: "スイス", area: EUROPE },
-    { name: "スウェーデン", area: EUROPE },
-    { name: "スーダン", area: AFRICA },
-    { name: "スペイン", area: EUROPE },
-    { name: "スリナム", area: SOUTH_AMERICA },
-    { name: "スリランカ", area: ASIA },
-    { name: "スロバキア", area: EUROPE },
-    { name: "スロベニア", area: EUROPE },
-    { name: "セーシェル", area: AFRICA },
-    { name: "セネガル", area: AFRICA },
-    { name: "セルビア", area: EUROPE },
-    { name: "セントクリストファー・ネービス", area: NORTH_AMERICA },
-    { name: "セントビンセント", area: NORTH_AMERICA },
-    { name: "セントルシア", area: NORTH_AMERICA },
-    { name: "ソマリア", area: AFRICA },
-    { name: "ソロモン諸島", area: OCEANIA },
-    { name: "タイ", area: ASIA },
-    { name: "タジキスタン", area: ASIA },
-    { name: "タンザニア", area: AFRICA },
-    { name: "チェコ", area: EUROPE },
-    { name: "チャド", area: AFRICA },
-    { name: "チュニジア", area: AFRICA },
-    { name: "チリ", area: SOUTH_AMERICA },
-    { name: "ツバル", area: OCEANIA },
-    { name: "デンマーク", area: EUROPE },
-    { name: "ドイツ", area: EUROPE },
-    { name: "トーゴ", area: AFRICA },
-    { name: "ドミニカ共和国", area: NORTH_AMERICA },
-    { name: "ドミニカ国", area: NORTH_AMERICA },
-    { name: "トリニダード・トバゴ", area: NORTH_AMERICA },
-    { name: "トルクメニスタン", area: ASIA },
-    { name: "トルコ", area: ASIA },
-    { name: "トンガ", area: OCEANIA },
-    { name: "ナイジェリア", area: AFRICA },
-    { name: "ナウル", area: OCEANIA },
-    { name: "ナミビア", area: AFRICA },
-    { name: "ニウエ", area: OCEANIA },
-    { name: "ニカラグア", area: NORTH_AMERICA },
-    { name: "ニジェール", area: AFRICA },
-    { name: "ニュージーランド", area: OCEANIA },
-    { name: "ネパール", area: ASIA },
-    { name: "ノルウェー", area: EUROPE },
-    { name: "バーレーン", area: ASIA },
-    { name: "ハイチ", area: NORTH_AMERICA },
-    { name: "パキスタン", area: ASIA },
-    { name: "バチカン市国", area: EUROPE },
-    { name: "パナマ", area: NORTH_AMERICA },
-    { name: "バヌアツ", area: OCEANIA },
-    { name: "バハマ", area: NORTH_AMERICA },
-    { name: "パプアニューギニア", area: OCEANIA },
-    { name: "パラオ", area: OCEANIA },
-    { name: "パラグアイ", area: SOUTH_AMERICA },
-    { name: "バルバドス", area: NORTH_AMERICA },
-    { name: "ハンガリー", area: EUROPE },
-    { name: "バングラデシュ", area: ASIA },
-    { name: "フィジー", area: OCEANIA },
-    { name: "フィリピン", area: ASIA },
-    { name: "フィンランド", area: EUROPE },
-    { name: "ブータン", area: ASIA },
-    { name: "ブラジル", area: SOUTH_AMERICA },
-    { name: "フランス", area: EUROPE },
-    { name: "ブルガリア", area: EUROPE },
-    { name: "ブルキナファソ", area: AFRICA },
-    { name: "ブルネイ", area: ASIA },
-    { name: "ブルンジ", area: AFRICA },
-    { name: "ベトナム", area: ASIA },
-    { name: "ベナン", area: AFRICA },
-    { name: "ベネズエラ", area: SOUTH_AMERICA },
-    { name: "ベラルーシ", area: EUROPE },
-    { name: "ベリーズ", area: NORTH_AMERICA },
-    { name: "ペルー", area: SOUTH_AMERICA },
-    { name: "ベルギー", area: EUROPE },
-    { name: "ポーランド", area: EUROPE },
-    { name: "ボスニア・ヘルツェゴビナ", area: EUROPE },
-    { name: "ボツワナ", area: AFRICA },
-    { name: "ボリビア", area: SOUTH_AMERICA },
-    { name: "ポルトガル", area: EUROPE },
-    { name: "ホンジュラス", area: NORTH_AMERICA },
-    { name: "マーシャル諸島", area: OCEANIA },
-    { name: "マダガスカル", area: AFRICA },
-    { name: "マラウイ", area: AFRICA },
-    { name: "マリ", area: AFRICA },
-    { name: "マルタ", area: EUROPE },
-    { name: "マレーシア", area: ASIA },
-    { name: "ミクロネシア", area: OCEANIA },
-    { name: "ミャンマー", area: ASIA },
-    { name: "メキシコ", area: SOUTH_AMERICA },
-    { name: "モーリシャス", area: AFRICA },
-    { name: "モーリタニア", area: AFRICA },
-    { name: "モザンビーク", area: AFRICA },
-    { name: "モナコ", area: EUROPE },
-    { name: "モルディブ", area: ASIA },
-    { name: "モルドバ", area: EUROPE },
-    { name: "モロッコ", area: AFRICA },
-    { name: "モンゴル", area: ASIA },
-    { name: "モンテネグロ", area: EUROPE },
-    { name: "ヨルダン", area: ASIA },
-    { name: "ラオス", area: ASIA },
-    { name: "ラトビア", area: EUROPE },
-    { name: "リトアニア", area: EUROPE },
-    { name: "リビア", area: AFRICA },
-    { name: "リヒテンシュタイン", area: AFRICA },
-    { name: "リベリア", area: AFRICA },
-    { name: "ルーマニア", area: EUROPE },
-    { name: "ルクセンブルク", area: EUROPE },
-    { name: "ルワンダ", area: AFRICA },
-    { name: "レソト", area: AFRICA },
-    { name: "レバノン", area: ASIA },
-    { name: "ロシア", area: EUROPE },
-    { name: "韓国", area: ASIA },
-    { name: "赤道ギニア", area: AFRICA },
-    { name: "中央アフリカ", area: AFRICA },
-    { name: "中国", area: ASIA },
-    { name: "東ティモール", area: ASIA },
-    { name: "南アフリカ", area: AFRICA },
-    { name: "南スーダン", area: AFRICA },
-    { name: "日本", area: ASIA },
-    { name: "北マケドニア", area: EUROPE },
-    { name: "北朝鮮", area: ASIA }
+    { name: "UAE", area: ASIA, nigate: false },
+    { name: "アイスランド", area: EUROPE, nigate: false },
+    { name: "アイルランド", area: EUROPE, nigate: false },
+    { name: "アゼルバイジャン", area: ASIA, nigate: false },
+    { name: "アフガニスタン", area: ASIA, nigate: false },
+    { name: "アメリカ", area: NORTH_AMERICA, nigate: false },
+    { name: "アルジェリア", area: AFRICA, nigate: false },
+    { name: "アルゼンチン", area: SOUTH_AMERICA, nigate: false },
+    { name: "アルバニア", area: EUROPE, nigate: false },
+    { name: "アルメニア", area: ASIA, nigate: false },
+    { name: "アンゴラ", area: AFRICA, nigate: false },
+    { name: "アンティグア・バーブーダ", area: NORTH_AMERICA, nigate: false },
+    { name: "アンドラ", area: EUROPE, nigate: false },
+    { name: "イエメン", area: ASIA, nigate: false },
+    { name: "イギリス", area: EUROPE, nigate: false },
+    { name: "イスラエル", area: ASIA, nigate: false },
+    { name: "イタリア", area: EUROPE, nigate: false },
+    { name: "イラク", area: ASIA, nigate: false },
+    { name: "イラン", area: ASIA, nigate: false },
+    { name: "インド", area: ASIA, nigate: false },
+    { name: "インドネシア", area: ASIA, nigate: false },
+    { name: "ウガンダ", area: AFRICA, nigate: false },
+    { name: "ウクライナ", area: EUROPE, nigate: false },
+    { name: "ウズベキスタン", area: ASIA, nigate: false },
+    { name: "ウルグアイ", area: NORTH_AMERICA, nigate: false },
+    { name: "エクアドル", area: NORTH_AMERICA, nigate: false },
+    { name: "エジプト", area: AFRICA, nigate: false },
+    { name: "エストニア", area: EUROPE, nigate: false },
+    { name: "エスワティニ", area: AFRICA, nigate: false },
+    { name: "エチオピア", area: AFRICA, nigate: false },
+    { name: "エリトリア", area: AFRICA, nigate: false },
+    { name: "エルサルバドル", area: NORTH_AMERICA, nigate: false },
+    { name: "オーストラリア", area: OCEANIA, nigate: false },
+    { name: "オーストリア", area: EUROPE, nigate: false },
+    { name: "オマーン", area: ASIA, nigate: false },
+    { name: "オランダ", area: EUROPE, nigate: false },
+    { name: "ガーナ", area: AFRICA, nigate: false },
+    { name: "カーボベルデ", area: AFRICA, nigate: false },
+    { name: "ガイアナ", area: NORTH_AMERICA, nigate: false },
+    { name: "カザフスタン", area: ASIA, nigate: false },
+    { name: "カタール", area: ASIA, nigate: false },
+    { name: "カナダ", area: NORTH_AMERICA, nigate: false },
+    { name: "ガボン", area: AFRICA, nigate: false },
+    { name: "カメルーン", area: AFRICA, nigate: false },
+    { name: "ガンビア", area: AFRICA, nigate: false },
+    { name: "カンボジア", area: ASIA, nigate: false },
+    { name: "ギニア", area: AFRICA, nigate: false },
+    { name: "ギニアビサウ", area: AFRICA, nigate: false },
+    { name: "キプロス", area: EUROPE, nigate: false },
+    { name: "キューバ", area: NORTH_AMERICA, nigate: false },
+    { name: "ギリシャ", area: EUROPE, nigate: false },
+    { name: "キリバス", area: OCEANIA, nigate: false },
+    { name: "キルギス", area: ASIA, nigate: false },
+    { name: "グアテマラ", area: NORTH_AMERICA, nigate: false },
+    { name: "クウェート", area: ASIA, nigate: false },
+    { name: "クック諸島", area: OCEANIA, nigate: false },
+    { name: "グレナダ", area: NORTH_AMERICA, nigate: false },
+    { name: "クロアチア", area: EUROPE, nigate: false },
+    { name: "ケニア", area: AFRICA, nigate: false },
+    { name: "コートジボワール", area: AFRICA, nigate: false },
+    { name: "コスタリカ", area: NORTH_AMERICA, nigate: false },
+    { name: "コソボ", area: EUROPE, nigate: false },
+    { name: "コモロ", area: AFRICA, nigate: false },
+    { name: "コロンビア", area: SOUTH_AMERICA, nigate: false },
+    { name: "コンゴ共和国", area: AFRICA, nigate: false },
+    { name: "コンゴ民主共和国", area: AFRICA, nigate: false },
+    { name: "サウジアラビア", area: ASIA, nigate: false },
+    { name: "サモア", area: OCEANIA, nigate: false },
+    { name: "サントメ・プリンシペ", area: AFRICA, nigate: false },
+    { name: "ザンビア", area: AFRICA, nigate: false },
+    { name: "サンマリノ", area: EUROPE, nigate: false },
+    { name: "シエラレオネ", area: AFRICA, nigate: false },
+    { name: "ジブチ", area: AFRICA, nigate: false },
+    { name: "ジャマイカ", area: NORTH_AMERICA, nigate: false },
+    { name: "ジョージア", area: EUROPE, nigate: false },
+    { name: "シリア", area: ASIA, nigate: false },
+    { name: "シンガポール", area: ASIA, nigate: false },
+    { name: "ジンバブエ", area: AFRICA, nigate: false },
+    { name: "スイス", area: EUROPE, nigate: false },
+    { name: "スウェーデン", area: EUROPE, nigate: false },
+    { name: "スーダン", area: AFRICA, nigate: false },
+    { name: "スペイン", area: EUROPE, nigate: false },
+    { name: "スリナム", area: SOUTH_AMERICA, nigate: false },
+    { name: "スリランカ", area: ASIA, nigate: false },
+    { name: "スロバキア", area: EUROPE, nigate: false },
+    { name: "スロベニア", area: EUROPE, nigate: false },
+    { name: "セーシェル", area: AFRICA, nigate: false },
+    { name: "セネガル", area: AFRICA, nigate: false },
+    { name: "セルビア", area: EUROPE, nigate: false },
+    { name: "セントクリストファー・ネービス", area: NORTH_AMERICA, nigate: false },
+    { name: "セントビンセント", area: NORTH_AMERICA, nigate: false },
+    { name: "セントルシア", area: NORTH_AMERICA, nigate: false },
+    { name: "ソマリア", area: AFRICA, nigate: false },
+    { name: "ソロモン諸島", area: OCEANIA, nigate: false },
+    { name: "タイ", area: ASIA, nigate: false },
+    { name: "タジキスタン", area: ASIA, nigate: false },
+    { name: "タンザニア", area: AFRICA, nigate: false },
+    { name: "チェコ", area: EUROPE, nigate: false },
+    { name: "チャド", area: AFRICA, nigate: false },
+    { name: "チュニジア", area: AFRICA, nigate: false },
+    { name: "チリ", area: SOUTH_AMERICA, nigate: false },
+    { name: "ツバル", area: OCEANIA, nigate: false },
+    { name: "デンマーク", area: EUROPE, nigate: false },
+    { name: "ドイツ", area: EUROPE, nigate: false },
+    { name: "トーゴ", area: AFRICA, nigate: false },
+    { name: "ドミニカ共和国", area: NORTH_AMERICA, nigate: false },
+    { name: "ドミニカ国", area: NORTH_AMERICA, nigate: false },
+    { name: "トリニダード・トバゴ", area: NORTH_AMERICA, nigate: false },
+    { name: "トルクメニスタン", area: ASIA, nigate: false },
+    { name: "トルコ", area: ASIA, nigate: false },
+    { name: "トンガ", area: OCEANIA, nigate: false },
+    { name: "ナイジェリア", area: AFRICA, nigate: false },
+    { name: "ナウル", area: OCEANIA, nigate: false },
+    { name: "ナミビア", area: AFRICA, nigate: false },
+    { name: "ニウエ", area: OCEANIA, nigate: false },
+    { name: "ニカラグア", area: NORTH_AMERICA, nigate: false },
+    { name: "ニジェール", area: AFRICA, nigate: false },
+    { name: "ニュージーランド", area: OCEANIA, nigate: false },
+    { name: "ネパール", area: ASIA, nigate: false },
+    { name: "ノルウェー", area: EUROPE, nigate: false },
+    { name: "バーレーン", area: ASIA, nigate: false },
+    { name: "ハイチ", area: NORTH_AMERICA, nigate: false },
+    { name: "パキスタン", area: ASIA, nigate: false },
+    { name: "バチカン市国", area: EUROPE, nigate: false },
+    { name: "パナマ", area: NORTH_AMERICA, nigate: false },
+    { name: "バヌアツ", area: OCEANIA, nigate: false },
+    { name: "バハマ", area: NORTH_AMERICA, nigate: false },
+    { name: "パプアニューギニア", area: OCEANIA, nigate: false },
+    { name: "パラオ", area: OCEANIA, nigate: false },
+    { name: "パラグアイ", area: SOUTH_AMERICA, nigate: false },
+    { name: "バルバドス", area: NORTH_AMERICA, nigate: false },
+    { name: "ハンガリー", area: EUROPE, nigate: false },
+    { name: "バングラデシュ", area: ASIA, nigate: false },
+    { name: "フィジー", area: OCEANIA, nigate: false },
+    { name: "フィリピン", area: ASIA, nigate: false },
+    { name: "フィンランド", area: EUROPE, nigate: false },
+    { name: "ブータン", area: ASIA, nigate: false },
+    { name: "ブラジル", area: SOUTH_AMERICA, nigate: false },
+    { name: "フランス", area: EUROPE, nigate: false },
+    { name: "ブルガリア", area: EUROPE, nigate: false },
+    { name: "ブルキナファソ", area: AFRICA, nigate: false },
+    { name: "ブルネイ", area: ASIA, nigate: false },
+    { name: "ブルンジ", area: AFRICA, nigate: false },
+    { name: "ベトナム", area: ASIA, nigate: false },
+    { name: "ベナン", area: AFRICA, nigate: false },
+    { name: "ベネズエラ", area: SOUTH_AMERICA, nigate: false },
+    { name: "ベラルーシ", area: EUROPE, nigate: false },
+    { name: "ベリーズ", area: NORTH_AMERICA, nigate: false },
+    { name: "ペルー", area: SOUTH_AMERICA, nigate: false },
+    { name: "ベルギー", area: EUROPE, nigate: false },
+    { name: "ポーランド", area: EUROPE, nigate: false },
+    { name: "ボスニア・ヘルツェゴビナ", area: EUROPE, nigate: false },
+    { name: "ボツワナ", area: AFRICA, nigate: false },
+    { name: "ボリビア", area: SOUTH_AMERICA, nigate: false },
+    { name: "ポルトガル", area: EUROPE, nigate: false },
+    { name: "ホンジュラス", area: NORTH_AMERICA, nigate: false },
+    { name: "マーシャル諸島", area: OCEANIA, nigate: false },
+    { name: "マダガスカル", area: AFRICA, nigate: false },
+    { name: "マラウイ", area: AFRICA, nigate: false },
+    { name: "マリ", area: AFRICA, nigate: false },
+    { name: "マルタ", area: EUROPE, nigate: false },
+    { name: "マレーシア", area: ASIA, nigate: false },
+    { name: "ミクロネシア", area: OCEANIA, nigate: false },
+    { name: "ミャンマー", area: ASIA, nigate: false },
+    { name: "メキシコ", area: SOUTH_AMERICA, nigate: false },
+    { name: "モーリシャス", area: AFRICA, nigate: false },
+    { name: "モーリタニア", area: AFRICA, nigate: false },
+    { name: "モザンビーク", area: AFRICA, nigate: false },
+    { name: "モナコ", area: EUROPE, nigate: false },
+    { name: "モルディブ", area: ASIA, nigate: false },
+    { name: "モルドバ", area: EUROPE, nigate: false },
+    { name: "モロッコ", area: AFRICA, nigate: false },
+    { name: "モンゴル", area: ASIA, nigate: false },
+    { name: "モンテネグロ", area: EUROPE, nigate: false },
+    { name: "ヨルダン", area: ASIA, nigate: false },
+    { name: "ラオス", area: ASIA, nigate: false },
+    { name: "ラトビア", area: EUROPE, nigate: false },
+    { name: "リトアニア", area: EUROPE, nigate: false },
+    { name: "リビア", area: AFRICA, nigate: false },
+    { name: "リヒテンシュタイン", area: AFRICA, nigate: false },
+    { name: "リベリア", area: AFRICA, nigate: false },
+    { name: "ルーマニア", area: EUROPE, nigate: false },
+    { name: "ルクセンブルク", area: EUROPE, nigate: false },
+    { name: "ルワンダ", area: AFRICA, nigate: false },
+    { name: "レソト", area: AFRICA, nigate: false },
+    { name: "レバノン", area: ASIA, nigate: false },
+    { name: "ロシア", area: EUROPE, nigate: false },
+    { name: "韓国", area: ASIA, nigate: false },
+    { name: "赤道ギニア", area: AFRICA, nigate: false },
+    { name: "中央アフリカ", area: AFRICA, nigate: false },
+    { name: "中国", area: ASIA, nigate: false },
+    { name: "東ティモール", area: ASIA, nigate: false },
+    { name: "南アフリカ", area: AFRICA, nigate: false },
+    { name: "南スーダン", area: AFRICA, nigate: false },
+    { name: "日本", area: ASIA, nigate: false },
+    { name: "北マケドニア", area: EUROPE, nigate: false },
+    { name: "北朝鮮", area: ASIA, nigate: false }
 ];
 
 
@@ -224,6 +224,9 @@ let ele_wrong_text = null;
 let ele_question_flag = null;
 let ele_question_name = null;
 let ele_modes = null;
+let ele_nigateonly = null;
+let ele_nigate_check = null;
+let ele_nigate_label = null;
 let allcheckButton = null;
 let allclearButton = null;
 let toggleBtn = null;
@@ -245,6 +248,7 @@ const MODE_FLAG = 0; // 国旗→名前
 const MODE_NAME = 1; // 名前→国旗
 
 const SETTINGS_KEY_NAME = 'national_flag_settings';
+const NIGATE_KEY_NAME = 'nigate_flag_settings';
 
 // ローカルストレージ用keyname
 function getBestTimeKeyName() {
@@ -291,6 +295,30 @@ function loadSettings() {
     }
 }
 
+// にがてリストをローカルストレージに保存
+function saveNigate() {
+    let saveStr = "";
+    for (let i = 0; i < flags.length; i++) {
+        saveStr += flags[i].nigate ? "1_" : "0_";
+    }
+    //console.log(saveStr);
+
+    localStorage.setItem(NIGATE_KEY_NAME, saveStr);
+}
+
+// にがてリストをローカルストレージから読み出し
+function loadNigate() {
+    let strSetting = localStorage.getItem(NIGATE_KEY_NAME);
+    if (null != strSetting) {
+        const settings = strSetting.match(/\d+/g);
+        for (let i = 0; i < flags.length; i++) {
+            flags[i].nigate = settings[i] == '1' ? true : false;
+            // console.log(flags[i].nigate);
+        }
+    }
+}
+
+
 // 配列シャッフル
 Array.prototype.shuffle = function () {
     let i = this.length;
@@ -316,6 +344,9 @@ function init() {
     ele_question_name = document.getElementById("question_name");
     ele_best_time = document.getElementById("best_time");
     ele_modes = document.getElementsByName("mode");
+    ele_nigateonly = document.getElementsByName("nigateonly")[0]; // 1つだけ;
+    ele_nigate_check = document.getElementsByName("nigate_check")[0]; // 1つだけ
+    ele_nigate_label = document.getElementById("nigate_label");
     allcheckButton = document.getElementsByName('allcheckbtn');
     allclearButton = document.getElementsByName('allclearbtn');
     toggleBtn = document.querySelector('.toggle_button');
@@ -329,6 +360,7 @@ function init() {
     }
 
     loadSettings(); // 設定を読み出しておく
+    loadNigate();
 
     resetAnswers();
 
@@ -354,6 +386,17 @@ function init() {
         });
     }
 
+    // にがてのみチェックボックスイベントハンドラ
+    ele_nigateonly.addEventListener('change', (e) => {
+        resetAnswers();
+        setButtonsState(false);
+    });
+
+    // にがてチェックボックスイベントハンドラ
+    ele_nigate_check.addEventListener('change', (e) => {
+        questions[currentQuestion].nigate = ele_nigate_check.checked ? true : false;
+    });
+
     /*
     // 音チェックボックスイベントハンドラ
     ele_check_sound.addEventListener('change', (e) => {
@@ -374,6 +417,9 @@ function resetAnswers() {
     for (let area = 0; area < NUM_AREA; area++) {
         if (ele_check_areas[area].checked) {
             for (let i = 0; i < flags.length; i++) {
+                if (ele_nigateonly.checked && !flags[i].nigate) {
+                    continue;
+                }
                 if (area == flags[i].area) {
                     let ele = null;
                     ele = document.createElement("input");
@@ -472,14 +518,20 @@ function prepareQuestions() {
 
     for (let i = 0; i < flags.length; i++) {
         if (ele_check_areas[flags[i].area].checked) {
-            // for Debug 短く試すとき用
-            // if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {             
-            //if (flags[i].name != "モンゴル") { 
-            //    continue;
-            //} else {
-            //    console.log(flags[i].name);
-            //}
-
+            // ++for Debug 短く試すとき用
+            /*
+            if (flags[i].name != "モンゴル" && flags[i].name != "イラン") {
+                //if (flags[i].name != "モンゴル") { 
+                continue;
+            } else {
+                console.log(flags[i].name);
+            }
+            */
+            // --for Debug 短く試すとき用
+            
+            if (ele_nigateonly.checked && !flags[i].nigate) {
+                continue;
+            }
             questions.push(flags[i]);
         }
     }
@@ -500,6 +552,7 @@ function showNextQuestion() {
     }
     ele_question_name.style.color = 'black';
     ele_wrong_text.textContent = "";
+    ele_nigate_check.checked = questions[currentQuestion].nigate ? true : false;
 }
 
 ////////////////////
@@ -517,6 +570,7 @@ function gameStart() {
 // 中断
 function gameStop() {
     resetRecord();
+    saveNigate();
     setButtonsState(false);
     ele_wrong_text.textContent = "";
 }
@@ -535,6 +589,7 @@ function gameEnd() {
     }
 
     stopRecord();
+    saveNigate();
 
     resetAnswers();
     setButtonsState(false);
@@ -566,6 +621,9 @@ function setButtonsState(isStart) {
         ele_modes[i].disabled = isStart ? true : false;
     }
 
+    // にがてのみチェックボックス
+    ele_nigateonly.disabled = isStart ? true : false;
+
     // 記録クリアボタン
     clearButton.disabled = isStart ? true : false;
 
@@ -594,6 +652,12 @@ function setButtonsState(isStart) {
         }
 
     }
+
+    // にがてチェックボックス
+    ele_nigate_check.disabled = isStart ? false : true;
+    ele_nigate_check.style.display = isStart ? 'inline' : 'none';
+    ele_nigate_label.style.display = isStart ? 'inline' : 'none';
+
 }
 
 // (地域)すべてチェックボタン
@@ -628,8 +692,23 @@ function onToggleButton() {
             }
         }
 
+        let noNigate = true;
+        if (ele_nigateonly.checked == false) {
+            noNigate = false;
+        } else {
+            for (let i = 0; i < flags.length; i++) {
+                if (flags[i].nigate == true) {
+                    // どれか一つでもにがてがあれば開始
+                    noNigate = false;
+                    break;
+                }
+            }
+        }
+
         if (noCheckd) {
             window.alert("一つ以上の地域にチェックを入れてください");
+        } else if(noNigate) {
+            window.alert("にがてはありません");
         } else {
             gameStart();
             toggleBtn.value = STOP_CAPTION;
@@ -645,6 +724,18 @@ function onClearBestTimeButton() {
     if (window.confirm("最高記録を消しても良いですか？")) {
         localStorage.removeItem(getBestTimeKeyName());
         resetRecord();
+        resetAnswers();
+    }
+}
+
+// にがてクリアボタン
+function onClearNigateOnlyButton() {
+    if (window.confirm("にがてを消しても良いですか？")) {
+        localStorage.removeItem(NIGATE_KEY_NAME);
+        for (let i = 0; i < flags.length; i++) {
+            flags[i].nigate = false;
+        }
+        ele_nigateonly.checked = false;
         resetAnswers();
     }
 }
@@ -739,7 +830,7 @@ function timerStart() {
         elapsedTime = Date.now() - startTime + penaltyTime;
         document.getElementById("record").textContent = timeToTextContent(elapsedTime);
     }, 100); // 秒
-//    }, 100); // 10分の1秒
+    //    }, 100); // 10分の1秒
 }
 
 function timeToTextContent(time) {

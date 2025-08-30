@@ -128,3 +128,13 @@ input[type=checkbox] {
   border-radius: 10px;
 }
 
+.clear_nigateonly_button {
+  width: 100px;
+  height: 30px;
+  color: white;
+  box-sizing: border-box;
+  background: yellowgreen;
+  cursor: pointer;
+  font-size: 18qpx;
+  border-radius: 10px;
+}
