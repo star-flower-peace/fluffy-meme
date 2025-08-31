@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英単語学習ゲーム</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2, #667eea);
+        }
+
+        @keyframes shimmer {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 15px;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .game-modes {
+            margin-bottom: 30px;
+        }
+
+        .mode-section {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .mode-label {
+            font-weight: bold;
+            color: #667eea;
+            margin-right: 10px;
+        }
+
+        .mode-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            background: gray;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+        }
+
+        .mode-btn:hover {
+            background: #5a67d8;
+            transform: translateY(-2px);
+        }
+
+        .mode-btn.active {
+            background: #667eea;
+            box-shadow: 0 5px 15px rgba(118, 75, 162, 0.3);
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 3px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .question-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            50% {
+                transform: translate(-20px, -10px) rotate(180deg);
+            }
+        }
+
+        .question {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .question-type {
+            font-size: 1em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+
+        .choice-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            padding: 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .choice-btn:hover {
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .choice-btn.correct {
+            background: #48bb78;
+            color: white;
+            border-color: #48bb78;
+            animation: bounce 0.5s ease;
+        }
+
+        .choice-btn.wrong {
+            background: #f56565;
+            color: white;
+            border-color: #f56565;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-5px);
+            }
+
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .next-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .block-selection {
+            margin-top: 15px;
+        }
+
+        .block-selection label {
+            display: inline-block;
+            margin-right: 10px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .block-selection select {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        .block-selection select:hover {
+            border-color: #667eea;
+        }
+
+        .block-selection select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .result {
+            margin-top: 5px;
+            padding: 5px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+
+        .result.correct {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+
+        .result.wrong {
+            background: #fed7d7;
+            color: #c53030;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+            border-radius: 5px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .game-container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .question {
+                font-size: 2em;
+            }
+
+            .choices {
+                grid-template-columns: 1fr;
+            }
+
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .mode-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="game-container">
+        <h1 id="gameTitle"></h1>
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-value" id="score">0</span>
+                <span class="stat-label">スコア</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="current">0</span>
+                <span class="stat-label">問題数</span>
+            </div>
+            <div class="stat">
+                <span class="stat-value" id="block">1</span>
+                <span class="stat-label">ブロック</span>
+            </div>
+        </div>
+
+        <div class="game-modes">
+            <div class="mode-section">
+                <span class="mode-label">モード選択：</span>
+                <div class="mode-buttons">
+                    <button class="mode-btn active" data-mode="japanese">英→日</button>
+                    <button class="mode-btn" data-mode="english">日→英</button>
+                </div>
+            </div>
+            <div class="block-selection">
+                <label for="lessonSelect">レッスン選択:</label>
+                <select id="lessonSelect" onchange="updateBlockOptions()"></select>
+            </div>
+            <div class="block-selection">
+                <label for="blockSelect">ブロック選択:</label>
+                <select id="blockSelect"></select>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+
+        <div class="question-card">
+            <div class="question" id="question">英単語を覚えよう！</div>
+            <div class="question-type" id="questionType">モードとブロックを選択してスタート！</div>
+        </div>
+
+        <div class="choices" id="choices"></div>
+
+        <div class="result hidden" id="result"></div>
+
+        <div>
+            <button class="next-btn" id="startBtn" onclick="startGame()">スタート</button>
+            <button class="next-btn" id="reviewBtn" onclick="startReview()">復習</button>
+            <button class="next-btn hidden" id="nextBtn" onclick="nextQuestion()" disabled>次の問題</button>
+            <button class="next-btn hidden" id="rememberedBtn" onclick="markAsRemembered()">覚えた</button>
+            <button class="next-btn" id="resetBtn" onclick="resetGame()">ホーム</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" rel="script" src="vocabulary1.js"></script>
+    <script type="text/javascript" rel="script" src="vocabulary2.js"></script>
+    <script type="text/javascript" rel="script" src="vocabulary3.js"></script>
+
+    <script>
+        let gameState = {
+            mode: 'japanese',
+            currentQuestion: null,
+            score: 0,
+            currentLesson: 1,
+            currentBlock: 1,
+            questionInBlock: 0,
+            totalQuestions: 0,
+            isAnswered: false,
+            currentBlockWords: [],
+            allBlocks: [],
+            isReviewMode: false,
+            reviewWords: []
+        };
+
+
+        // URLのGETパラメータからlevelを取得し、対応する単語帳をセット
+        let vocabulary = null;
+        const urlParams = new URLSearchParams(window.location.search);
+        const level = urlParams.get('level');
+        switch (level) {
+            case '2':
+                vocabulary = vocabulary2;
+                document.getElementById('gameTitle').textContent = '🎯 中2英単語';
+                break;
+            case '3':
+                vocabulary = vocabulary3;
+                document.getElementById('gameTitle').textContent = '🎯 中3英単語';
+                break;
+            default:
+                vocabulary = vocabulary1;
+                document.getElementById('gameTitle').textContent = '🎯 中1英単語';
+                break;
+        }
+
+        function initLessonOptions() {
+            const lessonSelect = document.getElementById('lessonSelect');
+            lessonSelect.innerHTML = '';
+
+
+            const lessons = [...new Set(vocabulary.map(w => w.lesson))];
+            lessons.forEach(lesson => {
+                const wordsInLesson = vocabulary.filter(w => w.lesson === lesson);
+                const start = vocabulary.findIndex(w => w.lesson === lesson) + 1;
+                const end = start + wordsInLesson.length - 1;
+                const option = document.createElement('option');
+                option.value = lesson;
+                option.textContent = `レッスン${lesson}`;
+                lessonSelect.appendChild(option);
+            });
+        }
+        function updateBlockOptions() {
+            const lesson = parseInt(document.getElementById('lessonSelect').value);
+            const wordsInLesson = vocabulary.filter(w => w.lesson === lesson);
+            const blockCount = Math.ceil(wordsInLesson.length / 20);
+
+            const blockSelect = document.getElementById('blockSelect');
+            blockSelect.innerHTML = '';
+
+            for (let i = 1; i <= blockCount; i++) {
+                const start = (i - 1) * 20 + 1;
+                const end = Math.min(i * 20, wordsInLesson.length);
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `ブロック${i} (${start}-${end})`;
+                blockSelect.appendChild(option);
+            }
+        }
+
+
+        function disableGameControls(disable) {
+            const modeButtons = document.querySelectorAll('.mode-btn');
+            const blockSelect = document.getElementById('blockSelect');
+
+            if (disable) {
+                document.querySelector('.game-modes').classList.add('disabled-controls');
+                modeButtons.forEach(btn => btn.disabled = true);
+                blockSelect.disabled = true;
+            } else {
+                document.querySelector('.game-modes').classList.remove('disabled-controls');
+                modeButtons.forEach(btn => btn.disabled = false);
+                blockSelect.disabled = false;
+            }
+        }
+
+        // Save wrong answers to memory (localStorage not supported)
+        let wrongAnswers = [];
+
+        // Save wrong answers to localStorage
+        function saveWrongAnswer(word, mode) {
+            let wrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+            const exists = wrongAnswers.find(item =>
+                item.english === word.english && item.mode === mode
+            );
+            if (!exists) {
+                wrongAnswers.push({
+                    english: word.english,
+                    japanese: word.japanese,
+                    mode: mode,
+                    // timestamp: Date.now()
+                });
+                localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+            }
+        }
+
+        // Get wrong answers from localStorage
+        function getWrongAnswers() {
+            return JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+        }
+
+        // Remove wrong answer from localStorage
+        function removeWrongAnswer(word, mode) {
+            let wrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+            wrongAnswers = wrongAnswers.filter(item =>
+                !(item.english === word.english && item.mode === mode)
+            );
+            localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+        }
+
+        // Mark as remembered function
+        function markAsRemembered() {
+            if (!gameState.isReviewMode || !gameState.currentQuestion) return;
+
+            // Remove from wrong answers list
+            removeWrongAnswer(gameState.currentQuestion.correctWord, gameState.mode);
+
+            // Update review button state
+            updateReviewButtonState();
+
+            // Show feedback
+            const resultElement = document.getElementById('result');
+            resultElement.textContent = '✅ この問題を復習リストから削除しました！';
+            resultElement.className = 'result correct';
+            resultElement.classList.remove('hidden');
+
+            // Hide the remembered button and enable next button
+            document.getElementById('rememberedBtn').classList.add('hidden');
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        // Mode button event listeners
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                gameState.mode = e.target.dataset.mode;
+            });
+        });
+
+        function shuffleArray(array) {
+            const shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function getRandomWords(excludeWord, count = 3) {
+            const availableWords = vocabulary.filter(word => word !== excludeWord);
+            return shuffleArray(availableWords).slice(0, count);
+        }
+
+
+        function initializeBlocks() {
+            const selectedLesson = parseInt(document.getElementById('lessonSelect').value);
+            const selectedBlock = parseInt(document.getElementById('blockSelect').value);
+
+            gameState.currentLesson = selectedLesson;
+            gameState.currentBlock = selectedBlock;
+            gameState.score = 0;
+            gameState.questionInBlock = 0;
+
+            const wordsInLesson = vocabulary.filter(w => w.lesson === selectedLesson);
+            const startIndex = (selectedBlock - 1) * 20;
+            const wordsForBlock = wordsInLesson.slice(startIndex, startIndex + 20);
+
+            gameState.currentBlockWords = shuffleArray(wordsForBlock);
+            gameState.totalQuestionsInBlock = gameState.currentBlockWords.length;
+        }
+
+        function initializeReviewMode() {
+            const wrongAnswersList = getWrongAnswers();
+            gameState.reviewWords = wrongAnswersList.map(item => ({
+                english: item.english,
+                japanese: item.japanese,
+            }));
+            gameState.currentBlockWords = [...gameState.reviewWords];
+            gameState.isReviewMode = true;
+            gameState.score = 0; // Reset score for review
+            gameState.questionInBlock = 0;
+        }
+
+        function generateQuestion() {
+            // If current block is finished
+            if (gameState.currentBlockWords.length === 0) {
+                if (gameState.isReviewMode) {
+                    showReviewComplete();
+                    return null;
+                } else {
+                    showBlockComplete();
+                    return null;
+                }
+            }
+
+            const correctWordIndex = Math.floor(Math.random() * gameState.currentBlockWords.length);
+            const correctWord = gameState.currentBlockWords[correctWordIndex];
+            gameState.currentBlockWords.splice(correctWordIndex, 1);
+
+            let questionText, questionType, choices;
+            let currentMode = gameState.mode;
+
+            if (currentMode === 'japanese') {
+                questionText = correctWord.english;
+                questionType = gameState.isReviewMode ?
+                    "【復習】この英単語の日本語は？" :
+                    "この英単語の日本語は？";
+                const wrongWords = getRandomWords(correctWord);
+                choices = shuffleArray([
+                    { text: correctWord.japanese, correct: true },
+                    ...wrongWords.map(word => ({ text: word.japanese, correct: false }))
+                ]);
+            } else {
+                questionText = correctWord.japanese;
+                questionType = gameState.isReviewMode ?
+                    "【復習】この日本語の英単語は？" :
+                    "この日本語の英単語は？";
+                const wrongWords = getRandomWords(correctWord);
+                choices = shuffleArray([
+                    { text: correctWord.english, correct: true },
+                    ...wrongWords.map(word => ({ text: word.english, correct: false }))
+                ]);
+            }
+
+            return {
+                question: questionText,
+                questionType: questionType,
+                choices: choices,
+                correctWord: correctWord
+            };
+        }
+
+        function displayQuestion() {
+            const question = generateQuestion();
+            if (!question) return; // Block finished or game complete
+
+            gameState.currentQuestion = question;
+            gameState.isAnswered = false;
+
+            document.getElementById('question').textContent = gameState.currentQuestion.question;
+            document.getElementById('questionType').textContent = gameState.currentQuestion.questionType;
+
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+
+            gameState.currentQuestion.choices.forEach((choice, index) => {
+                const button = document.createElement('button');
+                button.className = 'choice-btn';
+                button.textContent = choice.text;
+                button.onclick = () => selectAnswer(choice, button);
+                choicesContainer.appendChild(button);
+            });
+
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('result').classList.add('hidden');
+
+            // Show "覚えた" button only in review mode
+            if (gameState.isReviewMode) {
+                document.getElementById('rememberedBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('rememberedBtn').classList.add('hidden');
+            }
+        }
+
+        function selectAnswer(selectedChoice, buttonElement) {
+            if (gameState.isAnswered) return;
+
+            gameState.isAnswered = true;
+            gameState.totalQuestions++;
+
+            const isCorrect = selectedChoice.correct;
+            const resultElement = document.getElementById('result');
+
+            // Update button styles
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                const choice = gameState.currentQuestion.choices.find(c => c.text === btn.textContent);
+                if (choice.correct) {
+                    btn.classList.add('correct');
+                } else if (btn === buttonElement && !isCorrect) {
+                    btn.classList.add('wrong');
+                }
+                btn.onclick = null; // Disable further clicks
+            });
+
+            if (isCorrect) {
+                gameState.score += 5;
+                resultElement.textContent = `🎉 正解！ +5ポイント`;
+                resultElement.className = 'result correct';
+            } else {
+                // Save wrong answer for review
+                saveWrongAnswer(gameState.currentQuestion.correctWord, gameState.mode);
+                const correctAnswer = gameState.currentQuestion.choices.find(c => c.correct);
+                resultElement.textContent = `❌ 不正解... 正解は「${correctAnswer.text}」です`;
+                resultElement.className = 'result wrong';
+            }
+
+            resultElement.classList.remove('hidden');
+            document.getElementById('nextBtn').disabled = false;
+
+            if (gameState.isReviewMode) {
+                if (isCorrect) {
+                    document.getElementById('rememberedBtn').classList.remove('hidden');
+                } else {
+                    document.getElementById('rememberedBtn').classList.add('hidden');
+                }
+            }
+
+            updateStats();
+            updateProgress();
+        }
+
+        function showBlockComplete() {
+            disableGameControls(false); // Re-enable controls when block is complete
+
+            if (gameState.allBlocks.length > 0 && gameState.allBlocks[gameState.currentBlock - 1]) {
+                const maxQuestions = gameState.allBlocks[gameState.currentBlock - 1].length;
+                document.getElementById('question').textContent = `ブロック${gameState.currentBlock}完了！`;
+                document.getElementById('questionType').textContent = `スコア: ${gameState.score}/${maxQuestions * 5}点`;
+            } else {
+                document.getElementById('question').textContent = `ブロック完了！`;
+                document.getElementById('questionType').textContent = `スコア: ${gameState.score}点`;
+            }
+            document.getElementById('choices').innerHTML = '';
+            document.getElementById('result').textContent = '🎊 お疲れ様でした！他のブロックも挑戦してみましょう。';
+            document.getElementById('result').className = 'result correct';
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('reviewBtn').classList.remove('hidden');
+        }
+
+        function showReviewComplete() {
+            disableGameControls(false); // Re-enable controls when review is complete
+
+            const totalReview = gameState.reviewWords.length;
+            document.getElementById('question').textContent = '復習完了！';
+            document.getElementById('questionType').textContent = `スコア: ${gameState.score}/${totalReview * 5}点`;
+            document.getElementById('choices').innerHTML = '';
+            document.getElementById('result').textContent = '🏆 復習お疲れ様でした！間違いを克服できましたね。';
+            document.getElementById('result').className = 'result correct';
+            document.getElementById('result').classList.remove('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('reviewBtn').classList.remove('hidden');
+        }
+
+        function updateStats() {
+            document.getElementById('score').textContent = gameState.score;
+            if (gameState.isReviewMode) {
+                const totalReview = gameState.reviewWords.length;
+                const remaining = gameState.currentBlockWords.length;
+                document.getElementById('current').textContent = `${totalReview - remaining}/${totalReview}`;
+                document.getElementById('block').textContent = '復習';
+            } else {
+                if (gameState.allBlocks.length > 0 && gameState.allBlocks[gameState.currentBlock - 1]) {
+                    const maxQuestions = gameState.allBlocks[gameState.currentBlock - 1].length;
+                    const remaining = gameState.currentBlockWords.length;
+                    document.getElementById('current').textContent = `${maxQuestions - remaining}/${maxQuestions}`;
+                } else {
+                    document.getElementById('current').textContent = `0/20`;
+                }
+                document.getElementById('block').textContent = gameState.currentBlock;
+            }
+        }
+
+        function updateProgress() {
+            if (gameState.isReviewMode) {
+                const totalReview = gameState.reviewWords.length;
+                if (totalReview > 0) {
+                    const remaining = gameState.currentBlockWords.length;
+                    const progress = ((totalReview - remaining) / totalReview) * 100;
+                    document.getElementById('progress').style.width = `${progress}%`;
+                } else {
+                    document.getElementById('progress').style.width = '0%';
+                }
+            } else {
+                if (gameState.allBlocks.length > 0 && gameState.allBlocks[gameState.currentBlock - 1]) {
+                    const maxQuestions = gameState.allBlocks[gameState.currentBlock - 1].length;
+                    const remaining = gameState.currentBlockWords.length;
+                    const progress = ((maxQuestions - remaining) / maxQuestions) * 100;
+                    document.getElementById('progress').style.width = `${progress}%`;
+                } else {
+                    document.getElementById('progress').style.width = '0%';
+                }
+            }
+        }
+
+        function startGame() {
+            gameState.isReviewMode = false;
+            initializeBlocks();
+
+            disableGameControls(true); // Disable controls during game
+
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('reviewBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+            document.getElementById('nextBtn').textContent = '次の問題';
+
+            // Remove any existing review info
+            const existingInfo = document.querySelector('.review-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+
+            displayQuestion();
+        }
+
+        function startReview() {
+            const wrongAnswersList = getWrongAnswers();
+            if (wrongAnswersList.length === 0) {
+                alert('復習する問題がありません。まずは通常のゲームを行ってください。');
+                return;
+            }
+
+            gameState.isReviewMode = true;
+            initializeReviewMode();
+
+            disableGameControls(true); // Disable controls during review
+
+            document.getElementById('startBtn').classList.add('hidden');
+            document.getElementById('reviewBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+            document.getElementById('nextBtn').textContent = '次の問題';
+
+            // Remove any existing review info first
+            const existingInfo = document.querySelector('.review-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+
+            // Add new review info
+            const reviewInfo = document.createElement('div');
+            reviewInfo.className = 'review-info';
+            reviewInfo.textContent = `復習モード: ${wrongAnswersList.length}問の間違った問題を復習します`;
+            document.querySelector('.progress-bar').after(reviewInfo);
+
+            displayQuestion();
+        }
+
+        function nextQuestion() {
+            displayQuestion();
+        }
+
+        function resetGame() {
+            gameState = {
+                mode: gameState.mode,
+                currentQuestion: null,
+                score: 0,
+                currentBlock: 1,
+                questionInBlock: 0,
+                totalQuestions: 0,
+                isAnswered: false,
+                currentBlockWords: [],
+                allBlocks: [],
+                isReviewMode: false,
+                reviewWords: []
+            };
+
+            disableGameControls(false); // Re-enable controls
+
+            updateStats();
+            updateProgress();
+
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('reviewBtn').classList.remove('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('rememberedBtn').classList.add('hidden');
+            document.getElementById('rememberedBtn').classList.add('hidden');
+            document.getElementById('nextBtn').textContent = '次の問題';
+            document.getElementById('result').classList.add('hidden');
+            document.getElementById('question').textContent = '英単語を覚えよう！';
+            document.getElementById('questionType').textContent = 'モードとブロックを選択してスタート！';
+            document.getElementById('choices').innerHTML = '';
+
+            // Remove review info if exists
+            const existingInfo = document.querySelector('.review-info');
+            if (existingInfo) {
+                existingInfo.remove();
+            }
+
+            // Update review button state
+            updateReviewButtonState();
+        }
+
+        function updateReviewButtonState() {
+            const wrongAnswers = getWrongAnswers();
+            const reviewBtn = document.getElementById('reviewBtn');
+            if (wrongAnswers.length === 0) {
+                reviewBtn.style.opacity = '0.5';
+                reviewBtn.title = '復習する問題がありません';
+            } else {
+                reviewBtn.style.opacity = '1';
+                reviewBtn.title = `${wrongAnswers.length}問の復習問題があります`;
+            }
+        }
+
+        // Initialize the game
+        updateStats();
+        updateProgress();
+        updateReviewButtonState();
+        initLessonOptions();
+        updateBlockOptions();
+    </script>
+</body>
+
+</html>
