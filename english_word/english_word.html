@@ -424,6 +424,7 @@
         </div>
     </div>
 
+    <script type="text/javascript" rel="script" src="vocabulary0.js"></script>
     <script type="text/javascript" rel="script" src="vocabulary1.js"></script>
     <script type="text/javascript" rel="script" src="vocabulary2.js"></script>
     <script type="text/javascript" rel="script" src="vocabulary3.js"></script>
@@ -450,6 +451,10 @@
         const urlParams = new URLSearchParams(window.location.search);
         const level = urlParams.get('level');
         switch (level) {
+            case '0':
+                vocabulary = vocabulary0;
+                document.getElementById('gameTitle').textContent = '🎯 小学英単語';
+                break;
             case '2':
                 vocabulary = vocabulary2;
                 document.getElementById('gameTitle').textContent = '🎯 中2英単語';
