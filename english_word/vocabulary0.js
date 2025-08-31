@@ -69,7 +69,7 @@ const vocabulary0 = [
   { english: "see", japanese: "見える、(人に)会う", lesson: 1 },
   { english: "much", japanese: "たくさんの", lesson: 1 },
   { english: "family", japanese: "家族", lesson: 1 },
-  { english: "play the 楽器", japanese: "(楽器を)ひく", lesson: 1 },
+  { english: "play the 〜", japanese: "〜(楽器)をひく", lesson: 1 },
   { english: "read", japanese: "読む", lesson: 1 },
   { english: "desk", japanese: "机", lesson: 1 },
   { english: "tea", japanese: "お茶、紅茶", lesson: 1 },

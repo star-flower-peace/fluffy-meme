@@ -450,6 +450,8 @@
         let vocabulary = null;
         const urlParams = new URLSearchParams(window.location.search);
         const level = urlParams.get('level');
+        const localStorageKey = `wrongAnswers_level_${level}`;
+
         switch (level) {
             case '0':
                 vocabulary = vocabulary0;
@@ -524,7 +526,7 @@
 
         // Save wrong answers to localStorage
         function saveWrongAnswer(word, mode) {
-            let wrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+            let wrongAnswers = JSON.parse(localStorage.getItem(localStorageKey) || '[]');
             const exists = wrongAnswers.find(item =>
                 item.english === word.english && item.mode === mode
             );
@@ -535,22 +537,22 @@
                     mode: mode,
                     // timestamp: Date.now()
                 });
-                localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+                localStorage.setItem(localStorageKey, JSON.stringify(wrongAnswers));
             }
         }
 
         // Get wrong answers from localStorage
         function getWrongAnswers() {
-            return JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+            return JSON.parse(localStorage.getItem(localStorageKey) || '[]');
         }
 
         // Remove wrong answer from localStorage
         function removeWrongAnswer(word, mode) {
-            let wrongAnswers = JSON.parse(localStorage.getItem('wrongAnswers') || '[]');
+            let wrongAnswers = JSON.parse(localStorage.getItem(localStorageKey) || '[]');
             wrongAnswers = wrongAnswers.filter(item =>
                 !(item.english === word.english && item.mode === mode)
             );
-            localStorage.setItem('wrongAnswers', JSON.stringify(wrongAnswers));
+            localStorage.setItem(localStorageKey, JSON.stringify(wrongAnswers));
         }
 
         // Mark as remembered function
