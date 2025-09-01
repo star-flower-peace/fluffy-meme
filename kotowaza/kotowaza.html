@@ -418,6 +418,72 @@
         font-size: 1em;
       }
     }
+
+    .explanation .correct-mark {
+      color: #28a745;
+      /* 緑色 */
+      font-weight: bold;
+    }
+
+    .explanation .incorrect-mark {
+      color: #dc3545;
+      /* 赤色 */
+      font-weight: bold;
+    }
+
+    .block-selection-screen {
+      text-align: center;
+      padding: 40px 20px;
+    }
+
+    .block-selection-screen .result-title {
+      margin-bottom: 30px;
+    }
+
+    .block-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .block-btn {
+      background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      padding: 25px;
+      font-size: 1.2em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .block-btn:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .home-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: 1px solid #dee2e6;
+      border-radius: 25px;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: block;
+      margin: 0 auto 20px auto;
+    }
+
+    .home-btn:hover {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
   </style>
 </head>
 
@@ -449,7 +515,7 @@
       </div>
 
       <div class="question-card" id="questionCard">
-        <div class="question-type" id="questionType">ことわざクイズ</div>
+        <div class="question-type" id="questionType"></div>
         <div class="question-text" id="questionText"></div>
         <div class="options" id="options"></div>
         <div class="explanation" id="explanation"></div>
@@ -460,7 +526,18 @@
         <div class="result-emoji" id="resultEmoji">🎉</div>
         <div class="result-title" id="resultTitle">お疲れさまでした！</div>
         <div class="result-score" id="resultScore">10問中8問正解！</div>
-        <button class="restart-btn" onclick="restartGame()">もう一度挑戦</button>
+        <button class="restart-btn" onclick="showBlockSelection()">他のブロックに挑戦</button>
+      </div>
+      <div class="block-selection-screen" id="blockSelectionScreen">
+        <div class="result-title">挑戦するブロックを選ぼう！</div>
+        <div class="block-list" id="blockList"></div>
+      </div>
+
+      <div id="gameContent" style="display: none;">
+        <button class="home-btn" onclick="showBlockSelection()">ホーム</button>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -913,7 +990,7 @@
       },
       {
         type: "続き選択",
-        question: "「老兵は ___のみ」(ろうへいは)",
+        question: "「老兵は ___、ただ消え去るのみ」(ろうへいは　　ただきえさるのみ)",
         options: [
           "死なず",
           "強い",
@@ -1193,9 +1270,70 @@
     let correctAnswers = 0;
     let gameProverbs = [];
 
+    // 全問題を10問ずつのブロックに分割
+    const proverbBlocks = [];
+    for (let i = 0; i < proverbs.length; i += 10) {
+      proverbBlocks.push(proverbs.slice(i, i + 10));
+    }
+
+    const blockSelectionScreen = document.getElementById('blockSelectionScreen');
+    const gameContent = document.getElementById('gameContent');
+    const resultScreen = document.getElementById('resultScreen');
+
+    function showBlockSelection() {
+      // 画面を切り替え
+      blockSelectionScreen.style.display = 'block';
+      gameContent.style.display = 'none';
+      resultScreen.classList.remove('show');
+      
+      // ホーム画面に戻る際にゲーム画面の内容をリセット
+      document.getElementById('questionCard').style.display = 'block';
+      document.getElementById('questionType').textContent = '';
+      document.getElementById('questionText').textContent = '';
+      document.getElementById('options').innerHTML = '';
+      document.getElementById('explanation').classList.remove('show');
+      document.getElementById('nextBtn').classList.remove('show');
+      
+      // プログレスバーとスコアをリセット
+      document.getElementById('progressFill').style.width = '0%';
+      document.getElementById('currentQuestion').textContent = '0'; // 👈 ここを'0'に変更
+      document.getElementById('correctCount').textContent = '0';
+      
+      const blockList = document.getElementById('blockList');
+      blockList.innerHTML = '';
+      
+      // ブロック選択ボタンを生成
+      proverbBlocks.forEach((block, index) => {
+        const button = document.createElement('button');
+        button.className = 'block-btn';
+        button.textContent = `ブロック ${index + 1} (${block.length}問)`;
+        button.onclick = () => startGameWithBlock(index);
+        blockList.appendChild(button);
+      });
+    }
+
+    function startGameWithBlock(blockIndex) {
+      // 選択したブロックの問題セットを設定
+      gameProverbs = [...proverbBlocks[blockIndex]];
+
+      // ゲーム画面に切り替え
+      blockSelectionScreen.style.display = 'none';
+      gameContent.style.display = 'block';
+
+      // ゲームを初期化
+      initGame();
+    }
+
     function initGame() {
-      // 問題をシャッフル
-      gameProverbs = [...proverbs].sort(() => Math.random() - 0.5);
+      // 選択肢の順序をランダム化
+      gameProverbs.forEach(question => {
+        const correctOption = question.options[question.correct];
+        const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+        const newCorrectIndex = shuffledOptions.findIndex(option => option === correctOption);
+        question.options = shuffledOptions;
+        question.correct = newCorrectIndex;
+      });
+
       currentQuestionIndex = 0;
       correctAnswers = 0;
 
@@ -1224,7 +1362,19 @@
       const optionsContainer = document.getElementById('options');
       optionsContainer.innerHTML = '';
 
-      question.options.forEach((option, index) => {
+      // ここから修正
+      // 正解の選択肢を一時的に保持
+      const correctOption = question.options[question.correct];
+
+      // 選択肢の配列をシャッフル
+      const shuffledOptions = [...question.options].sort(() => Math.random() - 0.5);
+
+      // 新しい正解のインデックスを見つけて更新
+      const newCorrectIndex = shuffledOptions.findIndex(option => option === correctOption);
+      question.correct = newCorrectIndex;
+      // 修正ここまで
+
+      shuffledOptions.forEach((option, index) => {
         const button = document.createElement('button');
         button.className = 'option-btn';
         button.textContent = option;
@@ -1252,6 +1402,14 @@
       // 全ボタンを無効化
       optionButtons.forEach(btn => btn.classList.add('disabled'));
 
+      const explanationEl = document.getElementById('explanation');
+      explanationEl.innerHTML = ''; // HTMLをクリア
+
+      // 正解/不正解のマークを作成
+      const markSpan = document.createElement('span');
+      markSpan.textContent = selectedIndex === question.correct ? '◯ 正解' : '☓ 不正解';
+      markSpan.className = selectedIndex === question.correct ? 'correct-mark' : 'incorrect-mark';
+
       // 正解の場合
       if (selectedIndex === question.correct) {
         optionButtons[selectedIndex].classList.add('correct');
@@ -1266,8 +1424,9 @@
       }
 
       // 解説を表示
-      document.getElementById('explanation').textContent = question.explanation;
-      document.getElementById('explanation').classList.add('show');
+      explanationEl.appendChild(markSpan);
+      explanationEl.innerHTML += `： ${question.explanation}`;
+      explanationEl.classList.add('show');
 
       // 次へボタンを表示
       document.getElementById('nextBtn').classList.add('show');
@@ -1314,16 +1473,11 @@
     }
 
     function restartGame() {
-      // 画面をリセット
-      document.getElementById('questionCard').style.display = 'block';
-      document.getElementById('resultScreen').classList.remove('show');
-
-      // ゲームを初期化
-      initGame();
+      showBlockSelection();
     }
 
-    // ゲーム開始
-    initGame();
+    // ゲーム開始時はブロック選択画面から
+    showBlockSelection();
   </script>
 </body>
 
