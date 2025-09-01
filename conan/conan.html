@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>名探偵コナン 映画クイズ</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f7;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #d62d2d;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #4a4a4a;
+      font-size: 1.8em;
+      margin-top: 0;
+      text-align: left;
+    }
+
+    p {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+
+    .btn {
+      background-color: #d62d2d;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 50px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background-color: #b82525;
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .choice-btn {
+      background-color: #f7f7f7;
+      border: 2px solid #ddd;
+      color: #333;
+      padding: 15px;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.2s, border-color 0.2s;
+      text-align: left;
+      width: 100%;
+    }
+
+    .choice-btn:hover {
+      background-color: #e9e9e9;
+      border-color: #d62d2d;
+    }
+
+    .correct {
+      background-color: #d4edda;
+      border-color: #4CAF50;
+      color: #155724;
+    }
+
+    .incorrect {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .result-container {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #progress {
+      font-size: 1em;
+      color: #888;
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .btn,
+      .choice-btn {
+        font-size: 1em;
+        padding: 12px 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div id="start-screen">
+      <h1>名探偵コナン<br>映画クイズ</h1>
+      <p>キミはコナンの映画をどこまで知っているか？<br>歴代映画の知識を試してみよう！</p>
+      <button id="start-btn" class="btn">クイズを始める</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+      <h2 id="question-text"></h2>
+      <div id="choices-container" class="choices-container"></div>
+      <div id="progress"></div>
+      <button id="reset-btn" class="btn">最初からやり直す</button>
+    </div>
+
+    <div id="result-screen" class="hidden result-container">
+      <h1>クイズ終了！</h1>
+      <h2 id="result-text"></h2>
+      <p id="score-text"></p>
+      <button id="retry-btn" class="btn">もう一度挑戦する</button>
+    </div>
+  </div>
+
+  <script>
+    const quizzes = [
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>時計<rt>とけい</rt></ruby>じかけの<ruby>摩天楼<rt>まてんろう</rt></ruby>』で、<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>止<rt>と</rt></ruby>めるために<ruby>切<rt>き</rt></ruby>ったコードの<ruby>色<rt>いろ</rt></ruby>は<ruby>何色<rt>なにいろ</rt></ruby>？",
+        choices: ["<ruby>赤<rt>あか</rt></ruby>", "<ruby>青<rt>あお</rt></ruby>", "<ruby>黄<rt>き</rt></ruby>", "<ruby>白<rt>しろ</rt></ruby>"],
+        answer: "<ruby>青<rt>あお</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『14<ruby>番目<rt>ばんめ</rt></ruby>の<ruby>標的<rt>ひょうてき</rt></ruby>』で、コナンの<ruby>麻酔銃<rt>ますいじゅう</rt></ruby>が<ruby>効<rt>き</rt></ruby>かない<ruby>相手<rt>あいて</rt></ruby>は<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["<ruby>小五郎<rt>こごろう</rt></ruby>", "<ruby>阿笠博士<rt>あがさはかせ</rt></ruby>", "<ruby>蘭<rt>らん</rt></ruby>", "<ruby>新一<rt>しんいち</rt></ruby>"],
+        answer: "<ruby>新一<rt>しんいち</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>世紀末<rt>せいきまつ</rt></ruby>の<ruby>魔術師<rt>まじゅつし</rt></ruby>』で、コナンの<ruby>正体<rt>しょうたい</rt></ruby>がばれそうになった<ruby>時<rt>とき</rt></ruby>、<ruby>助<rt>たす</rt></ruby>けてくれたのは<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["<ruby>服部平次<rt>はっとりへいじ</rt></ruby>", "<ruby>怪盗<rt>かいとう</rt></ruby>キッド", "<ruby>灰原哀<rt>はいばらあい</rt></ruby>", "<ruby>毛利蘭<rt>もうりらん</rt></ruby>"],
+        answer: "<ruby>怪盗<rt>かいとう</rt></ruby>キッド"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>瞳<rt>ひとみ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>の<ruby>暗殺者<rt>あんさつしゃ</rt></ruby>』で、<ruby>蘭<rt>らん</rt></ruby>が<ruby>記憶喪失<rt>きおくそうしつ</rt></ruby>になった<ruby>時<rt>とき</rt></ruby>、<ruby>彼女<rt>かのじょ</rt></ruby>を<ruby>守<rt>まも</rt></ruby>るためコナンが<ruby>言<rt>い</rt></ruby>った<ruby>言葉<rt>ことば</rt></ruby>は？",
+        choices: ["<ruby>死<rt>し</rt></ruby>ぬな…<ruby>蘭<rt>らん</rt></ruby>！", "<ruby>待<rt>ま</rt></ruby>ってろよ、<ruby>蘭<rt>らん</rt></ruby>…", "<ruby>蘭<rt>らん</rt></ruby>はオレが<ruby>守<rt>まも</rt></ruby>る", "オレが<ruby>新一<rt>しんいち</rt></ruby>だ"],
+        answer: "<ruby>蘭<rt>らん</rt></ruby>はオレが<ruby>守<rt>まも</rt></ruby>る"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>天国<rt>てんごく</rt></ruby>へのカウントダウン』で、<ruby>少年探偵団<rt>しょうねんたんていだん</rt></ruby>が<ruby>脱出<rt>だっしゅつ</rt></ruby>のために<ruby>爆発<rt>ばくはつ</rt></ruby>させたのは<ruby>何階<rt>なんかい</rt></ruby>？",
+        choices: ["40<ruby>階<rt>かい</rt></ruby>", "50<ruby>階<rt>かい</rt></ruby>", "60<ruby>階<rt>かい</rt></ruby>", "70<ruby>階<rt>かい</rt></ruby>"],
+        answer: "70<ruby>階<rt>かい</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『ベイカー<ruby>街<rt>がい</rt></ruby>の<ruby>亡霊<rt>ぼうれい</rt></ruby>』で、コナンがゲームに<ruby>入<rt>はい</rt></ruby>った<ruby>場所<rt>ばしょ</rt></ruby>はどこ？",
+        choices: ["<ruby>大阪<rt>おおさか</rt></ruby>", "<ruby>東京<rt>とうきょう</rt></ruby>", "ロンドン", "ニューヨーク"],
+        answer: "ロンドン"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>迷宮<rt>めいきゅう</rt></ruby>の<ruby>十字路<rt>じゅうじろ</rt></ruby>』で、コナンが<ruby>服部平次<rt>はっとりへいじ</rt></ruby>と<ruby>再会<rt>さいかい</rt></ruby>した<ruby>場所<rt>ばしょ</rt></ruby>はどこ？",
+        choices: ["<ruby>清水寺<rt>きよみずでら</rt></ruby>", "<ruby>祇園<rt>ぎおん</rt></ruby>", "<ruby>知恩院<rt>ちおんいん</rt></ruby>", "<ruby>鞍馬寺<rt>くらまでら</rt></ruby>"],
+        answer: "<ruby>清水寺<rt>きよみずでら</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>銀翼<rt>ぎんよく</rt></ruby>の<ruby>奇術師<rt>きじゅつし</rt></ruby>』で、<ruby>怪盗<rt>かいとう</rt></ruby>キッドがコナンに<ruby>助<rt>たす</rt></ruby>けを<ruby>求<rt>もと</rt></ruby>めた<ruby>目的<rt>もくてき</rt></ruby>は？",
+        choices: ["<ruby>宝石<rt>ほうせき</rt></ruby>を<ruby>盗<rt>ぬす</rt></ruby>むため", "<ruby>飛行機<rt>ひこうき</rt></ruby>を<ruby>操縦<rt>そうじゅう</rt></ruby>するため", "<ruby>蘭<rt>らん</rt></ruby>の<ruby>正体<rt>しょうたい</rt></ruby>を<ruby>暴<rt>あば</rt></ruby>くため", "<ruby>逃走<rt>とうそう</rt></ruby>を<ruby>助<rt>たす</rt></ruby>けるため"],
+        answer: "<ruby>飛行機<rt>ひこうき</rt></ruby>を<ruby>操縦<rt>そうじゅう</rt></ruby>するため"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>水平線上<rt>すいへいせんじょう</rt></ruby>の<ruby>陰謀<rt>いんぼう</rt></ruby>』で、コナンが<ruby>犯人<rt>はんにん</rt></ruby>を<ruby>追<rt>お</rt></ruby>い<ruby>詰<rt>つ</rt></ruby>めた<ruby>場所<rt>ばしょ</rt></ruby>は？",
+        choices: ["<ruby>客室<rt>きゃくしつ</rt></ruby>", "<ruby>船長室<rt>せんちょうしつ</rt></ruby>", "<ruby>機関室<rt>きかんしつ</rt></ruby>", "ダイニングホール"],
+        answer: "<ruby>機関室<rt>きかんしつ</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>探偵<rt>たんてい</rt></ruby>たちの<ruby>鎮魂歌<rt>ちんこんか</rt></ruby>』で、コナンたちが<ruby>横浜<rt>よこはま</rt></ruby>で<ruby>挑戦<rt>ちょうせん</rt></ruby>したのは<ruby>何<rt>なん</rt></ruby>というゲーム？",
+        choices: ["ジェットコースター", "<ruby>観覧車<rt>かんらんしゃ</rt></ruby>", "<ruby>謎解<rt>なぞと</rt></ruby>き", "<ruby>脱出<rt>だっしゅつ</rt></ruby>ゲーム"],
+        answer: "<ruby>謎解<rt>なぞと</rt></ruby>き"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>戦慄<rt>せんりつ</rt></ruby>の<ruby>楽譜<rt>がくふ</rt></ruby>』で、コナンが<ruby>絶対音感<rt>ぜったいおんかん</rt></ruby>を<ruby>持<rt>も</rt></ruby>っていることを<ruby>利用<rt>りよう</rt></ruby>して、<ruby>犯人<rt>はんにん</rt></ruby>が<ruby>仕掛<rt>しか</rt></ruby>けたトリックを<ruby>暴<rt>あば</rt></ruby>いたのは<ruby>何<rt>なん</rt></ruby>という<ruby>楽器<rt>がっき</rt></ruby>の<ruby>音<rt>おと</rt></ruby>だった？",
+        choices: ["ピアノ", "バイオリン", "ハーモニカ", "フルート"],
+        answer: "フルート"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>漆黒<rt>しっこく</rt></ruby>の<ruby>追跡者<rt>ついせきしゃ</rt></ruby>』で、<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>のメンバーであるアイリッシュは<ruby>誰<rt>だれ</rt></ruby>に<ruby>変装<rt>へんそう</rt></ruby>して<ruby>潜入<rt>せんにゅう</rt></ruby>していた？",
+        choices: ["<ruby>阿笠博士<rt>あがさはかせ</rt></ruby>", "<ruby>目暮警部<rt>めぐれけいぶ</rt></ruby>", "<ruby>松本警視<rt>まつもとけいし</rt></ruby>", "<ruby>小嶋元太<rt>こじまげんた</rt></ruby>"],
+        answer: "<ruby>松本警視<rt>まつもとけいし</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>天空<rt>てんくう</rt></ruby>の<ruby>難破船<rt>なんぱせん</rt></ruby>』で、キッドが<ruby>飛行船<rt>ひこうせん</rt></ruby>を<ruby>乗<rt>の</rt></ruby>っ<ruby>取<rt>と</rt></ruby>ったテロリスト<ruby>集団<rt>しゅうだん</rt></ruby>『<ruby>赤<rt>あか</rt></ruby>いシャムネコ』とどのように<ruby>接触<rt>せっしょく</rt></ruby>した？",
+        choices: ["メールで<ruby>連絡<rt>れんらく</rt></ruby>", "<ruby>変装<rt>へんそう</rt></ruby>して<ruby>近<rt>ちか</rt></ruby>づいた", "<ruby>無線<rt>むせん</rt></ruby>で<ruby>指示<rt>しじ</rt></ruby>を<ruby>送<rt>おく</rt></ruby>った", "<ruby>直接<rt>ちょくせつ</rt></ruby><ruby>乗<rt>の</rt></ruby>り<ruby>込<rt>こ</rt></ruby>んだ"],
+        answer: "<ruby>直接<rt>ちょくせつ</rt></ruby><ruby>乗<rt>の</rt></ruby>り<ruby>込<rt>こ</rt></ruby>んだ"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>沈黙<rt>ちんもく</rt></ruby>の15<ruby>分<rt>ぷん</rt></ruby>』で、ダム<ruby>建設<rt>けんせつ</rt></ruby>のために<ruby>移転<rt>いてん</rt></ruby>した<ruby>村<rt>むら</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>は？",
+        choices: ["<ruby>北<rt>きた</rt></ruby>ノ<ruby>沢村<rt>さわむら</rt></ruby>", "<ruby>東<rt>ひがし</rt></ruby>ノ<ruby>沢村<rt>さわむら</rt></ruby>", "<ruby>南<rt>みなみ</rt></ruby>ノ<ruby>沢村<rt>さわむら</rt></ruby>", "<ruby>西<rt>にし</rt></ruby>ノ<ruby>沢村<rt>さわむら</rt></ruby>"],
+        answer: "<ruby>北<rt>きた</rt></ruby>ノ<ruby>沢村<rt>さわむら</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『11<ruby>人目<rt>にんめ</rt></ruby>のストライカー』で、<ruby>連続爆破事件<rt>れんぞくばくはじけん</rt></ruby>の<ruby>予告<rt>よこく</rt></ruby>にあった<ruby>暗号<rt>あんごう</rt></ruby>『<ruby>青<rt>あお</rt></ruby>いユニフォーム』が<ruby>示<rt>しめ</rt></ruby>す<ruby>人物<rt>じんぶつ</rt></ruby>は<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["サッカー<ruby>選手<rt>せんしゅ</rt></ruby>", "<ruby>犯人<rt>はんにん</rt></ruby>", "<ruby>被害者<rt>ひがいしゃ</rt></ruby>", "コナン"],
+        answer: "<ruby>犯人<rt>はんにん</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>絶海<rt>ぜっかい</rt></ruby>の<ruby>探偵<rt>たんてい</rt></ruby>』で、イージス<ruby>艦内<rt>かんない</rt></ruby>でスパイ<ruby>容疑<rt>ようぎ</rt></ruby>をかけられた<ruby>人物<rt>じんぶつ</rt></ruby>は？",
+        choices: ["<ruby>毛利蘭<rt>もうりらん</rt></ruby>", "<ruby>服部平次<rt>はっとりへいじ</rt></ruby>", "<ruby>灰原哀<rt>はいばらあい</rt></ruby>", "<ruby>海上自衛官<rt>かいじょうじえいかん</rt></ruby>の<ruby>藤井<rt>ふじい</rt></ruby>"],
+        answer: "<ruby>海上自衛官<rt>かいじょうじえいかん</rt></ruby>の<ruby>藤井<rt>ふじい</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>異次元<rt>いじげん</rt></ruby>の<ruby>狙撃手<rt>そげきしゅ</rt></ruby>』で、<ruby>狙撃事件<rt>そげきじけん</rt></ruby>の<ruby>容疑者<rt>ようぎしゃ</rt></ruby>として<ruby>浮上<rt>ふじょう</rt></ruby>した<ruby>元海軍特殊部隊<rt>もとかいぐんとくしゅぶたい</rt></ruby>のメンバーは？",
+        choices: ["ジェイムズ・ブラック", "<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>", "ティモシー・ハンター", "ケビン・ヨシノ"],
+        answer: "ケビン・ヨシノ"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>業火<rt>ごうか</rt></ruby>の<ruby>向日葵<rt>ひまわり</rt></ruby>』で、<ruby>怪盗<rt>かいとう</rt></ruby>キッドが<ruby>狙<rt>ねら</rt></ruby>った『ゴッホのひまわり』は、<ruby>何枚<rt>なんまい</rt></ruby><ruby>描<rt>えが</rt></ruby>かれたと<ruby>言<rt>い</rt></ruby>われている？",
+        choices: ["7<ruby>枚<rt>まい</rt></ruby>", "5<ruby>枚<rt>まい</rt></ruby>", "9<ruby>枚<rt>まい</rt></ruby>", "10<ruby>枚<rt>まい</rt></ruby>"],
+        answer: "7<ruby>枚<rt>まい</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>純黒<rt>じゅんこく</rt></ruby>の<ruby>悪夢<rt>あくむ</rt></ruby>』で、<ruby>記憶喪失<rt>きおくそうしつ</rt></ruby>の<ruby>女性<rt>じょせい</rt></ruby>『キュラソー』は、<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>のどの<ruby>人物<rt>じんぶつ</rt></ruby>の<ruby>部下<rt>ぶか</rt></ruby>だった？",
+        choices: ["ジン", "ベルモット", "ウォッカ", "ラム"],
+        answer: "ラム"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『から<ruby>紅<rt>くれない</rt></ruby>の<ruby>恋歌<rt>こいうた</rt></ruby>』で、<ruby>遠山和葉<rt>とおやまかずは</rt></ruby>と<ruby>服部平次<rt>はっとりへいじ</rt></ruby>が<ruby>百人一首<rt>ひゃくにんいっしゅ</rt></ruby>の<ruby>大会<rt>たいかい</rt></ruby>で<ruby>対決<rt>たいけつ</rt></ruby>する<ruby>場所<rt>ばしょ</rt></ruby>はどこ？",
+        choices: ["<ruby>京都<rt>きょうと</rt></ruby>", "<ruby>大阪<rt>おおさか</rt></ruby>", "<ruby>奈良<rt>なら</rt></ruby>", "<ruby>滋賀<rt>しが</rt></ruby>"],
+        answer: "<ruby>大阪<rt>おおさか</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『ゼロの<ruby>執行人<rt>しっこうにん</rt></ruby>』で、<ruby>安室透<rt>あむろとおる</rt></ruby>が『<ruby>僕<rt>ぼく</rt></ruby>の<ruby>恋人<rt>こいびと</rt></ruby>はこの<ruby>国<rt>くに</rt></ruby>さ』と<ruby>言<rt>い</rt></ruby>ったのは、どのような<ruby>状況<rt>じょうきょう</rt></ruby>でのセリフ？",
+        choices: ["テロリストを<ruby>逮捕<rt>たいほ</rt></ruby>したとき", "コナンに<ruby>協力<rt>きょうりょく</rt></ruby>したとき", "<ruby>車<rt>くるま</rt></ruby>を<ruby>運転中<rt>うんてんちゅう</rt></ruby>", "<ruby>裁判<rt>さいばん</rt></ruby>で<ruby>証言<rt>しょうげん</rt></ruby>したとき"],
+        answer: "<ruby>車<rt>くるま</rt></ruby>を<ruby>運転中<rt>うんてんちゅう</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>紺青<rt>こんじょう</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>』で、<ruby>怪盗<rt>かいとう</rt></ruby>キッドがシンガポールで<ruby>狙<rt>ねら</rt></ruby>った<ruby>宝石<rt>ほうせき</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>は？",
+        choices: ["<ruby>紺青<rt>こんじょう</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>", "<ruby>紺碧<rt>こんぺき</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>", "<ruby>紺青<rt>こんじょう</rt></ruby>の<ruby>石<rt>いし</rt></ruby>", "<ruby>紺色<rt>こんいろ</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>"],
+        answer: "<ruby>紺青<rt>こんじょう</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>緋色<rt>ひいろ</rt></ruby>の<ruby>弾丸<rt>だんがん</rt></ruby>』で、<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>が「<ruby>貫<rt>つらぬ</rt></ruby>く」と<ruby>表現<rt>ひょうげん</rt></ruby>した<ruby>新幹線<rt>しんかんせん</rt></ruby>の<ruby>最高速度<rt>さいこうそくど</rt></ruby>は？",
+        choices: ["<ruby>時速<rt>じそく</rt></ruby>1000km", "<ruby>時速<rt>じそく</rt></ruby>500km", "<ruby>時速<rt>じそく</rt></ruby>200km", "<ruby>時速<rt>じそく</rt></ruby>100km"],
+        answer: "<ruby>時速<rt>じそく</rt></ruby>1000km"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『ハロウィンの<ruby>花嫁<rt>はなよめ</rt></ruby>』で、<ruby>安室透<rt>あむろとおる</rt></ruby>が<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>仕掛<rt>しか</rt></ruby>けられた<ruby>場所<rt>ばしょ</rt></ruby>は？",
+        choices: ["<ruby>首<rt>くび</rt></ruby>", "<ruby>腕<rt>うで</rt></ruby>", "<ruby>足<rt>あし</rt></ruby>", "<ruby>胸<rt>むね</rt></ruby>"],
+        answer: "<ruby>首<rt>くび</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>黒鉄<rt>くろがね</rt></ruby>の<ruby>魚影<rt>ぎょえい</rt></ruby>』で、<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>のメンバーが<ruby>潜伏<rt>せんぷく</rt></ruby>していた<ruby>場所<rt>ばしょ</rt></ruby>は？",
+        choices: ["<ruby>八丈島<rt>はちじょうじま</rt></ruby>", "<ruby>種子島<rt>たねがしま</rt></ruby>", "<ruby>小笠原諸島<rt>おがさわらしょとう</rt></ruby>", "<ruby>淡路島<rt>あわじしま</rt></ruby>"],
+        answer: "<ruby>八丈島<rt>はちじょうじま</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>時計<rt>とけい</rt></ruby>じかけの<ruby>摩天楼<rt>まてんろう</rt></ruby>』で、コナンが<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>止<rt>と</rt></ruby>めるために<ruby>蘭<rt>らん</rt></ruby>に<ruby>伝<rt>つた</rt></ruby>えたメッセージは？",
+        choices: ["<ruby>愛<rt>あい</rt></ruby>してる", "ずっと<ruby>待<rt>ま</rt></ruby>ってる", "<ruby>会<rt>あ</rt></ruby>いたい", "<ruby>蘭<rt>らん</rt></ruby>、<ruby>大好<rt>だいす</rt></ruby>きだ"],
+        answer: "<ruby>会<rt>あ</rt></ruby>いたい"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『14<ruby>番目<rt>ばんめ</rt></ruby>の<ruby>標的<rt>ひょうてき</rt></ruby>』で、<ruby>小五郎<rt>こごろう</rt></ruby>がターゲットにされた<ruby>理由<rt>りゆう</rt></ruby>は<ruby>何<rt>なに</rt></ruby>だった？",
+        choices: ["<ruby>過去<rt>かこ</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>", "<ruby>推理<rt>すいり</rt></ruby>ミス", "<ruby>裁判<rt>さいばん</rt></ruby>での<ruby>証言<rt>しょうげん</rt></ruby>", "<ruby>警察官<rt>けいさつかん</rt></ruby>を<ruby>辞<rt>や</rt></ruby>めたこと"],
+        answer: "<ruby>過去<rt>かこ</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>世紀末<rt>せいきまつ</rt></ruby>の<ruby>魔術師<rt>まじゅつし</rt></ruby>』で、ロシア<ruby>皇帝<rt>こうてい</rt></ruby>の<ruby>秘宝<rt>ひほう</rt></ruby>『インペリアル・イースター・エッグ』を<ruby>狙<rt>ねら</rt></ruby>った<ruby>人物<rt>じんぶつ</rt></ruby>は？",
+        choices: ["<ruby>怪盗<rt>かいとう</rt></ruby>キッド", "ラスプーチン", "スコーピオン", "<ruby>怪人二十面相<rt>かいじんにじゅうめんそう</rt></ruby>"],
+        answer: "スコーピオン"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>瞳<rt>ひとみ</rt></ruby>の<ruby>中<rt>なか</rt></ruby>の<ruby>暗殺者<rt>あんさつしゃ</rt></ruby>』で、<ruby>蘭<rt>らん</rt></ruby>が<ruby>記憶<rt>きおく</rt></ruby>を<ruby>失<rt>うしな</rt></ruby>った<ruby>原因<rt>げんいん</rt></ruby>となった<ruby>事件<rt>じけん</rt></ruby>が<ruby>起<rt>お</rt></ruby>きた<ruby>場所<rt>ばしょ</rt></ruby>は？",
+        choices: ["<ruby>遊園地<rt>ゆうえんち</rt></ruby>", "プールサイド", "<ruby>駅<rt>えき</rt></ruby>のホーム", "トロピカルランド"],
+        answer: "<ruby>駅<rt>えき</rt></ruby>のホーム"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>天国<rt>てんごく</rt></ruby>へのカウントダウン』で、<ruby>少年探偵団<rt>しょうねんたんていだん</rt></ruby>がキャンプで<ruby>使<rt>つか</rt></ruby>っていた<ruby>車<rt>くるま</rt></ruby>のナンバーは？",
+        choices: ["1-2-3", "8-8-8", "7-4-6", "5-5-5"],
+        answer: "7-4-6"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>迷宮<rt>めいきゅう</rt></ruby>の<ruby>十字路<rt>じゅうじろ</rt></ruby>』で、<ruby>服部平次<rt>はっとりへいじ</rt></ruby>が<ruby>京都<rt>きょうと</rt></ruby>で<ruby>出会<rt>であ</rt></ruby>った<ruby>初恋<rt>はつこい</rt></ruby>の<ruby>相手<rt>あいて</rt></ruby>は<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["<ruby>毛利蘭<rt>もうりらん</rt></ruby>", "<ruby>遠山和葉<rt>とおやまかずは</rt></ruby>", "<ruby>大岡紅葉<rt>おおおかもみじ</rt></ruby>", "<ruby>円谷光彦<rt>つぶらやみつひこ</rt></ruby>"],
+        answer: "<ruby>遠山和葉<rt>とおやまかずは</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>銀翼<rt>ぎんよく</rt></ruby>の<ruby>奇術師<rt>きじゅつし</rt></ruby>』で、コナンたちが<ruby>乗<rt>の</rt></ruby>っていた<ruby>飛行機<rt>ひこうき</rt></ruby>の<ruby>機体番号<rt>きたいばんごう</rt></ruby>は？",
+        choices: ["JA8888", "JA4026", "JA4003", "JA7477"],
+        answer: "JA4026"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>水平線上<rt>すいへいせんじょう</rt></ruby>の<ruby>陰謀<rt>いんぼう</rt></ruby>』で、<ruby>小五郎<rt>こごろう</rt></ruby>が<ruby>過去<rt>かこ</rt></ruby>に<ruby>所属<rt>しょぞく</rt></ruby>していた<ruby>警察<rt>けいさつ</rt></ruby>の<ruby>部署<rt>ぶしょ</rt></ruby>は？",
+        choices: ["<ruby>捜査一課<rt>そうさいっか</rt></ruby>", "<ruby>機動捜査隊<rt>きどうそうさたい</rt></ruby>", "<ruby>公安部<rt>こうあんぶ</rt></ruby>", "<ruby>交通課<rt>こうつうか</rt></ruby>"],
+        answer: "<ruby>機動捜査隊<rt>きどうそうさたい</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>探偵<rt>たんてい</rt></ruby>たちの<ruby>鎮魂歌<rt>ちんこんか</rt></ruby>』で、コナンと<ruby>平次<rt>へいじ</rt></ruby>が<ruby>協力<rt>きょうりょく</rt></ruby>して<ruby>謎<rt>なぞ</rt></ruby>を<ruby>解<rt>と</rt></ruby>いたのはなぜ？",
+        choices: ["<ruby>蘭<rt>らん</rt></ruby>と<ruby>和葉<rt>かずは</rt></ruby>が<ruby>人質<rt>ひとじち</rt></ruby>に<ruby>取<rt>と</rt></ruby>られたから", "<ruby>依頼料<rt>いらいりょう</rt></ruby>が<ruby>欲<rt>ほ</rt></ruby>しかったから", "お<ruby>互<rt>たが</rt></ruby>いの<ruby>推理力<rt>すいりょく</rt></ruby>を<ruby>試<rt>ため</rt></ruby>すため", "<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>を<ruby>追<rt>お</rt></ruby>うため"],
+        answer: "<ruby>蘭<rt>らん</rt></ruby>と<ruby>和葉<rt>かずは</rt></ruby>が<ruby>人質<rt>ひとじち</rt></ruby>に<ruby>取<rt>と</rt></ruby>られたから"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>戦慄<rt>せんりつ</rt></ruby>の<ruby>楽譜<rt>がくふ</rt></ruby>』で、コナンが<ruby>犯人<rt>はんにん</rt></ruby>の<ruby>正体<rt>しょうたい</rt></ruby>を<ruby>暴<rt>あば</rt></ruby>くために<ruby>利用<rt>りよう</rt></ruby>したのは<ruby>何<rt>なに</rt></ruby>だった？",
+        choices: ["<ruby>音階<rt>おんかい</rt></ruby>", "<ruby>歌声<rt>うたごえ</rt></ruby>", "<ruby>絶対音感<rt>ぜったいおんかん</rt></ruby>", "<ruby>足音<rt>あしおと</rt></ruby>"],
+        answer: "<ruby>絶対音感<rt>ぜったいおんかん</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>漆黒<rt>しっこく</rt></ruby>の<ruby>追跡者<rt>ついせきしゃ</rt></ruby>』で、ジンとウォッカがコナンを<ruby>追<rt>お</rt></ruby>って<ruby>行<rt>い</rt></ruby>った<ruby>場所<rt>ばしょ</rt></ruby>はどこ？",
+        choices: ["<ruby>東都<rt>とうと</rt></ruby>タワー", "<ruby>東京<rt>とうきょう</rt></ruby>スカイツリー", "<ruby>毛利探偵事務所<rt>もうりたんていじむしょ</rt></ruby>", "<ruby>米花<rt>べいか</rt></ruby>デパート"],
+        answer: "<ruby>東都<rt>とうと</rt></ruby>タワー"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>天空<rt>てんくう</rt></ruby>の<ruby>難破船<rt>なんぱせん</rt></ruby>』で、テロリスト<ruby>集団<rt>しゅうだん</rt></ruby>『<ruby>赤<rt>あか</rt></ruby>いシャムネコ』が<ruby>狙<rt>ねら</rt></ruby>ったのは<ruby>何<rt>なに</rt></ruby>だった？",
+        choices: ["<ruby>細菌兵器<rt>さいきんへいき</rt></ruby>", "<ruby>宝石<rt>ほうせき</rt></ruby>", "<ruby>現金<rt>げんきん</rt></ruby>", "<ruby>飛行船<rt>ひこうせん</rt></ruby>"],
+        answer: "<ruby>細菌兵器<rt>さいきんへいき</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>沈黙<rt>ちんもく</rt></ruby>の15<ruby>分<rt>ぷん</rt></ruby>』で、<ruby>犯人<rt>はんにん</rt></ruby>が<ruby>仕掛<rt>しか</rt></ruby>けたトリックは<ruby>何<rt>なに</rt></ruby>だった？",
+        choices: ["<ruby>雪崩<rt>なだれ</rt></ruby>", "<ruby>爆弾<rt>ばくだん</rt></ruby>", "ダムの<ruby>放水<rt>ほうすい</rt></ruby>", "<ruby>地滑<rt>じすべ</rt></ruby>り"],
+        answer: "<ruby>雪崩<rt>なだれ</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『11<ruby>人目<rt>にんめ</rt></ruby>のストライカー』で、サッカーの<ruby>試合中<rt>しあいちゅう</rt></ruby>に<ruby>起<rt>お</rt></ruby>きた<ruby>最初<rt>さいしょ</rt></ruby>の<ruby>爆破事件<rt>ばくはじけん</rt></ruby>はどこで<ruby>起<rt>お</rt></ruby>きた？",
+        choices: ["スタジアムの<ruby>観客席<rt>かんきゃくせき</rt></ruby>", "<ruby>選手<rt>せんしゅ</rt></ruby>のロッカールーム", "グラウンド", "スタジアムの<ruby>地下駐車場<rt>ちかちゅうしゃじょう</rt></ruby>"],
+        answer: "スタジアムの<ruby>地下駐車場<rt>ちかちゅうしゃじょう</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>絶海<rt>ぜっかい</rt></ruby>の<ruby>探偵<rt>たんてい</rt></ruby>』で、イージス<ruby>艦内<rt>かんない</rt></ruby>のスパイ『X』の<ruby>正体<rt>しょうたい</rt></ruby>は<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["スパイ", "<ruby>自衛官<rt>じえいかん</rt></ruby>", "<ruby>警察官<rt>けいさつかん</rt></ruby>", "<ruby>潜入捜査官<rt>せんにゅうそうさかん</rt></ruby>"],
+        answer: "スパイ"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>異次元<rt>いじげん</rt></ruby>の<ruby>狙撃手<rt>そげきしゅ</rt></ruby>』で、<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>がスナイパーとして<ruby>登場<rt>とうじょう</rt></ruby>した<ruby>時<rt>とき</rt></ruby>の<ruby>名前<rt>なまえ</rt></ruby>は？",
+        choices: ["<ruby>沖矢昴<rt>おきやすばる</rt></ruby>", "<ruby>諸星大<rt>もろほしだい</rt></ruby>", "ライ", "<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>"],
+        answer: "<ruby>沖矢昴<rt>おきやすばる</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>業火<rt>ごうか</rt></ruby>の<ruby>向日葵<rt>ひまわり</rt></ruby>』で、ゴッホの『ひまわり』を<ruby>狙<rt>ねら</rt></ruby>った<ruby>怪盗<rt>かいとう</rt></ruby>キッドの<ruby>目的<rt>もくてき</rt></ruby>は？",
+        choices: ["<ruby>美術品<rt>びじゅつひん</rt></ruby>を<ruby>盗<rt>ぬす</rt></ruby>むこと", "<ruby>贋作<rt>がんさく</rt></ruby>を<ruby>見破<rt>みやぶ</rt></ruby>ること", "<ruby>宝石<rt>ほうせき</rt></ruby>を<ruby>盗<rt>ぬす</rt></ruby>むこと", "<ruby>犯人<rt>はんにん</rt></ruby>を<ruby>捕<rt>つか</rt></ruby>まえること"],
+        answer: "<ruby>贋作<rt>がんさく</rt></ruby>を<ruby>見破<rt>みやぶ</rt></ruby>ること"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>純黒<rt>じゅんこく</rt></ruby>の<ruby>悪夢<rt>あくむ</rt></ruby>』で、キュラソーが<ruby>持<rt>も</rt></ruby>っていた<ruby>瞳<rt>ひとみ</rt></ruby>の<ruby>色<rt>いろ</rt></ruby>は？",
+        choices: ["<ruby>虹色<rt>にじいろ</rt></ruby>", "<ruby>青<rt>あお</rt></ruby>", "<ruby>赤<rt>あか</rt></ruby>", "<ruby>緑<rt>みどり</rt></ruby>"],
+        answer: "<ruby>虹色<rt>にじいろ</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『から<ruby>紅<rt>くれない</rt></ruby>の<ruby>恋歌<rt>こいうた</rt></ruby>』で、<ruby>百人一首<rt>ひゃくにんいっしゅ</rt></ruby><ruby>大会<rt>たいかい</rt></ruby>の<ruby>準決勝<rt>じゅんけっしょう</rt></ruby>で<ruby>服部平次<rt>はっとりへいじ</rt></ruby>と<ruby>対戦<rt>たいせん</rt></ruby>したのは<ruby>誰<rt>だれ</rt></ruby>？",
+        choices: ["<ruby>遠山和葉<rt>とおやまかずは</rt></ruby>", "<ruby>大岡紅葉<rt>おおおかもみじ</rt></ruby>", "<ruby>毛利蘭<rt>もうりらん</rt></ruby>", "<ruby>阿笠博士<rt>あがさはかせ</rt></ruby>"],
+        answer: "<ruby>大岡紅葉<rt>おおおかもみじ</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『ゼロの<ruby>執行人<rt>しっこうにん</rt></ruby>』で、<ruby>安室透<rt>あむろとおる</rt></ruby>が<ruby>公安警察<rt>こうあんけいさつ</rt></ruby>として<ruby>働<rt>はたら</rt></ruby>いていたのは、<ruby>誰<rt>だれ</rt></ruby>に<ruby>協力<rt>きょうりょく</rt></ruby>を<ruby>仰<rt>あお</rt></ruby>ぐため？",
+        choices: ["コナン", "<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>", "<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>", "<ruby>毛利小五郎<rt>もうりこごろう</rt></ruby>"],
+        answer: "コナン"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>紺青<rt>こんじょう</rt></ruby>の<ruby>拳<rt>こぶし</rt></ruby>』で、<ruby>京極真<rt>きょうごくまこと</rt></ruby>が<ruby>園子<rt>そのこ</rt></ruby>のために<ruby>戦<rt>たたか</rt></ruby>った<ruby>相手<rt>あいて</rt></ruby>は？",
+        choices: ["<ruby>怪盗<rt>かいとう</rt></ruby>キッド", "シンガポールの<ruby>格闘家<rt>かくとうか</rt></ruby>", "リシ・ラマナサン", "レオン・ロー"],
+        answer: "リシ・ラマナサン"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>緋色<rt>ひいろ</rt></ruby>の<ruby>弾丸<rt>だんがん</rt></ruby>』で、<ruby>赤井秀一<rt>あかいしゅういち</rt></ruby>が「<ruby>日本<rt>にほん</rt></ruby>のFBI」と<ruby>呼<rt>よ</rt></ruby>んだ<ruby>組織<rt>そしき</rt></ruby>は？",
+        choices: ["<ruby>警察<rt>けいさつ</rt></ruby>", "<ruby>公安<rt>こうあん</rt></ruby>", "<ruby>機動隊<rt>きどうたい</rt></ruby>", "<ruby>自衛隊<rt>じえいたい</rt></ruby>"],
+        answer: "<ruby>公安<rt>こうあん</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『ハロウィンの<ruby>花嫁<rt>はなよめ</rt></ruby>』で、コナンが<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>止<rt>と</rt></ruby>めるために<ruby>利用<rt>りよう</rt></ruby>したのは？",
+        choices: ["<ruby>爆弾解体班<rt>ばくだんかいたいはん</rt></ruby>", "<ruby>爆弾処理班<rt>ばくだんしょりはん</rt></ruby>", "<ruby>警察<rt>けいさつ</rt></ruby>", "<ruby>少年探偵団<rt>しょうねんたんていだん</rt></ruby>"],
+        answer: "<ruby>爆弾処理班<rt>ばくだんしょりはん</rt></ruby>"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>黒鉄<rt>くろがね</rt></ruby>の<ruby>魚影<rt>ぎょえい</rt></ruby>』で、<ruby>灰原哀<rt>はいばらあい</rt></ruby>の<ruby>正体<rt>しょうたい</rt></ruby>を<ruby>暴<rt>あば</rt></ruby>こうとした<ruby>黒<rt>くろ</rt></ruby>の<ruby>組織<rt>そしき</rt></ruby>のメンバーは？",
+        choices: ["ジン", "ベルモット", "ピンガ", "ウォッカ"],
+        answer: "ピンガ"
+      },
+      {
+        question: "<ruby>映画<rt>えいが</rt></ruby>『<ruby>名探偵<rt>めいたんてい</rt></ruby>コナン ハロウィンの<ruby>花嫁<rt>はなよめ</rt></ruby>』で、<ruby>安室透<rt>あむろとおる</rt></ruby>がコナンに<ruby>助<rt>たす</rt></ruby>けを<ruby>求<rt>もと</rt></ruby>めた<ruby>最初<rt>さいしょ</rt></ruby>のきっかけは？",
+        choices: ["<ruby>結婚式<rt>けっこんしき</rt></ruby>での<ruby>事件<rt>じけん</rt></ruby>", "<ruby>警察学校組<rt>けいさつがっこうぐみ</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>", "<ruby>過去<rt>かこ</rt></ruby>の<ruby>事件<rt>じけん</rt></ruby>の<ruby>真相<rt>しんそう</rt></ruby>", "<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>仕掛<rt>しか</rt></ruby>けられたこと"],
+        answer: "<ruby>爆弾<rt>ばくだん</rt></ruby>を<ruby>仕掛<rt>しか</rt></ruby>けられたこと"
+      }
+    ];
+
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const questionText = document.getElementById('question-text');
+    const choicesContainer = document.getElementById('choices-container');
+    const progressText = document.getElementById('progress');
+    const resultText = document.getElementById('result-text');
+    const scoreText = document.getElementById('score-text');
+
+    let currentQuizIndex = 0;
+    let score = 0;
+    let shuffledQuizzes = [];
+
+    startBtn.addEventListener('click', startQuiz);
+    retryBtn.addEventListener('click', retryQuiz);
+    resetBtn.addEventListener('click', resetQuiz);
+
+    // 配列をシャッフルする関数
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function startQuiz() {
+      startScreen.classList.add('hidden');
+      quizScreen.classList.remove('hidden');
+      currentQuizIndex = 0;
+      score = 0;
+      // クイズの配列をシャッフル
+      shuffledQuizzes = [...quizzes];
+      shuffleArray(shuffledQuizzes);
+      loadQuiz();
+    }
+
+    function retryQuiz() {
+      resultScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+      resultScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      quizScreen.classList.add('hidden');
+      currentQuizIndex = 0;
+      score = 0;
+    }
+
+    function loadQuiz() {
+      if (currentQuizIndex < shuffledQuizzes.length) {
+        const currentQuiz = shuffledQuizzes[currentQuizIndex];
+        questionText.innerHTML = currentQuiz.question;
+        choicesContainer.innerHTML = '';
+        // 変更箇所: progressTextにスコアも表示するように修正
+        progressText.textContent = `第${currentQuizIndex + 1}問 / 全${quizzes.length}問 (スコア: ${score}点)`;
+
+        // 選択肢の配列をシャッフル
+        const shuffledChoices = [...currentQuiz.choices];
+        shuffleArray(shuffledChoices);
+
+        shuffledChoices.forEach(choice => {
+          const button = document.createElement('button');
+          button.innerHTML = choice;
+          button.classList.add('choice-btn');
+          button.addEventListener('click', () => checkAnswer(choice, currentQuiz.answer));
+          choicesContainer.appendChild(button);
+        });
+      } else {
+        showResult();
+      }
+    }
+
+    function checkAnswer(selectedChoice, correctAnswer) {
+      const buttons = choicesContainer.querySelectorAll('.choice-btn');
+      let isCorrect = (selectedChoice === correctAnswer);
+
+      buttons.forEach(button => {
+        if (button.innerHTML === correctAnswer) {
+          button.classList.add('correct');
+        } else if (button.innerHTML === selectedChoice) {
+          button.classList.add('incorrect');
+        }
+        button.disabled = true;
+      });
+
+      if (isCorrect) {
+        score++;
+        // 変更箇所: 正解の場合に「正解！」を表示
+        const message = document.createElement('div');
+        message.textContent = '正解！';
+        message.style.color = '#4CAF50';
+        message.style.fontSize = '1.5em';
+        message.style.fontWeight = 'bold';
+        message.style.marginTop = '10px';
+        choicesContainer.appendChild(message);
+      } else {
+        // 変更箇所: 不正解の場合に「不正解…」を表示
+        const message = document.createElement('div');
+        message.textContent = '不正解…';
+        message.style.color = '#dc3545';
+        message.style.fontSize = '1.5em';
+        message.style.fontWeight = 'bold';
+        message.style.marginTop = '10px';
+        choicesContainer.appendChild(message);
+      }
+
+      // 次の問題へ進むまでの待機
+      setTimeout(() => {
+        currentQuizIndex++;
+        loadQuiz();
+      }, 1500);
+    }
+
+    function showResult() {
+      quizScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      scoreText.textContent = `${score} / ${quizzes.length} 点`;
+
+      let message = '';
+      if (score === quizzes.length) {
+        message = "おめでとう！あなたは「コナンマイスター」だ！🎉";
+      } else if (score >= quizzes.length * 0.7) {
+        message = "なかなかの腕前だ！「名探偵助手」レベル！🕵️";
+      } else if (score >= quizzes.length * 0.4) {
+        message = "まだまだこれから！「見習い探偵」として頑張ろう！";
+      } else {
+        message = "ぜんぜんだめ！映画をもう一度見直してみよう！";
+      }
+      resultText.textContent = message;
+    }
+  </script>
+
+</body>
+
+</html>
