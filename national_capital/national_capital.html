@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <title>Study Tool</title>
+  <link type="text/css" rel="stylesheet" href="./national_capital.css">
+  <script type="text/javascript" rel="script" src="national_capital.js"></script>
+</head>
+
+<body onload="init()">
+  <div>地域
+    <input type="button" id="allcheckbtn" class="allcheck_button" value="すべてチェック" onclick="onAllAreaButton();">
+    <input type="button" id="allclearbtn" class="allcheck_button" value="すべてはずす" onclick="onAllClearButton();">
+    <!-- <span>　　　　　　</span><label><input type="checkbox" id="sound" checked />音</label> -->
+  </div>
+  <div>
+    <!-- 順番はjsのconst ASIA等の並びと合わせる（配列にするので） -->
+    <label><input type="checkbox" name="area" checked/>アジア</label>
+    <label><input type="checkbox" name="area" />ヨーロッパ</label>
+    <label><input type="checkbox" name="area" />北アメリカ</label>
+    <label><input type="checkbox" name="area" />南アメリカ</label>
+    <label><input type="checkbox" name="area" />アフリカ</label>
+    <label><input type="checkbox" name="area" />オセアニア</label>
+  </div>
+  <br>
+  <table width="100%">
+    <tr>
+      <td>
+        <div>
+          <label><input type="radio" name="mode" value="国名→首都" checked>国名→首都</label>
+          <label><input type="radio" name="mode" value="首都→国名">首都→国名</label>
+          　<label><input type="checkbox" name="nigateonly">にがてのみ</label>
+          <input type="button" class="clear_nigateonly_button" value="にがてクリア" onclick="onClearNigateOnlyButton();"><br><br>
+          <input type="button" class="toggle_button" value="" onclick="onToggleButton();">
+          <input type="button" class="clear_best_button" value="記録クリア" onclick="onClearBestTimeButton();">
+        </div>
+        <div class="best">
+          <span id="record">0</span>秒
+          (最高記録: <span id="best_time">0</span>秒)
+        </div>
+      </td>
+      <td>
+        <span class="wrong_text"></span><br>
+        <span id="question_str"></span><br>
+        <span id="question_correct"></span>
+      </td>
+      <td>
+        <input type="button" id="giveup_button" class="giveup" value="答えを見る" onclick="onGiveupButton();">
+        <span class="giveup_second">(+10秒)</span><br>
+        <label id = "nigate_label"><input type="checkbox" name="nigate_check">にがて</label>
+      </td>
+    </tr>
+  </table>
+
+  <div id="buttons"></div>
+<!--
+  <audio id="correct_sound">
+    <source src="./correct.mp3" type="audio/mp3">
+  </audio>
+  <audio id="wrong_sound">
+    <source src="./wrong.mp3" type="audio/mp3">
+  </audio>
+-->
+</body>
+
+</html>

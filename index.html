@@ -77,28 +77,33 @@
     }
 
     .color-3 {
-      background: linear-gradient(45deg, #ffc107, #d39e00);
+      background: linear-gradient(45deg, #5cb85c, #449d44);
     }
 
     .color-4 {
-      background: linear-gradient(45deg, #dc3545, #bd2130);
+      background: linear-gradient(45deg, #ffc107, #d39e00);
     }
 
     .color-5 {
-      background: linear-gradient(45deg, #6c757d, #5a6268);
+      background: linear-gradient(45deg, #dc3545, #bd2130);
     }
 
     .color-6 {
-      background: linear-gradient(45deg, #17a2b8, #117a8b);
+      background: linear-gradient(45deg, #6c757d, #5a6268);
     }
 
     .color-7 {
-      background: linear-gradient(45deg, #fd7e14, #d3660a);
+      background: linear-gradient(45deg, #17a2b8, #117a8b);
     }
 
     .color-8 {
+      background: linear-gradient(45deg, #fd7e14, #d3660a);
+    }
+
+    .color-9 {
       background: linear-gradient(45deg, #6f42c1, #563d7c);
     }
+    
 
     /* Responsive adjustments */
     @media (max-width: 480px) {
@@ -119,91 +124,19 @@
     <div class="button-grid">
       <button class="menu_button color-1" onclick="location.href='./sum_pair/sum_pair.html'">足して◯ゲーム</button>
       <button class="menu_button color-2" onclick="location.href='./national_flag/national_flag.html'">国旗当てゲーム</button>
-      <button class="menu_button color-3"
-        onclick="location.href='./english_word/english_word.html?level=0'">小学英単語</button>
+      <button class="menu_button color-3" onclick="location.href='./national_capital/national_capital.html'">首都当てゲーム</button>
       <button class="menu_button color-4"
-        onclick="location.href='./english_word/english_word.html?level=1'">中1英単語</button>
+        onclick="location.href='./english_word/english_word.html?level=0'">小学英単語</button>
       <button class="menu_button color-5"
-        onclick="location.href='./english_word/english_word.html?level=2'">中2英単語</button>
+        onclick="location.href='./english_word/english_word.html?level=1'">中1英単語</button>
       <button class="menu_button color-6"
+        onclick="location.href='./english_word/english_word.html?level=2'">中2英単語</button>
+      <button class="menu_button color-7"
         onclick="location.href='./english_word/english_word.html?level=3'">中3英単語</button>
-      <button class="menu_button color-7" onclick="location.href='./kotowaza/kotowaza.html'">ことわざ学習ゲーム</button>
-      <button class="menu_button color-8" onclick="location.href='./conan/conan.html'">名探偵コナン 映画クイズ</button>
+      <button class="menu_button color-8" onclick="location.href='./kotowaza/kotowaza.html'">ことわざ学習ゲーム</button>
+      <button class="menu_button color-9" onclick="location.href='./conan/conan.html'">名探偵コナン 映画クイズ</button>
     </div>
   </div>
 </body>
 
 </html>
-
-<!--
-<!DOCTYPE html>
-<html>
-
-<head>
-  <meta name=”robots” content=”noindex”>
-  <meta name=”robots” content=”nofollow”>
-  <meta charset="UTF-8">
-  <title>Study Tool</title>
-  <style>
-    h1 {
-      padding: 0.5em;
-      color: #010101;
-      background: #eaf3ff;
-      border-bottom: solid 3px #516ab6;
-    }
-
-    .menu_button {
-      width: 60%;
-      height: 80px;
-      font-size: 30px;
-      display: block;
-      margin-left: auto;
-      margin-right: auto;
-      padding: 10px 20px;
-      font-weight: bold;
-      background: linear-gradient(90deg, #1f28ba, #85bcff);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      box-shadow: 0 4px 8px rgba(0, 114, 255, 0.4);
-      cursor: pointer;
-      transition: box-shadow 0.3s;
-    }
-  </style>
-</head>
-
-<body>
-  <h1>Study Tool</h1>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'" onclick="location.href='./sum_pair/sum_pair.html'">足して◯ゲーム</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'" onclick="location.href='./national_flag/national_flag.html'">国旗当てゲーム</button>
-  </p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'"
-      onclick="location.href='./english_word/english_word.html?level=0'">小学英単語</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'"
-      onclick="location.href='./english_word/english_word.html?level=1'">中1英単語</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'"
-      onclick="location.href='./english_word/english_word.html?level=2'">中2英単語</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'"
-      onclick="location.href='./english_word/english_word.html?level=3'">中3英単語</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'" onclick="location.href='./kotowaza/kotowaza.html'">ことわざ学習ゲーム</button></p>
-  <p><button class="menu_button" onmouseover="this.style.boxShadow='0 6px 12px rgba(0, 114, 255, 0.6)'"
-      onmouseout="this.style.boxShadow='0 4px 8px rgba(0, 114, 255, 0.4)'" onmousedown="this.style.opacity='0.5'"
-      onmouseup="this.style.opacity='1'" onclick="location.href='./conan/conan.html'">名探偵コナン 映画クイズ</button></p>
-</body>
-
-</html>
--->

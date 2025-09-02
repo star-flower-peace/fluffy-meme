@@ -1,0 +1,98 @@
+div {
+  font-size: 20px;
+}
+
+#question_str {
+  font-size: 30px;
+}
+
+#question_correct {
+  font-size: 30px;
+}
+
+
+.wrong_text {
+  font-size: 30px; /*question_nameと同じにする*/
+  color: red;
+}
+
+.best {
+  font-size: 34px;  
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+}
+
+.country_button {
+/*	width: 120px;*/
+/*	font-weight: bold;*/
+	padding: 0.2rem 0.2rem;
+	margin: 2px;
+  font-size: 24px;
+	background-image: linear-gradient(to top, #D8D9DB 0%, #fff 80%, #FDFDFD 100%);
+	border-radius: 100vh;
+/*	color: blue;*/
+	border: 1px solid #999;
+}
+
+.allcheck_button {
+  width: 200px;
+  height: 40px;
+  color: black;
+  box-sizing: border-box;
+  background: lightblue;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 10px;
+}
+
+.giveup {
+  width: 160px;
+  height: 40px;
+  color: black;
+  box-sizing: border-box;
+  background: orange;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 10px;
+  display: none; /*最初非表示*/
+}
+
+.giveup_second {
+  font-size: 24px;
+  display: none; /*最初非表示*/
+}
+
+.toggle_button {
+  width: 180px;
+  height: 70px;
+  color: white;
+  box-sizing: border-box;
+  background: teal;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 10px;
+}
+
+.clear_best_button {
+  width: 180px;
+  height: 70px;
+  color: white;
+  box-sizing: border-box;
+  background: yellowgreen;
+  cursor: pointer;
+  font-size: 24px;
+  border-radius: 10px;
+}
+
+.clear_nigateonly_button {
+  width: 100px;
+  height: 30px;
+  color: white;
+  box-sizing: border-box;
+  background: yellowgreen;
+  cursor: pointer;
+  font-size: 18qpx;
+  border-radius: 10px;
+}
