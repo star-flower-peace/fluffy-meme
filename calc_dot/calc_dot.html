@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta name="robots" content="noindex">
+  <meta name="robots" content="nofollow">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>数が量で見える 計算ゲーム</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .game-container {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+    }
+
+    .title {
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .game-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      font-size: 1.2em;
+    }
+
+    .score,
+    .timer {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 10px 20px;
+      border-radius: 10px;
+      min-width: 120px;
+    }
+
+    .problem-area {
+      margin-bottom: 30px;
+    }
+
+    .problem {
+      font-size: 3em;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 15px;
+      min-height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .visual-numbers {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .number-visual {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+      min-width: 200px;
+    }
+
+    .number-label {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    .dots {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+      justify-content: flex-start;
+      max-width: 180px;
+      margin: 0 auto;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      background: #FFD700;
+      border-radius: 50%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-area {
+      margin-bottom: 30px;
+    }
+
+    .answer-display {
+      font-size: 2em;
+      background: rgba(255, 255, 255, 0.3);
+      border: 3px solid rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      max-width: 240px;
+      margin: 0 auto 20px;
+    }
+
+    .key {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-size: 1.5em;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .key.wide {
+      grid-column: span 1;
+      width: 70px;
+    }
+
+    .key:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .key:active {
+      transform: translateY(0);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+      border: none;
+      border-radius: 10px;
+      padding: 12px 24px;
+      font-size: 1.1em;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .btn.primary {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+    }
+
+    .btn.secondary {
+      background: linear-gradient(45deg, #4CAF50, #45a049);
+    }
+
+    .btn.selected {
+      background: linear-gradient(45deg, #9c27b0, #673ab7);
+      box-shadow: inset 0 3px 7px rgba(0, 0, 0, 0.3);
+      transform: translateY(1px);
+    }
+
+    .btn.selected:hover {
+      background: linear-gradient(45deg, #9c27b0, #673ab7);
+      transform: translateY(1px);
+    }
+
+    /* 青色のボタンスタイル */
+    .btn.blue {
+      background: linear-gradient(45deg, #2196F3, #1976D2);
+    }
+
+    .btn.blue:hover {
+      background: linear-gradient(45deg, #2196F3, #1976D2);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .start-screen {
+      text-align: center;
+    }
+
+    .start-screen h2 {
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    .difficulty-buttons {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .operation-buttons {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 20px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .result-screen {
+      text-align: center;
+    }
+
+    .result-screen h2 {
+      margin-bottom: 20px;
+      font-size: 2.2em;
+    }
+
+    .final-score {
+      font-size: 1.5em;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px;
+      border-radius: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .correct {
+      background: rgba(76, 175, 80, 0.3) !important;
+      animation: flash-green 0.5s;
+    }
+
+    .incorrect {
+      background: rgba(244, 67, 54, 0.3) !important;
+      animation: flash-red 0.5s;
+    }
+
+    @keyframes flash-green {
+
+      0%,
+      100% {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      50% {
+        background: rgba(76, 175, 80, 0.5);
+      }
+    }
+
+    @keyframes flash-red {
+
+      0%,
+      100% {
+        background: rgba(255, 255, 255, 0.3);
+      }
+
+      50% {
+        background: rgba(244, 67, 54, 0.5);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .visual-numbers {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .game-info {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .title {
+        font-size: 2em;
+      }
+
+      .operation-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-container">
+    <div id="startScreen" class="start-screen">
+      <h1 class="title">🧮 数が量で見える!<br> 計算ゲーム</h1>
+      <h2>計算タイプを選択してください<br>（組み合わせOK）</h2>
+      <div class="operation-buttons">
+        <button class="btn primary selected" id="additionBtn" onclick="toggleOperationType('addition')">たし算</button>
+        <button class="btn" id="subtractionBtn" onclick="toggleOperationType('subtraction')">ひき算</button>
+        <button class="btn" id="multiplicationBtn" onclick="toggleOperationType('multiplication')">かけ算</button>
+        <button class="btn" id="divisionBtn" onclick="toggleOperationType('division')">わり算</button>
+      </div>
+      <h2 style="margin-top: 30px;">難易度を選択してください</h2>
+      <div class="difficulty-buttons">
+        <button class="btn primary selected" id="easyBtn" onclick="setDifficulty('easy')">かんたん</button>
+        <button class="btn" id="mediumBtn" onclick="setDifficulty('medium')">ふつう</button>
+        <button class="btn secondary" id="hardBtn" onclick="setDifficulty('hard')">むずかしい</button>
+      </div>
+      <h2 style="margin-top: 30px;">ゲーム時間を選択してください</h2>
+      <div class="difficulty-buttons">
+        <button class="btn primary selected" id="time1Btn" onclick="setTimeAndStart(60)">1分</button>
+        <button class="btn" id="time3Btn" onclick="setTimeAndStart(180)">3分</button>
+        <button class="btn secondary" id="time5Btn" onclick="setTimeAndStart(300)">5分</button>
+      </div>
+      <div id="selectedSettings"
+        style="margin-top: 20px; font-size: 1.1em; background: rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 10px;">
+        <div>計算: <span id="selectedOperation">たし算</span></div>
+        <div>難易度: <span id="selectedDifficulty">かんたん</span></div>
+        <div>時間: <span id="selectedTime">1分</span></div>
+      </div>
+      <div style="margin-top: 20px;">
+        <button class="btn blue" id="startButton" onclick="startGameIfReady()"
+          style="font-size: 1.3em; padding: 15px 30px;">🎮 スタート</button>
+      </div>
+    </div>
+
+    <div id="gameScreen" class="hidden">
+      <div class="game-info">
+        <div class="score">スコア: <span id="score">0</span></div>
+        <div class="timer">残り時間: <span id="timer">60</span>秒</div>
+      </div>
+
+      <div class="problem-area">
+        <div class="problem" id="problem">問題を生成中...</div>
+
+        <div class="visual-numbers" id="visualNumbers">
+        </div>
+      </div>
+
+      <div class="input-area">
+        <div class="answer-display" id="answerDisplay">?</div>
+
+        <div class="keypad">
+          <button class="key" onclick="inputNumber(7)">7</button>
+          <button class="key" onclick="inputNumber(8)">8</button>
+          <button class="key" onclick="inputNumber(9)">9</button>
+          <button class="key" onclick="inputNumber(4)">4</button>
+          <button class="key" onclick="inputNumber(5)">5</button>
+          <button class="key" onclick="inputNumber(6)">6</button>
+          <button class="key" onclick="inputNumber(1)">1</button>
+          <button class="key" onclick="inputNumber(2)">2</button>
+          <button class="key" onclick="inputNumber(3)">3</button>
+          <button class="key" onclick="inputNumber(0)">0</button>
+          <button class="key" onclick="clearInput()">C</button>
+          <button class="key primary" onclick="submitAnswer()"
+            style="background: linear-gradient(45deg, #4CAF50, #45a049); font-size: 1.2em;">↵</button>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn blue" onclick="endGame()">ゲーム終了</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultScreen" class="result-screen hidden">
+      <h2 id="resultTitle">🎉 ゲーム終了！</h2>
+      <div class="final-score">
+        <div>最終スコア: <span id="finalScore">0</span>問正解</div>
+        <div>正解率: <span id="accuracy">0</span>%</div>
+      </div>
+      <div class="action-buttons">
+        <button class="btn blue" onclick="showStartScreen()">もう一度プレイ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let gameState = {
+      currentProblem: null,
+      currentAnswer: '',
+      score: 0,
+      totalProblems: 0,
+      timeLeft: 60,
+      gameTime: 60,
+      timer: null,
+      difficulty: 'easy',
+      maxNumber: 10,
+      operationTypes: ['addition'] // 複数選択可能な配列
+    };
+
+    function showStartScreen() {
+      document.getElementById('startScreen').classList.remove('hidden');
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+      resetGame();
+      updateSelectedSettings();
+    }
+
+    function toggleOperationType(type) {
+      const index = gameState.operationTypes.indexOf(type);
+      if (index > -1) {
+        // 既に選択されている場合は削除（ただし、最低1つは残す）
+        if (gameState.operationTypes.length > 1) {
+          gameState.operationTypes.splice(index, 1);
+        }
+      } else {
+        // 選択されていない場合は追加
+        gameState.operationTypes.push(type);
+      }
+      updateButtonSelection('operation');
+      updateSelectedSettings();
+    }
+
+    function setDifficulty(difficulty) {
+      gameState.difficulty = difficulty;
+      gameState.maxNumber = difficulty === 'easy' ? 10 : difficulty === 'medium' ? 30 : 100;
+      updateButtonSelection('difficulty', difficulty);
+      updateSelectedSettings();
+    }
+
+    function setTimeAndStart(seconds) {
+      gameState.gameTime = seconds;
+      gameState.timeLeft = seconds;
+      updateButtonSelection('time', seconds);
+      updateSelectedSettings();
+    }
+
+    function updateButtonSelection(category, value) {
+      if (category === 'operation') {
+        // 計算タイプボタンの選択状態を更新
+        ['additionBtn', 'subtractionBtn', 'multiplicationBtn', 'divisionBtn'].forEach(id => {
+          document.getElementById(id).classList.remove('selected');
+        });
+
+        // 選択されている操作タイプのボタンをハイライト
+        gameState.operationTypes.forEach(type => {
+          const buttonId = type === 'addition' ? 'additionBtn' :
+            type === 'subtraction' ? 'subtractionBtn' :
+              type === 'multiplication' ? 'multiplicationBtn' : 'divisionBtn';
+          document.getElementById(buttonId).classList.add('selected');
+        });
+      } else if (category === 'difficulty') {
+        // 難易度ボタンの選択状態を更新
+        ['easyBtn', 'mediumBtn', 'hardBtn'].forEach(id => {
+          document.getElementById(id).classList.remove('selected');
+        });
+        const buttonId = value === 'easy' ? 'easyBtn' :
+          value === 'medium' ? 'mediumBtn' : 'hardBtn';
+        document.getElementById(buttonId).classList.add('selected');
+      } else if (category === 'time') {
+        // 時間ボタンの選択状態を更新
+        ['time1Btn', 'time3Btn', 'time5Btn'].forEach(id => {
+          document.getElementById(id).classList.remove('selected');
+        });
+        const buttonId = value === 60 ? 'time1Btn' :
+          value === 180 ? 'time3Btn' : 'time5Btn';
+        document.getElementById(buttonId).classList.add('selected');
+      }
+    }
+
+    function updateSelectedSettings() {
+      const operationNames = {
+        'addition': 'たし算',
+        'subtraction': 'ひき算',
+        'multiplication': 'かけ算',
+        'division': 'わり算'
+      };
+
+      const difficultyNames = {
+        'easy': 'かんたん',
+        'medium': 'ふつう',
+        'hard': 'むずかしい'
+      };
+
+      // 選択された操作タイプを文字列に変換
+      const selectedOperationNames = gameState.operationTypes.map(type => operationNames[type]).join('・');
+
+      document.getElementById('selectedOperation').textContent = selectedOperationNames;
+      document.getElementById('selectedDifficulty').textContent = difficultyNames[gameState.difficulty];
+      document.getElementById('selectedTime').textContent = `${gameState.gameTime / 60}分`;
+
+      // ハイスコア表示を更新
+      const highScoreKey = getHighScoreKey();
+      const highScore = localStorage.getItem(highScoreKey) || 0;
+
+      const highScoreElement = document.getElementById('highScoreDisplay');
+      if (!highScoreElement) {
+        const settingsDiv = document.getElementById('selectedSettings');
+        const newHighScoreElement = document.createElement('div');
+        newHighScoreElement.id = 'highScoreDisplay';
+        settingsDiv.appendChild(newHighScoreElement);
+      }
+      document.getElementById('highScoreDisplay').textContent = `最高スコア: ${highScore} 問`;
+    }
+
+    function startGameIfReady() {
+      startGame();
+    }
+
+    function startGame() {
+      document.getElementById('startScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+      document.getElementById('resultScreen').classList.add('hidden');
+
+      resetGame();
+      generateProblem();
+      startTimer();
+    }
+
+    function resetGame() {
+      gameState.score = 0;
+      gameState.totalProblems = 0;
+      gameState.timeLeft = gameState.gameTime;
+      gameState.currentAnswer = '';
+
+      if (gameState.timer) {
+        clearInterval(gameState.timer);
+      }
+
+      updateDisplay();
+    }
+
+    function generateProblem() {
+      // 選択された操作タイプからランダムに1つを選ぶ
+      const selectedOperation = gameState.operationTypes[Math.floor(Math.random() * gameState.operationTypes.length)];
+
+      let num1, num2, answer, operation, expression;
+
+      switch (selectedOperation) {
+        case 'addition':
+          // 足し算：答えが100以下になるように
+          num1 = Math.floor(Math.random() * gameState.maxNumber) + 1;
+          num2 = Math.floor(Math.random() * Math.min(gameState.maxNumber, 100 - num1)) + 1;
+          answer = num1 + num2;
+          operation = '+';
+          expression = `${num1} + ${num2}`;
+          break;
+
+        case 'subtraction':
+          // 引き算：答えが自然数になるように
+          num1 = Math.floor(Math.random() * gameState.maxNumber) + 2;
+          num2 = Math.floor(Math.random() * (num1 - 1)) + 1;
+          answer = num1 - num2;
+          operation = '-';
+          expression = `${num1} - ${num2}`;
+          break;
+
+        case 'multiplication':
+          // かけ算：答えが100以下になるように、かつ掛ける数・掛けられる数のどちらも1でないように
+          do {
+            num1 = Math.floor(Math.random() * Math.min(gameState.maxNumber, 10)) + 1;
+            num2 = Math.floor(Math.random() * Math.min(gameState.maxNumber, Math.floor(100 / num1))) + 1;
+          } while (num1 === 1 || num2 === 1); // どちらかが1の場合は再生成
+
+          answer = num1 * num2;
+          operation = '×';
+          expression = `${num1} × ${num2}`;
+          break;
+
+        case 'division':
+          // わり算：割る数も割られる数も100以下とし、割る数と割られる数が同じにならないようにする
+          do {
+            num2 = Math.floor(Math.random() * Math.min(gameState.maxNumber, 100)) + 1;
+            answer = Math.floor(Math.random() * Math.min(gameState.maxNumber, Math.floor(100 / num2))) + 1;
+            num1 = num2 * answer;
+          } while (num1 === num2); // 割る数と割られる数が同じ場合は再生成
+
+          // 結果的にnum1が100を超えた場合は再調整
+          if (num1 > 100) {
+            answer = Math.floor(100 / num2);
+            num1 = num2 * answer;
+            // 再調整後も同じ値になる場合は、num2を変更
+            if (num1 === num2) {
+              num2 = Math.floor(Math.random() * Math.min(gameState.maxNumber, 50)) + 2;
+              answer = Math.floor(Math.random() * Math.min(gameState.maxNumber, Math.floor(100 / num2))) + 1;
+              num1 = num2 * answer;
+            }
+          }
+          operation = '÷';
+          expression = `${num1} ÷ ${num2}`;
+          break;
+      }
+
+      gameState.currentProblem = {
+        expression: expression,
+        num1: num1,
+        num2: num2,
+        operation: operation,
+        answer: answer
+      };
+
+      gameState.currentAnswer = '';
+      updateDisplay();
+    }
+
+    function createDots(number) {
+      const dots = [];
+      for (let i = 0; i < number; i++) {
+        // 10個ごとに改行を入れる
+        if (i > 0 && i % 10 === 0) {
+          dots.push('<div style="width: 100%; height: 0;"></div>');
+        }
+        dots.push('<div class="dot"></div>');
+      }
+      return dots.join('');
+    }
+
+    function updateDisplay() {
+      document.getElementById('score').textContent = gameState.score;
+      // Calculate minutes and seconds
+      const minutes = Math.floor(gameState.timeLeft / 60);
+      const seconds = gameState.timeLeft % 60;
+
+      // Format the time with leading zeros if necessary
+      const formattedTime = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+      // Update the timer display
+      document.getElementById('timer').textContent = formattedTime;
+      document.getElementById('answerDisplay').textContent = gameState.currentAnswer || '?';
+
+      if (gameState.currentProblem) {
+        document.getElementById('problem').textContent = gameState.currentProblem.expression + ' = ?';
+
+        const visualNumbers = document.getElementById('visualNumbers');
+        const operation = gameState.currentProblem.operation;
+
+        // 全ての場合においてドットを表示
+        if (operation === '+') {
+          visualNumbers.innerHTML = `
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num1}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num1)}</div>
+                        </div>
+                        <div class="number-visual" style="display: flex; align-items: center; font-size: 2em; min-width: auto;">+</div>
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num2}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num2)}</div>
+                        </div>
+                    `;
+        } else if (operation === '-') {
+          visualNumbers.innerHTML = `
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num1}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num1)}</div>
+                        </div>
+                        <div class="number-visual" style="display: flex; align-items: center; font-size: 2em; min-width: auto;">-</div>
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num2}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num2)}</div>
+                        </div>
+                    `;
+        } else if (operation === '×') {
+          visualNumbers.innerHTML = `
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num1}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num1)}</div>
+                        </div>
+                        <div class="number-visual" style="display: flex; align-items: center; font-size: 2em; min-width: auto;">×</div>
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num2}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num2)}</div>
+                        </div>
+                    `;
+        } else if (operation === '÷') {
+          visualNumbers.innerHTML = `
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num1}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num1)}</div>
+                        </div>
+                        <div class="number-visual" style="display: flex; align-items: center; font-size: 2em; min-width: auto;">÷</div>
+                        <div class="number-visual">
+                            <div class="number-label">${gameState.currentProblem.num2}</div>
+                            <div class="dots">${createDots(gameState.currentProblem.num2)}</div>
+                        </div>
+                    `;
+        }
+      }
+    }
+
+    function startTimer() {
+      gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        updateDisplay();
+
+        if (gameState.timeLeft <= 0) {
+          endGame(true); // <-- Call with 'true'
+        }
+      }, 1000);
+    }
+
+    function inputNumber(num) {
+      if (gameState.currentAnswer.length < 3) {
+        gameState.currentAnswer += num.toString();
+        updateDisplay();
+      }
+    }
+
+    function clearInput() {
+      gameState.currentAnswer = '';
+      updateDisplay();
+    }
+
+    function submitAnswer() {
+      if (gameState.currentAnswer === '') return;
+
+      const userAnswer = parseInt(gameState.currentAnswer);
+      const correctAnswer = gameState.currentProblem.answer;
+      const answerDisplay = document.getElementById('answerDisplay');
+
+      gameState.totalProblems++;
+
+      if (userAnswer === correctAnswer) {
+        gameState.score++;
+        answerDisplay.classList.add('correct');
+        setTimeout(() => {
+          answerDisplay.classList.remove('correct');
+          generateProblem();
+        }, 500);
+      } else {
+        answerDisplay.classList.add('incorrect');
+        setTimeout(() => {
+          answerDisplay.classList.remove('incorrect');
+          // 間違った場合も次の問題へ
+          generateProblem();
+        }, 500);
+      }
+    }
+
+    function endGame(isTimeUp = false) {
+      if (gameState.timer) {
+        clearInterval(gameState.timer);
+      }
+
+      // Only update high score if the game ended because time ran out.
+      if (isTimeUp) {
+        const highScoreKey = getHighScoreKey();
+        const currentHighScore = localStorage.getItem(highScoreKey);
+        const finalScore = gameState.score;
+
+        const savedHighScore = currentHighScore ? parseInt(currentHighScore) : 0;
+
+        const resultTitle = document.getElementById('resultTitle');
+
+        if (finalScore > savedHighScore) {
+          localStorage.setItem(highScoreKey, finalScore);
+          resultTitle.textContent = '🏆 ハイスコア更新！';
+        } else {
+          resultTitle.textContent = '🎉 ゲーム終了！';
+        }
+      } else {
+        // If the game was ended manually
+        document.getElementById('resultTitle').textContent = '🎉 ゲーム終了！';
+      }
+
+      document.getElementById('gameScreen').classList.add('hidden');
+      document.getElementById('resultScreen').classList.remove('hidden');
+
+      const accuracy = gameState.totalProblems > 0 ?
+        Math.round((gameState.score / gameState.totalProblems) * 100) : 0;
+
+      document.getElementById('finalScore').textContent = gameState.score;
+      document.getElementById('accuracy').textContent = accuracy;
+
+      // (オプション) 結果画面にハイスコアも表示する
+      const resultScreen = document.getElementById('resultScreen');
+      const existingHighScoreDisplay = resultScreen.querySelector('#highScoreDisplay');
+      if (existingHighScoreDisplay) {
+        existingHighScoreDisplay.remove();
+      }
+
+      // Get the high score to display, whether it was just updated or not.
+      const highScoreKey = getHighScoreKey();
+      const currentHighScore = localStorage.getItem(highScoreKey) || 0;
+
+      const highScoreDisplay = document.createElement('div');
+      highScoreDisplay.id = 'highScoreDisplay';
+      highScoreDisplay.textContent = `ハイスコア: ${currentHighScore} 問`;
+      resultScreen.appendChild(highScoreDisplay);
+    }
+
+    // キーボード入力対応
+    document.addEventListener('keydown', (event) => {
+      if (document.getElementById('gameScreen').classList.contains('hidden')) return;
+
+      const key = event.key;
+      if (key >= '0' && key <= '9') {
+        inputNumber(parseInt(key));
+      } else if (key === 'Enter') {
+        event.preventDefault();
+        submitAnswer();
+      } else if (key === 'Backspace' || key === 'Delete') {
+        event.preventDefault();
+        if (gameState.currentAnswer.length > 0) {
+          gameState.currentAnswer = gameState.currentAnswer.slice(0, -1);
+          updateDisplay();
+        }
+      } else if (key === 'Escape') {
+        clearInput();
+      }
+    });
+
+    function getHighScoreKey() {
+      const sortedOperations = gameState.operationTypes.slice().sort();
+      return `highscore-${sortedOperations.join('-')}-${gameState.difficulty}-${gameState.gameTime}`;
+    }
+
+    // 初期表示
+    showStartScreen();
+  </script>
+</body>
+
+</html>
