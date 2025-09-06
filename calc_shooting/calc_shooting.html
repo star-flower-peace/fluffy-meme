@@ -337,8 +337,8 @@
     </div>
 
     <div id="touchControls">
-      <button id="leftButton" class="control-button">◀</button>
-      <button id="rightButton" class="control-button">▶</button>
+      <button id="leftButton" class="control-button"></button>
+      <button id="rightButton" class="control-button"></button>
     </div>
 
     <div id="startScreen">
@@ -467,10 +467,6 @@
     const rightButton = document.getElementById('rightButton');
     const resetButton = document.getElementById('resetButton');
 
-    // タッチ操作用のボタンを非表示にする
-    leftButton.style.display = 'none';
-    rightButton.style.display = 'none';
-
     // 画面タップでミサイル発射と自機移動を統合
     canvas.addEventListener('mousedown', handleInputStart);
     canvas.addEventListener('mousemove', handleInputMove);
@@ -489,6 +485,18 @@
       e.preventDefault();
       handleInputEnd();
     }, { passive: false });
+
+   // 左右ボタンタップでミサイル発射
+    leftButton.addEventListener('click', () => {
+        if (gameState === 'playing') {
+            shootBullet();
+        }
+    });
+    rightButton.addEventListener('click', () => {
+        if (gameState === 'playing') {
+            shootBullet();
+        }
+    });
 
     // 画面操作の開始
     function handleInputStart(input) {
@@ -539,7 +547,7 @@
       touchMoveActive = false;
 
       // タップとクリックによる発射
-      shootBullet();
+      // shootBullet();
     }
 
 
@@ -585,9 +593,9 @@
       let baseSpeed = 1;
 
       if (correctAnswers >= 12) {
-        // 12問正解後、3問正解ごとに0.3ずつスピードを上げる
+        // 12問正解後、3問正解ごとに0.1ずつスピードを上げる
         const speedBoosts = Math.floor((correctAnswers - 12) / 3) + 1;
-        baseSpeed = 1 + (speedBoosts * 0.3);
+        baseSpeed = 1 + (speedBoosts * 0.1);
       }
 
       return baseSpeed * baseSpeedMultiplier;
@@ -911,7 +919,8 @@
         enemy.y += enemy.speed;
 
         if (currentTime - enemy.lastShot > 2000 + Math.random() * 3000 && enemy.y > 0 && enemy.y < canvas.height / 2) {
-          if (Math.random() < 0.3) {
+          // 敵機のミサイル発射頻度
+          if (Math.random() < 0.1) {
             shootEnemyBullet(enemy);
             enemy.lastShot = currentTime;
           }
