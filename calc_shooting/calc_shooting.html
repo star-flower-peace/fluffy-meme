@@ -374,6 +374,12 @@
             </div>
           </div>
         </div>
+        <div class="setting-group">
+          <div class="checkbox-item">
+            <input type="checkbox" id="shootOnTap" checked>
+            <label for="shootOnTap">タップで発射</label>
+          </div>
+        </div>
       </div>
       <div class="score-info">
         ハイスコア: <span id="highScoreStart">0</span>
@@ -486,16 +492,16 @@
       handleInputEnd();
     }, { passive: false });
 
-   // 左右ボタンタップでミサイル発射
+    // 左右ボタンタップでミサイル発射
     leftButton.addEventListener('click', () => {
-        if (gameState === 'playing') {
-            shootBullet();
-        }
+      if (gameState === 'playing') {
+        shootBullet();
+      }
     });
     rightButton.addEventListener('click', () => {
-        if (gameState === 'playing') {
-            shootBullet();
-        }
+      if (gameState === 'playing') {
+        shootBullet();
+      }
     });
 
     // 画面操作の開始
@@ -547,7 +553,10 @@
       touchMoveActive = false;
 
       // タップとクリックによる発射
-      // shootBullet();
+      const shootOnTap = document.getElementById('shootOnTap').checked;
+      if (shootOnTap) {
+        shootBullet();
+      }
     }
 
 
