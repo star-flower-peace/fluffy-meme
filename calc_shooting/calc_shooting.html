@@ -635,7 +635,7 @@
           break;
       }
 
-      return { expression, answer: result };
+      return { expression, answer: result, operation: operation };
     }
 
     // プレイヤー戦闘機の描画関数
@@ -932,7 +932,26 @@
 
             if (enemy.isCorrect) {
               correctAnswers++;
+              // 難易度に応じてスコアを加算
               score += difficulty === 'easy' ? 50 : difficulty === 'normal' ? 70 : 90;
+              // 問題の種類に応じてスコアを加算
+              let pointsToAdd = 0;
+              switch (currentProblem.operation) {
+                case 'addition':
+                  pointsToAdd = 0;
+                  break;
+                case 'subtraction':
+                  pointsToAdd = 5;
+                  break;
+                case 'multiplication':
+                  pointsToAdd = 10;
+                  break;
+                case 'division':
+                  pointsToAdd = 15;
+                  break;
+              }
+              score += pointsToAdd;
+
               createExplosion(enemy.x + enemy.width / 2, enemy.y + enemy.height / 2, '#4ecdc4');
 
               enemies.splice(enemyIndex, 1);
@@ -1082,7 +1101,7 @@
 
         // 数字表示
         ctx.fillStyle = 'white';
-        ctx.font = 'bold 16px Arial';
+        ctx.font = 'bold 24px Arial';
         ctx.textAlign = 'center';
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 2;
