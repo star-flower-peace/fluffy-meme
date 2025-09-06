@@ -40,13 +40,19 @@
       left: 20px;
       right: 20px;
       z-index: 10;
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      z-index: 10;
       background: rgba(0, 0, 0, 0.7);
       padding: 15px;
       border-radius: 10px;
       backdrop-filter: blur(10px);
       display: flex;
       align-items: center;
-      gap: 30px;
+      justify-content: space-between;
+      /* 要素を両端に配置 */
       flex-wrap: wrap;
     }
 
@@ -276,6 +282,39 @@
         height: 16px;
       }
     }
+
+    /* オープニング画面内のハイスコア表示用スタイル */
+    .score-info {
+      font-size: 16px;
+      white-space: nowrap;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* ボタンのデザイン */
+    #clearHighScoreButton {
+      padding: 8px 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(45deg, #e74c3c, #c0392b);
+      color: white;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      white-space: nowrap;
+    }
+
+    #clearHighScoreButton:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    #clearHighScoreButton:active {
+      transform: scale(0.98);
+    }
   </style>
 </head>
 
@@ -288,18 +327,17 @@
       <div class="score-info">スコア: <span id="score">0</span></div>
       <div class="score-info">ハイスコア: <span id="highScore">0</span></div>
       <div class="score-info">正解数: <span id="correctCount">0</span></div>
-      <div hidden class="score-info">敵機数: <span id="enemyCount">2</span></div>
+      <!--<div hidden class="score-info">敵機数: <span id="enemyCount">2</span></div>-->
       <div class="score-info">敵機スピード: <span id="enemySpeed">1.0x</span></div>
+      <button id="resetButton">リセット</button>
     </div>
 
     <div id="problem">
       問題を準備中...
     </div>
 
-    <!-- タッチ操作用コントロール -->
     <div id="touchControls">
       <button id="leftButton" class="control-button">◀</button>
-      <button id="resetButton">リセット</button>
       <button id="rightButton" class="control-button">▶</button>
     </div>
 
@@ -337,13 +375,17 @@
           </div>
         </div>
       </div>
+      <div class="score-info">
+        ハイスコア: <span id="highScoreStart">0</span>
+        <button id="clearHighScoreButton">ハイスコアリセット</button>
+      </div>
       <a href="./play_rule.html" style="color: white;">遊び方</a>
       <button onclick="startGame()">ゲーム開始</button>
     </div>
 
     <div id="gameOverScreen" class="hidden">
-      <h2>ゲームオーバー</h2>
-      <div class="score-info">最終スコア: <span id="finalScore">0</span></div>
+      <h2 id="gameOverTitle">ゲームオーバー</h2>
+      <div class="score-info">今回のスコア: <span id="finalScore">0</span></div>
       <div class="score-info">ハイスコア: <span id="finalHighScore">0</span></div>
       <div class="score-info">正解数: <span id="finalCorrectCount">0</span></div>
       <button onclick="showStartScreen()">タイトルに戻る</button>
@@ -354,6 +396,8 @@
   <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
+    const clearHighScoreButton = document.getElementById('clearHighScoreButton');
+    const highScoreStartSpan = document.getElementById('highScoreStart');
 
     // ゲーム状態
     let gameState = 'start'; // 'start', 'playing', 'gameOver'
@@ -366,6 +410,7 @@
     let correctAnswer = 0;
     let speedMultiplier = 1;
     let baseSpeedMultiplier = 1;
+    highScoreStartSpan.textContent = highScore;
 
     // ゲーム設定
     let difficulty = 'easy';
@@ -415,48 +460,88 @@
     // タッチ操作の設定
     let isLeftPressed = false;
     let isRightPressed = false;
+    let touchMoveActive = false;
+    let lastTouchX = null;
 
     const leftButton = document.getElementById('leftButton');
     const rightButton = document.getElementById('rightButton');
     const resetButton = document.getElementById('resetButton');
 
-    // 左ボタンのイベント
-    leftButton.addEventListener('mousedown', () => {
-      isLeftPressed = true;
-    });
-    leftButton.addEventListener('mouseup', () => {
-      isLeftPressed = false;
-    });
-    leftButton.addEventListener('mouseleave', () => {
-      isLeftPressed = false;
-    });
-    leftButton.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      isLeftPressed = true;
-    });
-    leftButton.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      isLeftPressed = false;
-    });
+    // タッチ操作用のボタンを非表示にする
+    leftButton.style.display = 'none';
+    rightButton.style.display = 'none';
 
-    // 右ボタンのイベント
-    rightButton.addEventListener('mousedown', () => {
-      isRightPressed = true;
-    });
-    rightButton.addEventListener('mouseup', () => {
-      isRightPressed = false;
-    });
-    rightButton.addEventListener('mouseleave', () => {
-      isRightPressed = false;
-    });
-    rightButton.addEventListener('touchstart', (e) => {
+    // 画面タップでミサイル発射と自機移動を統合
+    canvas.addEventListener('mousedown', handleInputStart);
+    canvas.addEventListener('mousemove', handleInputMove);
+    canvas.addEventListener('mouseup', handleInputEnd);
+    canvas.addEventListener('mouseleave', handleInputEnd);
+
+    canvas.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      isRightPressed = true;
-    });
-    rightButton.addEventListener('touchend', (e) => {
+      handleInputStart(e.touches[0]);
+    }, { passive: false });
+    canvas.addEventListener('touchmove', (e) => {
       e.preventDefault();
+      handleInputMove(e.touches[0]);
+    }, { passive: false });
+    canvas.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handleInputEnd();
+    }, { passive: false });
+
+    // 画面操作の開始
+    function handleInputStart(input) {
+      if (gameState !== 'playing') return;
+
+      const x = input.clientX;
+      const playerCenterX = player.x + player.width / 2;
+
+      // 自機より左をタップ
+      if (x < playerCenterX) {
+        isLeftPressed = true;
+        isRightPressed = false;
+      }
+      // 自機より右をタップ
+      else if (x > playerCenterX) {
+        isLeftPressed = false;
+        isRightPressed = true;
+      }
+
+      touchMoveActive = true;
+      lastTouchX = x;
+    }
+
+    // 画面操作の移動
+    function handleInputMove(input) {
+      if (!touchMoveActive || gameState !== 'playing') return;
+
+      const x = input.clientX;
+      const playerCenterX = player.x + player.width / 2;
+
+      if (x < playerCenterX) {
+        isLeftPressed = true;
+        isRightPressed = false;
+      } else {
+        isLeftPressed = false;
+        isRightPressed = true;
+      }
+
+      lastTouchX = x;
+    }
+
+    // 画面操作の終了
+    function handleInputEnd() {
+      if (gameState !== 'playing') return;
+
+      isLeftPressed = false;
       isRightPressed = false;
-    });
+      touchMoveActive = false;
+
+      // タップとクリックによる発射
+      shootBullet();
+    }
+
 
     // リセットボタンのイベント
     resetButton.addEventListener('click', () => {
@@ -470,18 +555,16 @@
         showStartScreen();
       }
     });
+    clearHighScoreButton.addEventListener('click', () => {
+      // ハイスコアをクリアする処理
+      highScore = 0;
+      localStorage.setItem('mathShooterHighScore', '0');
 
-    // 画面タップでミサイル発射
-    canvas.addEventListener('click', (e) => {
-      if (gameState === 'playing') {
-        shootBullet();
-      }
-    });
-    canvas.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      if (gameState === 'playing') {
-        shootBullet();
-      }
+      // スタート画面とゲームオーバー画面のハイスコア表示を更新
+      highScoreStartSpan.textContent = highScore;
+      document.getElementById('finalHighScore').textContent = highScore;
+
+      alert('ハイスコアを消去しました。'); // 確認メッセージを表示
     });
 
     // ハイスコア表示更新
@@ -800,12 +883,15 @@
       if (gameState !== 'playing') return;
 
       // プレイヤー移動
-      if ((keys['ArrowLeft'] || isLeftPressed) && player.x > 0) {
+      if (keys['ArrowLeft'] || isLeftPressed) {
         player.x -= player.speed;
       }
-      if ((keys['ArrowRight'] || isRightPressed) && player.x < canvas.width - player.width) {
+      if (keys['ArrowRight'] || isRightPressed) {
         player.x += player.speed;
       }
+      // 画面外に出ないように制限
+      player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+
 
       // 弾丸移動
       bullets = bullets.filter(bullet => {
@@ -1016,7 +1102,7 @@
     function updateUI() {
       document.getElementById('score').textContent = score;
       document.getElementById('correctCount').textContent = correctAnswers;
-      document.getElementById('enemyCount').textContent = currentEnemyCount;
+      // document.getElementById('enemyCount').textContent = currentEnemyCount;
       document.getElementById('enemySpeed').textContent = speedMultiplier.toFixed(1) + 'x';
 
       // ライフ表示更新
@@ -1080,11 +1166,24 @@
       // ハイスコア更新
       if (score > highScore) {
         highScore = score;
+        // スタート画面のハイスコアも更新
+        highScoreStartSpan.textContent = highScore;
         localStorage.setItem('mathShooterHighScore', highScore.toString());
         document.getElementById('highScore').textContent = highScore;
+        // ハイスコア更新時の表示変更
+        gameOverTitle.textContent = 'ハイスコア更新！';
+        gameOverTitle.style.background = 'linear-gradient(45deg, #4ecdc4, #45b7d1)';
+        gameOverTitle.style['-webkit-background-clip'] = 'text';
+        gameOverTitle.style['-webkit-text-fill-color'] = 'transparent';
+      } else {
+        // ハイスコア更新がなかった場合の表示
+        gameOverTitle.textContent = 'ゲームオーバー';
+        gameOverTitle.style.background = '';
+        gameOverTitle.style['-webkit-background-clip'] = '';
+        gameOverTitle.style['-webkit-text-fill-color'] = '';
       }
 
-      // 最終スコア表示
+      // 今回のスコア表示
       document.getElementById('finalScore').textContent = score;
       document.getElementById('finalHighScore').textContent = highScore;
       document.getElementById('finalCorrectCount').textContent = correctAnswers;
