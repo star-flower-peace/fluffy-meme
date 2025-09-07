@@ -334,6 +334,44 @@
             border-radius: 5px;
         }
 
+        .text-input-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .text-input-container input {
+            width: 80%;
+            padding: 10px;
+            font-size: 1.2em;
+            border-radius: 10px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .text-input-container input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .answer-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+        }
+
+        .answer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
         .hidden {
             display: none;
         }
@@ -392,6 +430,7 @@
                 <div class="mode-buttons">
                     <button class="mode-btn active" data-mode="japanese">英→日</button>
                     <button class="mode-btn" data-mode="english">日→英</button>
+                    <button class="mode-btn" data-mode="english-input">日→英（テキスト入力）</button>
                 </div>
             </div>
             <div class="block-selection">
@@ -415,6 +454,11 @@
 
         <div class="choices" id="choices"></div>
 
+        <div class="text-input-container hidden" id="textInputContainer">
+            <input type="text" id="answerInput" placeholder="英単語を入力してください">
+            <button class="answer-btn" id="answerBtn" onclick="submitAnswer()">回答</button>
+        </div>
+
         <div class="result hidden" id="result"></div>
 
         <div>
@@ -432,6 +476,17 @@
     <script type="text/javascript" rel="script" src="vocabulary3.js"></script>
 
     <script>
+        const vocabulary_test = [
+            { english: "is", japanese: "～である", lesson: 1 },
+            { english: "they", japanese: "彼らは", lesson: 1 },
+            { english: "why", japanese: "なぜ", lesson: 1 },
+            { english: "an", japanese: "１つの", lesson: 1 },
+            { english: "like", japanese: "～が好きだ", lesson: 1 },
+            { english: "that", japanese: "あれ", lesson: 1 },
+            { english: "thing", japanese: "こと", lesson: 1 }
+        ];
+
+
         let gameState = {
             mode: 'japanese',
             currentQuestion: null,
@@ -459,6 +514,10 @@
                 vocabulary = vocabulary0;
                 document.getElementById('gameTitle').textContent = '🎯 小学英単語';
                 break;
+            case '1':
+                vocabulary = vocabulary1;
+                document.getElementById('gameTitle').textContent = '🎯 中1英単語';
+                break;
             case '2':
                 vocabulary = vocabulary2;
                 document.getElementById('gameTitle').textContent = '🎯 中2英単語';
@@ -468,8 +527,8 @@
                 document.getElementById('gameTitle').textContent = '🎯 中3英単語';
                 break;
             default:
-                vocabulary = vocabulary1;
-                document.getElementById('gameTitle').textContent = '🎯 中1英単語';
+                vocabulary = vocabulary_test;
+                document.getElementById('gameTitle').textContent = '🎯 英単語(デバッグ用)';
                 break;
         }
 
@@ -660,7 +719,7 @@
                     { text: correctWord.japanese, correct: true },
                     ...wrongWords.map(word => ({ text: word.japanese, correct: false }))
                 ]);
-            } else {
+            } else if (currentMode === 'english') {
                 questionText = correctWord.japanese;
                 questionType = gameState.isReviewMode ?
                     "【復習】この日本語の英単語は？" :
@@ -670,6 +729,13 @@
                     { text: correctWord.english, correct: true },
                     ...wrongWords.map(word => ({ text: word.english, correct: false }))
                 ]);
+            } else if (currentMode === 'english-input') {
+                questionText = correctWord.japanese;
+                questionType = gameState.isReviewMode ?
+                    "【復習】この日本語の英単語を入力してください" :
+                    "この日本語の英単語を入力してください";
+                // Choices are not needed in input mode
+                choices = null;
             }
 
             return {
@@ -691,15 +757,29 @@
             document.getElementById('questionType').textContent = gameState.currentQuestion.questionType;
 
             const choicesContainer = document.getElementById('choices');
-            choicesContainer.innerHTML = '';
+            const textInputContainer = document.getElementById('textInputContainer');
 
-            gameState.currentQuestion.choices.forEach((choice, index) => {
-                const button = document.createElement('button');
-                button.className = 'choice-btn';
-                button.textContent = choice.text;
-                button.onclick = () => selectAnswer(choice, button);
-                choicesContainer.appendChild(button);
-            });
+            if (gameState.mode === 'english-input') {
+                choicesContainer.classList.add('hidden');
+                textInputContainer.classList.remove('hidden');
+                const answerInput = document.getElementById('answerInput');
+                answerInput.value = ''; // Clear previous input
+                answerInput.disabled = false;
+                const answerBtn = document.getElementById('answerBtn');
+                answerBtn.disabled = false;
+                answerInput.focus();
+            } else {
+                choicesContainer.classList.remove('hidden');
+                textInputContainer.classList.add('hidden');
+                choicesContainer.innerHTML = '';
+                gameState.currentQuestion.choices.forEach((choice, index) => {
+                    const button = document.createElement('button');
+                    button.className = 'choice-btn';
+                    button.textContent = choice.text;
+                    button.onclick = () => selectAnswer(choice, button);
+                    choicesContainer.appendChild(button);
+                });
+            }
 
             document.getElementById('nextBtn').disabled = true;
             document.getElementById('result').classList.add('hidden');
@@ -712,6 +792,23 @@
             }
         }
 
+        function submitAnswer() {
+            if (gameState.isAnswered) return;
+
+            const userInput = document.getElementById('answerInput').value.trim().toLowerCase();
+            const correctAnswer = gameState.currentQuestion.correctWord.english.toLowerCase();
+            const isCorrect = userInput === correctAnswer;
+
+            // Simulate the selectedChoice object for the generic selectAnswer logic
+            const simulatedChoice = {
+                text: userInput,
+                correct: isCorrect
+            };
+
+            selectAnswer(simulatedChoice, null); // Pass null as button element since there isn't one
+        }
+
+
         function selectAnswer(selectedChoice, buttonElement) {
             if (gameState.isAnswered) return;
 
@@ -721,16 +818,23 @@
             const isCorrect = selectedChoice.correct;
             const resultElement = document.getElementById('result');
 
-            // Update button styles
-            document.querySelectorAll('.choice-btn').forEach(btn => {
-                const choice = gameState.currentQuestion.choices.find(c => c.text === btn.textContent);
-                if (choice.correct) {
-                    btn.classList.add('correct');
-                } else if (btn === buttonElement && !isCorrect) {
-                    btn.classList.add('wrong');
-                }
-                btn.onclick = null; // Disable further clicks
-            });
+            // Update button styles for multiple choice
+            if (gameState.mode !== 'english-input') {
+                document.querySelectorAll('.choice-btn').forEach(btn => {
+                    const choice = gameState.currentQuestion.choices.find(c => c.text === btn.textContent);
+                    if (choice.correct) {
+                        btn.classList.add('correct');
+                    } else if (btn === buttonElement && !isCorrect) {
+                        btn.classList.add('wrong');
+                    }
+                    btn.onclick = null; // Disable further clicks
+                });
+            } else {
+                // Disable input and button for text input mode
+                document.getElementById('answerInput').disabled = true;
+                document.getElementById('answerBtn').disabled = true;
+            }
+
 
             if (isCorrect) {
                 gameState.score += 5;
@@ -739,8 +843,8 @@
             } else {
                 // Save wrong answer for review
                 saveWrongAnswer(gameState.currentQuestion.correctWord, gameState.mode);
-                const correctAnswer = gameState.currentQuestion.choices.find(c => c.correct);
-                resultElement.textContent = `❌ 不正解... 正解は「${correctAnswer.text}」です`;
+                const correctAnswer = gameState.currentQuestion.correctWord.english;
+                resultElement.textContent = `❌ 不正解... 正解は「${correctAnswer}」です`;
                 resultElement.className = 'result wrong';
             }
 
@@ -761,6 +865,8 @@
 
         function showBlockComplete() {
             disableGameControls(false); // Re-enable controls when block is complete
+            document.getElementById('answerInput').disabled = false;
+            document.getElementById('answerBtn').disabled = false;
 
             if (gameState.allBlocks.length > 0 && gameState.allBlocks[gameState.currentBlock - 1]) {
                 const maxQuestions = gameState.allBlocks[gameState.currentBlock - 1].length;
@@ -771,6 +877,7 @@
                 document.getElementById('questionType').textContent = `スコア: ${gameState.score}点`;
             }
             document.getElementById('choices').innerHTML = '';
+            document.getElementById('textInputContainer').classList.add('hidden');
             document.getElementById('result').textContent = '🎊 お疲れ様でした！他のブロックも挑戦してみましょう。';
             document.getElementById('result').className = 'result correct';
             document.getElementById('result').classList.remove('hidden');
@@ -781,11 +888,14 @@
 
         function showReviewComplete() {
             disableGameControls(false); // Re-enable controls when review is complete
+            document.getElementById('answerInput').disabled = false;
+            document.getElementById('answerBtn').disabled = false;
 
             const totalReview = gameState.reviewWords.length;
             document.getElementById('question').textContent = '復習完了！';
             document.getElementById('questionType').textContent = `スコア: ${gameState.score}/${totalReview * 5}点`;
             document.getElementById('choices').innerHTML = '';
+            document.getElementById('textInputContainer').classList.add('hidden');
             document.getElementById('result').textContent = '🏆 復習お疲れ様でした！間違いを克服できましたね。';
             document.getElementById('result').className = 'result correct';
             document.getElementById('result').classList.remove('hidden');
@@ -839,14 +949,20 @@
             gameState.isReviewMode = false;
             initializeBlocks();
 
-            disableGameControls(true); // Disable controls during game
+            disableGameControls(true);
 
             document.getElementById('startBtn').classList.add('hidden');
             document.getElementById('reviewBtn').classList.add('hidden');
             document.getElementById('nextBtn').classList.remove('hidden');
             document.getElementById('nextBtn').textContent = '次の問題';
+            document.getElementById('rememberedBtn').classList.add('hidden');
 
-            // Remove any existing review info
+            // モードに応じてテキスト入力を有効化
+            if (gameState.mode === 'english-input') {
+                document.getElementById('answerInput').disabled = false;
+                document.getElementById('answerBtn').disabled = false;
+            }
+
             const existingInfo = document.querySelector('.review-info');
             if (existingInfo) {
                 existingInfo.remove();
@@ -871,6 +987,8 @@
             document.getElementById('reviewBtn').classList.add('hidden');
             document.getElementById('nextBtn').classList.remove('hidden');
             document.getElementById('nextBtn').textContent = '次の問題';
+            document.getElementById('answerInput').disabled = false;
+            document.getElementById('answerBtn').disabled = false;
 
             // Remove any existing review info first
             const existingInfo = document.querySelector('.review-info');
@@ -907,6 +1025,9 @@
             };
 
             disableGameControls(false); // Re-enable controls
+            document.getElementById('answerInput').disabled = false;
+            document.getElementById('answerBtn').disabled = false;
+
 
             updateStats();
             updateProgress();
@@ -915,12 +1036,12 @@
             document.getElementById('reviewBtn').classList.remove('hidden');
             document.getElementById('nextBtn').classList.add('hidden');
             document.getElementById('rememberedBtn').classList.add('hidden');
-            document.getElementById('rememberedBtn').classList.add('hidden');
             document.getElementById('nextBtn').textContent = '次の問題';
             document.getElementById('result').classList.add('hidden');
             document.getElementById('question').textContent = '英単語を覚えよう！';
             document.getElementById('questionType').textContent = 'モードとブロックを選択してスタート！';
             document.getElementById('choices').innerHTML = '';
+            document.getElementById('textInputContainer').classList.add('hidden');
 
             // Remove review info if exists
             const existingInfo = document.querySelector('.review-info');
@@ -929,6 +1050,10 @@
             }
 
             // Update review button state
+            updateReviewButtonState();
+
+            // モードに応じてテキスト入力の表示状態をリセット
+            updateTextInputVisibility();
             updateReviewButtonState();
         }
 
@@ -950,6 +1075,9 @@
         updateReviewButtonState();
         initLessonOptions();
         updateBlockOptions();
+        document.addEventListener('DOMContentLoaded', function () {
+            updateTextInputVisibility();
+        });
     </script>
 </body>
 
