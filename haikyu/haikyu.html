@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ハイキュー!! クイズ</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f4f7;
+      color: #333;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 700px;
+      background-color: #ffffff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #d62d2d;
+      font-size: 2.5em;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #4a4a4a;
+      font-size: 1.8em;
+      margin-top: 0;
+      text-align: left;
+    }
+
+    p {
+      font-size: 1.1em;
+      line-height: 1.6;
+    }
+
+    .btn {
+      background-color: #d62d2d;
+      color: #fff;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1.2em;
+      cursor: pointer;
+      border-radius: 50px;
+      transition: background-color 0.3s, transform 0.2s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      margin-top: 20px;
+    }
+
+    .btn:hover {
+      background-color: #b82525;
+      transform: translateY(-2px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .choices-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .choice-btn {
+      background-color: #f7f7f7;
+      border: 2px solid #ddd;
+      color: #333;
+      padding: 15px;
+      font-size: 1.1em;
+      cursor: pointer;
+      border-radius: 10px;
+      transition: background-color 0.2s, border-color 0.2s;
+      text-align: left;
+      width: 100%;
+    }
+
+    .choice-btn:hover {
+      background-color: #e9e9e9;
+      border-color: #d62d2d;
+    }
+
+    .correct {
+      background-color: #d4edda;
+      border-color: #4CAF50;
+      color: #155724;
+    }
+
+    .incorrect {
+      background-color: #f8d7da;
+      border-color: #dc3545;
+      color: #721c24;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .result-container {
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #progress {
+      font-size: 1em;
+      color: #888;
+      margin-top: 10px;
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      h1 {
+        font-size: 2em;
+      }
+
+      .btn,
+      .choice-btn {
+        font-size: 1em;
+        padding: 12px 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div id="start-screen">
+      <h1>ハイキュー!! クイズ</h1>
+      <p>キミはをハイキュー!!をどこまで知っているか？<br>知識を試してみよう！</p>
+      <button id="start-btn" class="btn">クイズを始める</button>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+      <h2 id="question-text"></h2>
+      <div id="choices-container" class="choices-container"></div>
+      <div id="progress"></div>
+      <button id="reset-btn" class="btn">最初からやり直す</button>
+    </div>
+
+    <div id="result-screen" class="hidden result-container">
+      <h1>クイズ終了！</h1>
+      <h2 id="result-text"></h2>
+      <p id="score-text"></p>
+      <button id="retry-btn" class="btn">もう一度挑戦する</button>
+    </div>
+  </div>
+
+  <script>
+    const quizzes = [
+      {
+        question: "烏野高校バレーボール部の主人公の名前は？",
+        choices: ["日向翔陽", "影山飛雄", "澤村大地", "東峰旭"],
+        answer: "日向翔陽"
+      },
+      {
+        question: "影山飛雄の中学時代のあだ名は？",
+        choices: ["キング", "天才セッター", "独裁王", "コート上の王様"],
+        answer: "コート上の王様"
+      },
+      {
+        question: "烏野高校バレー部の監督は誰？",
+        choices: ["武田一徹", "烏養繋心", "及川徹", "黒尾鉄朗"],
+        answer: "烏養繋心"
+      },
+      {
+        question: "日向翔陽の身長は？",
+        choices: ["162.8cm", "164.2cm", "160.5cm", "163.1cm"],
+        answer: "162.8cm"
+      },
+      {
+        question: "青葉城西高校のキャプテンは？",
+        choices: ["及川徹", "岩泉一", "金田一勇太郎", "国見英"],
+        answer: "及川徹"
+      },
+      {
+        question: "音駒高校の「ブレイン」と呼ばれる選手は？",
+        choices: ["黒尾鉄朗", "孤爪研磨", "海信行", "夜久衛輔"],
+        answer: "孤爪研磨"
+      },
+      {
+        question: "烏野高校の背番号10番を付けている選手は？",
+        choices: ["日向翔陽", "影山飛雄", "澤村大地", "菅原孝支"],
+        answer: "日向翔陽"
+      },
+      {
+        question: "白鳥沢学園のエースアタッカーは？",
+        choices: ["牛島若利", "天童覚", "白布賢二郎", "大平獅音"],
+        answer: "牛島若利"
+      },
+      {
+        question: "烏野の「守護神」と呼ばれた元選手は？",
+        choices: ["西谷夕", "東峰旭", "澤村大地", "西谷夕の先輩"],
+        answer: "西谷夕の先輩"
+      },
+      {
+        question: "日向が最初に憧れた「小さな巨人」の背番号は？",
+        choices: ["9番", "10番", "11番", "12番"],
+        answer: "10番"
+      },
+      {
+        question: "春高バレーの正式名称は？",
+        choices: ["全国高等学校バレーボール選手権大会", "春の高校バレー", "全日本高校選手権", "全国高校総体"],
+        answer: "全国高等学校バレーボール選手権大会"
+      },
+      {
+        question: "伊達工業高校のキャプテンは？",
+        choices: ["青根高伸", "二口堅治", "作並浩輔", "茂庭要"],
+        answer: "青根高伸"
+      },
+      {
+        question: "梟谷学園の「世界で5本の指に入る」スパイカーは？",
+        choices: ["木兎光太郎", "赤葦京治", "鷲匠鋭", "小見春樹"],
+        answer: "木兎光太郎"
+      },
+      {
+        question: "影山の好きな食べ物は？",
+        choices: ["牛乳", "飛雄の好物", "からあげ", "カレー"],
+        answer: "牛乳"
+      },
+      {
+        question: "烏野高校の制服の色は？",
+        choices: ["黒", "紺", "グレー", "茶色"],
+        answer: "黒"
+      },
+      {
+        question: "日向が通っていた中学校は？",
+        choices: ["雪ヶ丘中学校", "北川第一中学校", "湯本中学校", "雪が丘中学校"],
+        answer: "雪ヶ丘中学校"
+      },
+      {
+        question: "烏野のリベロ西谷夕の身長は？",
+        choices: ["159.3cm", "158.3cm", "160.1cm", "157.2cm"],
+        answer: "159.3cm"
+      },
+      {
+        question: "青葉城西の副キャプテンは？",
+        choices: ["岩泉一", "松川一静", "花巻貴大", "国見英"],
+        answer: "岩泉一"
+      },
+      {
+        question: "音駒高校の監督は？",
+        choices: ["猫又育史", "烏養繋心", "入畑監督", "鷲匠監督"],
+        answer: "猫又育史"
+      },
+      {
+        question: "日向の妹の名前は？",
+        choices: ["日向夏", "日向咲", "日向花", "日向桜"],
+        answer: "日向夏"
+      },
+      {
+        question: "烏野高校がある都道府県は？",
+        choices: ["宮城県", "岩手県", "山形県", "福島県"],
+        answer: "宮城県"
+      },
+      {
+        question: "及川徹の得意技は？",
+        choices: ["ジャンプサーブ", "サーブ", "スパイク", "ブロック"],
+        answer: "サーブ"
+      },
+      {
+        question: "烏野の応援団長の職業は？",
+        choices: ["太鼓店店主", "八百屋", "肉屋", "魚屋"],
+        answer: "太鼓店店主"
+      },
+      {
+        question: "月島蛍の兄の名前は？",
+        choices: ["月島明光", "月島秋人", "月島昭人", "月島明人"],
+        answer: "月島明光"
+      },
+      {
+        question: "田中龍之介の妹の名前は？",
+        choices: ["田中冴子", "田中聡子", "田中佐和子", "田中紗季"],
+        answer: "田中冴子"
+      },
+      {
+        question: "烏野のマネージャー清水潔子の後任は？",
+        choices: ["谷地仁花", "夜久衛輔", "山本猛虎", "谷地ちゃん"],
+        answer: "谷地仁花"
+      },
+      {
+        question: "日向が合宿で出会った「小さな巨人」のモデルとなった人物は？",
+        choices: ["天内叶歌", "立花慎之介", "及川徹", "武田一徹"],
+        answer: "天内叶歌"
+      },
+      {
+        question: "白鳥沢学園の校風は？",
+        choices: ["シンプル・イズ・ベスト", "質実剛健", "文武両道", "自由闊達"],
+        answer: "シンプル・イズ・ベスト"
+      },
+      {
+        question: "稲荷崎高校のキャプテンは？",
+        choices: ["北信介", "宮侑", "宮治", "角名倫太郎"],
+        answer: "北信介"
+      },
+      {
+        question: "宮兄弟の兄はどっち？",
+        choices: ["宮治", "宮侑", "同い年", "不明"],
+        answer: "宮治"
+      },
+      {
+        question: "烏野が春高で戦った最初の相手校は？",
+        choices: ["常波高校", "椿原学園", "角川学園", "伊達工業"],
+        answer: "椿原学園"
+      },
+      {
+        question: "影山が高校で初めて決めた速攻のコンビ名は？",
+        choices: ["変人速攻", "奇襲攻撃", "超速攻", "神速攻撃"],
+        answer: "変人速攻"
+      },
+      {
+        question: "烏野の元コーチで現在は農家をしている人は？",
+        choices: ["烏養一繋", "上野隆雄", "田中龍之介の父", "澤村大地の父"],
+        answer: "烏養一繋"
+      },
+      {
+        question: "音駒高校の「血液」と呼ばれるポジションの選手は？",
+        choices: ["夜久衛輔", "海信行", "黒尾鉄朗", "孤爪研磨"],
+        answer: "夜久衛輔"
+      },
+      {
+        question: "春高で烏野が青葉城西と戦ったのは何回戦？",
+        choices: ["1回戦", "2回戦", "3回戦", "準々決勝"],
+        answer: "2回戦"
+      },
+      {
+        question: "月島蛍のポジションは？",
+        choices: ["ミドルブロッカー", "アウトサイドヒッター", "セッター", "リベロ"],
+        answer: "ミドルブロッカー"
+      },
+      {
+        question: "梟谷学園の監督の特徴は？",
+        choices: ["白髪", "坊主頭", "長髪", "帽子着用"],
+        answer: "白髪"
+      },
+      {
+        question: "孤爪研磨の髪色は？",
+        choices: ["金髪", "茶髪", "黒髪", "銀髪"],
+        answer: "金髪"
+      },
+      {
+        question: "影山飛雄の背番号は？",
+        choices: ["9番", "1番", "2番", "11番"],
+        answer: "9番"
+      },
+      {
+        question: "東京遠征で烏野が合宿した場所は？",
+        choices: ["音駒高校", "梟谷学園", "森然高校", "生川高校"],
+        answer: "音駒高校"
+      },
+      {
+        question: "及川徹の愛称は？",
+        choices: ["オイカワ", "及川さん", "トオル", "キャプテン"],
+        answer: "オイカワ"
+      },
+      {
+        question: "烏野の顧問教師の担当科目は？",
+        choices: ["現代文", "古典", "英語", "数学"],
+        answer: "現代文"
+      },
+      {
+        question: "木兎光太郎の口癖は？",
+        choices: ["ヘイヘイヘイ！", "うっす！", "よっしゃー！", "エーススパイク！"],
+        answer: "ヘイヘイヘイ！"
+      },
+      {
+        question: "稲荷崎高校がある都道府県は？",
+        choices: ["兵庫県", "大阪府", "奈良県", "京都府"],
+        answer: "兵庫県"
+      },
+      {
+        question: "宮侑のポジションは？",
+        choices: ["セッター", "アタッカー", "リベロ", "ミドルブロッカー"],
+        answer: "セッター"
+      },
+      {
+        question: "烏野が初めて全国大会に出場したのはいつ？",
+        choices: ["物語開始から1年目", "物語開始から2年目", "物語開始前", "物語開始から3年目"],
+        answer: "物語開始から1年目"
+      },
+      {
+        question: "春高で烏野が敗退したのは？",
+        choices: ["準々決勝", "準決勝", "決勝", "3位決定戦"],
+        answer: "準々決勝"
+      },
+      {
+        question: "作者の古舘春一さんが連載前に描いた読み切り作品のタイトルは？",
+        choices: ["ハイキュー！！", "詭弁学派、四ッ谷先輩の怪談。", "四ッ谷先輩の怪談", "バレーボール少年"],
+        answer: "詭弁学派、四ッ谷先輩の怪談。"
+      },
+      {
+        question: "アニメ版で日向翔陽の声を担当した声優は？",
+        choices: ["村瀬歩", "石川界人", "日野聡", "内山昂輝"],
+        answer: "村瀬歩"
+      },
+      {
+        question: "ハイキュー!!の連載が開始されたのは何年？",
+        choices: ["2012年", "2011年", "2013年", "2010年"],
+        answer: "2012年"
+      }
+    ];
+
+    const startScreen = document.getElementById('start-screen');
+    const quizScreen = document.getElementById('quiz-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const startBtn = document.getElementById('start-btn');
+    const retryBtn = document.getElementById('retry-btn');
+    const resetBtn = document.getElementById('reset-btn');
+    const questionText = document.getElementById('question-text');
+    const choicesContainer = document.getElementById('choices-container');
+    const progressText = document.getElementById('progress');
+    const resultText = document.getElementById('result-text');
+    const scoreText = document.getElementById('score-text');
+
+    let currentQuizIndex = 0;
+    let score = 0;
+    let shuffledQuizzes = [];
+
+    startBtn.addEventListener('click', startQuiz);
+    retryBtn.addEventListener('click', retryQuiz);
+    resetBtn.addEventListener('click', resetQuiz);
+
+    // 配列をシャッフルする関数
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+    }
+
+    function startQuiz() {
+      startScreen.classList.add('hidden');
+      quizScreen.classList.remove('hidden');
+      currentQuizIndex = 0;
+      score = 0;
+      // クイズの配列をシャッフル
+      shuffledQuizzes = [...quizzes];
+      shuffleArray(shuffledQuizzes);
+      loadQuiz();
+    }
+
+    function retryQuiz() {
+      resultScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+    }
+
+    function resetQuiz() {
+      resultScreen.classList.add('hidden');
+      startScreen.classList.remove('hidden');
+      quizScreen.classList.add('hidden');
+      currentQuizIndex = 0;
+      score = 0;
+    }
+
+    function loadQuiz() {
+      if (currentQuizIndex < shuffledQuizzes.length) {
+        const currentQuiz = shuffledQuizzes[currentQuizIndex];
+        questionText.innerHTML = currentQuiz.question;
+        choicesContainer.innerHTML = '';
+        // 変更箇所: progressTextにスコアも表示するように修正
+        progressText.textContent = `第${currentQuizIndex + 1}問 / 全${quizzes.length}問 (スコア: ${score}点)`;
+
+        // 選択肢の配列をシャッフル
+        const shuffledChoices = [...currentQuiz.choices];
+        shuffleArray(shuffledChoices);
+
+        shuffledChoices.forEach(choice => {
+          const button = document.createElement('button');
+          button.innerHTML = choice;
+          button.classList.add('choice-btn');
+          button.addEventListener('click', () => checkAnswer(choice, currentQuiz.answer));
+          choicesContainer.appendChild(button);
+        });
+      } else {
+        showResult();
+      }
+    }
+
+    function checkAnswer(selectedChoice, correctAnswer) {
+      const buttons = choicesContainer.querySelectorAll('.choice-btn');
+      let isCorrect = (selectedChoice === correctAnswer);
+
+      buttons.forEach(button => {
+        if (button.innerHTML === correctAnswer) {
+          button.classList.add('correct');
+        } else if (button.innerHTML === selectedChoice) {
+          button.classList.add('incorrect');
+        }
+        button.disabled = true;
+      });
+
+      if (isCorrect) {
+        score++;
+        // 変更箇所: 正解の場合に「正解！」を表示
+        const message = document.createElement('div');
+        message.textContent = '正解！';
+        message.style.color = '#4CAF50';
+        message.style.fontSize = '1.5em';
+        message.style.fontWeight = 'bold';
+        message.style.marginTop = '10px';
+        choicesContainer.appendChild(message);
+      } else {
+        // 変更箇所: 不正解の場合に「不正解…」を表示
+        const message = document.createElement('div');
+        message.textContent = '不正解…';
+        message.style.color = '#dc3545';
+        message.style.fontSize = '1.5em';
+        message.style.fontWeight = 'bold';
+        message.style.marginTop = '10px';
+        choicesContainer.appendChild(message);
+      }
+
+      // 次の問題へ進むまでの待機
+      setTimeout(() => {
+        currentQuizIndex++;
+        loadQuiz();
+      }, 1500);
+    }
+
+    function showResult() {
+      quizScreen.classList.add('hidden');
+      resultScreen.classList.remove('hidden');
+
+      scoreText.textContent = `${score} / ${quizzes.length} 点`;
+
+      let message = '';
+      if (score === quizzes.length) {
+        message = "おめでとう！あなあはハイキューマスターだ！🎉";
+      } else if (score >= quizzes.length * 0.7) {
+        message = "まあまあだ！🕵️";
+      } else if (score >= quizzes.length * 0.4) {
+        message = "まだまだこれから！頑張ろう！";
+      } else {
+        message = "ぜんぜんだめ！もう一度見直してみよう！";
+      }
+      resultText.textContent = message;
+    }
+  </script>
+
+</body>
+
+</html>
