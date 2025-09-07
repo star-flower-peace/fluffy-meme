@@ -624,30 +624,46 @@
       let a, b, result, expression;
 
       const range = difficulty === 'easy' ? 5 : difficulty === 'normal' ? 20 : 50;
+      // Modify the number generation logic here
+      const minNum = (difficulty === 'easy') ? 1 : 2;
 
       switch (operation) {
         case 'addition':
-          a = Math.floor(Math.random() * range) + 1;
-          b = Math.floor(Math.random() * range) + 1;
+          a = Math.floor(Math.random() * (range - minNum + 1)) + minNum;
+          b = Math.floor(Math.random() * (range - minNum + 1)) + minNum;
           result = a + b;
           expression = `${a} + ${b}`;
           break;
         case 'subtraction':
-          a = Math.floor(Math.random() * range) + Math.floor(range / 2);
-          b = Math.floor(Math.random() * Math.floor(range / 2)) + 1;
+          a = Math.floor(Math.random() * (range - minNum + 1)) + minNum;
+          b = Math.floor(Math.random() * (a - minNum + 1)) + minNum;
+          // Make sure a >= b
+          if (a < b) {
+            [a, b] = [b, a];
+          }
           result = a - b;
           expression = `${a} - ${b}`;
           break;
         case 'multiplication':
-          a = Math.floor(Math.random() * (difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10)) + 1;
-          b = Math.floor(Math.random() * (difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10)) + 1;
+          const multRange = difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10;
+          const multMinNum = (difficulty === 'easy') ? 1 : 2;
+          a = Math.floor(Math.random() * (multRange - multMinNum + 1)) + multMinNum;
+          b = Math.floor(Math.random() * (multRange - multMinNum + 1)) + multMinNum;
           result = a * b;
           expression = `${a} × ${b}`;
           break;
         case 'division':
-          b = Math.floor(Math.random() * (difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10)) + 1;
-          result = Math.floor(Math.random() * (difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10)) + 1;
-          a = b * result;
+          const divRange = difficulty === 'easy' ? 5 : difficulty === 'normal' ? 8 : 10;
+          const divMinNum = (difficulty === 'easy') ? 1 : 2;
+
+          do {
+            b = Math.floor(Math.random() * (divRange - divMinNum + 1)) + divMinNum;
+            result = Math.floor(Math.random() * (divRange - divMinNum + 1)) + divMinNum;
+            a = b * result;
+          } while (
+            // Exclude these cases on "normal" and "hard" difficulty
+            (difficulty !== 'easy' && (b === result || b === 10 || result === 10))
+          );
           expression = `${a} ÷ ${b}`;
           break;
       }
