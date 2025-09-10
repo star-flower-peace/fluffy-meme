@@ -409,7 +409,7 @@
 <body>
     <div class="game-container">
         <h1 id="gameTitle"></h1>
-        <div class="stats">
+        <div class="stats hidden" id="statsContainer">
             <div class="stat">
                 <span class="stat-value" id="score">0</span>
                 <span class="stat-label">スコア</span>
@@ -494,7 +494,6 @@
             currentLesson: 1,
             currentBlock: 1,
             questionInBlock: 0,
-            totalQuestions: 0,
             isAnswered: false,
             currentBlockWords: [],
             allBlocks: [],
@@ -675,7 +674,6 @@
             const wordsForBlock = wordsInLesson.slice(startIndex, startIndex + 20);
 
             gameState.currentBlockWords = shuffleArray(wordsForBlock);
-            gameState.totalQuestionsInBlock = gameState.currentBlockWords.length;
         }
 
         function initializeReviewMode() {
@@ -813,7 +811,7 @@
             if (gameState.isAnswered) return;
 
             gameState.isAnswered = true;
-            gameState.totalQuestions++;
+            gameState.questionInBlock++;
 
             const isCorrect = selectedChoice.correct;
             const resultElement = document.getElementById('result');
@@ -912,13 +910,13 @@
                 document.getElementById('current').textContent = `${totalReview - remaining}/${totalReview}`;
                 document.getElementById('block').textContent = '復習';
             } else {
-                if (gameState.allBlocks.length > 0 && gameState.allBlocks[gameState.currentBlock - 1]) {
-                    const maxQuestions = gameState.allBlocks[gameState.currentBlock - 1].length;
-                    const remaining = gameState.currentBlockWords.length;
-                    document.getElementById('current').textContent = `${maxQuestions - remaining}/${maxQuestions}`;
-                } else {
-                    document.getElementById('current').textContent = `0/20`;
-                }
+                const selectedLesson = parseInt(document.getElementById('lessonSelect').value);
+                const wordsInLesson = vocabulary.filter(w => w.lesson === selectedLesson);
+                const startIndex = (gameState.currentBlock - 1) * 20;
+                const wordsForBlock = wordsInLesson.slice(startIndex, startIndex + 20);
+                const maxQuestions = wordsForBlock.length;
+
+                document.getElementById('current').textContent = `${gameState.questionInBlock}/${maxQuestions}`; // FIX: Use questionInBlock here
                 document.getElementById('block').textContent = gameState.currentBlock;
             }
         }
@@ -968,7 +966,9 @@
                 existingInfo.remove();
             }
 
+            updateStats();
             displayQuestion();
+            document.getElementById('statsContainer').classList.remove('hidden'); // Add this line
         }
 
         function startReview() {
@@ -1002,7 +1002,9 @@
             reviewInfo.textContent = `復習モード: ${wrongAnswersList.length}問の間違った問題を復習します`;
             document.querySelector('.progress-bar').after(reviewInfo);
 
+            updateStats();
             displayQuestion();
+            document.getElementById('statsContainer').classList.remove('hidden'); // Add this line
         }
 
         function nextQuestion() {
@@ -1016,7 +1018,6 @@
                 score: 0,
                 currentBlock: 1,
                 questionInBlock: 0,
-                totalQuestions: 0,
                 isAnswered: false,
                 currentBlockWords: [],
                 allBlocks: [],
@@ -1052,9 +1053,8 @@
             // Update review button state
             updateReviewButtonState();
 
-            // モードに応じてテキスト入力の表示状態をリセット
-            updateTextInputVisibility();
             updateReviewButtonState();
+            document.getElementById('statsContainer').classList.add('hidden'); // Add this line
         }
 
         function updateReviewButtonState() {
@@ -1075,9 +1075,6 @@
         updateReviewButtonState();
         initLessonOptions();
         updateBlockOptions();
-        document.addEventListener('DOMContentLoaded', function () {
-            updateTextInputVisibility();
-        });
     </script>
 </body>
 
