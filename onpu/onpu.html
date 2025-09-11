@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta name="robots" content="noindex">
+  <meta name="robots" content="noffollow">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>五線譜音符当てゲーム</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5rem;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .score-board {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 30px;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .score-item {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #555;
+    }
+
+    .staff-container {
+      margin: 40px 0;
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .staff {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      margin: 20px 0;
+    }
+
+    .staff-line {
+      position: absolute;
+      width: 100%;
+      height: 2px;
+      background-color: black;
+    }
+
+    /* 五線譜 */
+    /* 高い高いソ */
+    .staff-line:nth-child(1) {
+      top: 20px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 高い高いミ */
+    .staff-line:nth-child(2) {
+      top: 40px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 高い高いド */
+    .staff-line:nth-child(3) {
+      top: 60px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 高いラ */
+    .staff-line:nth-child(4) {
+      top: 80px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 高いファ */
+    .staff-line:nth-child(5) {
+      top: 100px;
+    }
+
+    /* 高いレ */
+    .staff-line:nth-child(6) {
+      top: 120px;
+    }
+
+    /* シ */
+    .staff-line:nth-child(7) {
+      top: 140px;
+    }
+
+    /* ソ */
+    .staff-line:nth-child(8) {
+      top: 160px;
+    }
+
+    /* ミ */
+    .staff-line:nth-child(9) {
+      top: 180px;
+    }
+
+    /* ド */
+    .staff-line:nth-child(10) {
+      top: 200px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 低いラ */
+    .staff-line:nth-child(11) {
+      top: 220px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 低いファ */
+    .staff-line:nth-child(12) {
+      top: 240px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    /* 低いレ */
+    .staff-line:nth-child(13) {
+      top: 260px;
+      background-color: lightblue;
+      width: 50px;
+      height: 2px;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    .clef {
+      position: absolute;
+      left: 20px;
+      font-size: 120px;
+      color: #333;
+      line-height: 1;
+    }
+
+    .treble-clef {
+      top: 70px;
+    }
+
+    .bass-clef {
+      top: 90px;
+    }
+
+    .note {
+      position: absolute;
+      width: 30px;
+      /* 音符の幅 */
+      height: 20px;
+      /* 音符の高さ */
+      background-color: #333;
+      border-radius: 50%;
+      left: 200px;
+      transform: translateX(-50%) translateY(-50%);
+      transition: all 0.3s ease;
+    }
+
+    /*　旗不要
+    .note::before {
+      content: '';
+      position: absolute;
+      width: 2px;
+      height: 80px;
+      background-color: #333;
+      right: -1px;
+      top: -60px;
+    }
+*/
+
+    .ledger-line {
+      position: absolute;
+      width: 50px;
+      height: 2px;
+      background-color: #333;
+      left: 175px;
+      transform: translateY(-50%);
+    }
+
+    .options {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .option-btn {
+      padding: 15px 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+    }
+
+    .option-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 172, 254, 0.4);
+    }
+
+    .option-btn.correct {
+      background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+      animation: pulse 0.6s ease-in-out;
+    }
+
+    .option-btn.incorrect {
+      background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%);
+      animation: shake 0.6s ease-in-out;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      25% {
+        transform: translateX(-5px);
+      }
+
+      75% {
+        transform: translateX(5px);
+      }
+    }
+
+    .controls {
+      margin-top: 30px;
+    }
+
+    .btn {
+      padding: 15px 30px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .feedback {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feedback.correct {
+      background: #d4edda;
+      color: #155724;
+      border: 2px solid #c3e6cb;
+    }
+
+    .feedback.incorrect {
+      background: #f8d7da;
+      color: #721c24;
+      border: 2px solid #f5c6cb;
+    }
+
+    .selector {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    .selector select {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    @media (max-width: 600px) {
+      .game-container {
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .clef {
+        font-size: 80px;
+        left: 10px;
+      }
+
+      .note {
+        left: 150px;
+      }
+
+      .ledger-line {
+        left: 125px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="game-container">
+    <h1>🎵 音符当て練習 🎵</h1>
+
+    <div class="score-board">
+      <div class="score-item">スコア: <span id="score">0</span></div>
+      <div class="score-item">問題数: <span id="total">0</span></div>
+      <div class="score-item">正答率: <span id="accuracy">0%</span></div>
+    </div>
+
+    <div class="selector">
+      <div>
+        <label for="clef">記号: </label>
+        <select id="clef" onchange="changeClef()">
+          <option value="treble">ト音記号</option>
+          <option value="bass">ヘ音記号</option>
+        </select>
+      </div>
+      <label for="difficulty">難易度: </label>
+      <select id="difficulty" onchange="changeDifficulty()">
+        <option value="basic"></option>
+        <option value="extended"></option>
+        <option value="advanced"></option>
+      </select>
+    </div>
+
+    <div class="staff-container">
+      <div class="staff">
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div class="staff-line"></div>
+        <div id="treble-clef" class="clef treble-clef">𝄞</div>
+        <div id="bass-clef" class="clef bass-clef" style="display: none;">𝄢</div>
+        <div id="note" class="note"></div>
+        <div id="ledger-line" class="ledger-line" style="display: none;"></div>
+      </div>
+    </div>
+
+    <div id="options" class="options">
+      <!-- オプションボタンがここに動的に生成される -->
+    </div>
+
+    <div id="feedback" class="feedback" style="display: none;">
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" onclick="newQuestion()">次の問題</button>
+      <button class="btn btn-primary" onclick="resetGame()">リセット</button>
+    </div>
+  </div>
+
+  <script>
+    // 音符のデータ（位置と名前）- 五線譜の実際の位置に合わせて調整
+    // positionは音符の中心の位置
+    const notes = {
+      treble: {
+        basic: [
+          { name: 'ド', position: 200, ledger: true, ledgerPos: 200 }, // 下第1線 (C4)
+          { name: 'レ', position: 190, ledger: false }, // 第1線と第2線の間 (D4)
+          { name: 'ミ', position: 180, ledger: false }, // 第1線上 (E4)
+          { name: 'ファ', position: 170, ledger: false }, // 第1線と第2線の間 (F4)
+          { name: 'ソ', position: 160, ledger: false }, // 第2線上 (G4)
+          { name: 'ラ', position: 150, ledger: false }, // 第3線上 (A4)
+          { name: 'シ', position: 140, ledger: false }, // 第3線と第4線の間 (B4)
+          { name: '高いド', position: 130, ledger: false }, // 第4線上 (C5)
+          { name: '高いレ', position: 120, ledger: false }, // 第4線と第5線の間 (D5)
+          { name: '高いミ', position: 110, ledger: false }, // 第5線上 (E5)
+        ],
+        extended: [
+          { name: '高いファ', position: 100, ledger: false }, // 第5線の上 (F5)
+          { name: '高いソ', position: 90, ledger: false }, // 上第1線 (G5)
+          { name: '高いラ', position: 80, ledger: true, ledgerPos: 80 }, // 上第1線 (G5)
+          { name: '高いシ', position: 70, ledger: false }, // 上第1線 (G5)
+          { name: '高い高いド', position: 60, ledger: true, ledgerPos: 60 }, // 上第1線 (G5)
+          { name: '高い高いレ', position: 50, ledger: false }, // 上第1線 (G5)
+          { name: '高い高いミ', position: 40, ledger: true, ledgerPos: 40 }, // 上第1線 (G5)
+          { name: '高い高いファ', position: 30, ledger: false }, // 上第1線 (G5)
+          { name: '高い高いソ', position: 20, ledger: true, ledgerPos: 20 }, // 上第1線 (G5)
+          { name: '高い高いラ', position: 10, ledger: false }, // 上第1線 (G5)
+        ],
+        advanced: [
+          { name: '低いド', position: 270, ledger: false }, // 下第3線と下第2線の間 (G3)
+          { name: '低いレ', position: 260, ledger: true, ledgerPos: 260 }, // 下第3線と下第2線の間 (G3)
+          { name: '低いミ', position: 250, ledger: false }, // 下第3線と下第2線の間 (G3)
+          { name: '低いファ', position: 240, ledger: true, ledgerPos: 240 }, // 下第3線と下第2線の間 (G3)
+          { name: '低いソ', position: 230, ledger: false }, // 下第3線と下第2線の間 (G3)
+          { name: '低いラ', position: 220, ledger: true, ledgerPos: 220 }, // 下第2線 (A3)
+          { name: '低いシ', position: 210, ledger: false }, // 下第1線 (B3)
+        ]
+      },
+      bass: {
+        basic: [
+          { name: '低いド', position: 150, ledger: false },
+          { name: '低いレ', position: 140, ledger: false },
+          { name: '低いミ', position: 130, ledger: false },
+          { name: '低いファ', position: 120, ledger: false },
+          { name: '低いソ', position: 110, ledger: false },
+          { name: '低いラ', position: 100, ledger: false },
+          { name: '低いシ', position: 90, ledger: false },
+          { name: 'ド', position: 80, ledger: true, ledgerPos: 80 }
+        ],
+        extended: [
+          { name: '低い低いド', position: 220, ledger: true, ledgerPos: 220 },
+          { name: '低い低いレ', position: 210, ledger: false },
+          { name: '低い低いミ', position: 200, ledger: true, ledgerPos: 200 },
+          { name: '低い低いファ', position: 190, ledger: false },
+          { name: '低い低いソ', position: 180, ledger: false },
+          { name: '低い低いラ', position: 170, ledger: false },
+          { name: '低い低いシ', position: 160, ledger: false },
+        ]
+      }
+    };
+
+    let currentNote = null;
+    let score = 0;
+    let totalQuestions = 0;
+    let currentClef = 'treble';
+    let currentDifficulty = 'basic';
+    let gameState = 'waiting'; // 'waiting', 'answered'
+
+    function changeClef() {
+      currentClef = document.getElementById('clef').value;
+
+      const difficultySelect = document.getElementById('difficulty');
+      difficultySelect.innerHTML = ''; // オプションをクリア
+
+      if (currentClef === 'treble') {
+        difficultySelect.innerHTML = `
+              <option value="basic">基本 (ド〜高いミ)</option>
+              <option value="extended">高い (高いファ〜高い高いラ)</option>
+              <option value="advanced">低い (低いド〜低いシ)</option>
+          `;
+        currentDifficulty = 'basic';
+      } else {
+        difficultySelect.innerHTML = `
+              <option value="basic">基本 (低いド〜ド)</option>
+              <option value="extended">低い (低い低いド〜低い低いシ)</option>
+          `;
+        currentDifficulty = 'basic';
+      }
+
+      newQuestion();
+    }
+
+    function changeDifficulty() {
+      currentDifficulty = document.getElementById('difficulty').value;
+      newQuestion();
+    }
+
+    function getRandomNote() {
+      const availableNotes = notes[currentClef][currentDifficulty];
+      return availableNotes[Math.floor(Math.random() * availableNotes.length)];
+    }
+
+    function generateWrongOptions(correctNote, count = 3) {
+      const availableNotes = notes[currentClef][currentDifficulty];
+      const wrongOptions = [];
+
+      while (wrongOptions.length < count) {
+        const randomNote = availableNotes[Math.floor(Math.random() * availableNotes.length)];
+        if (randomNote.name !== correctNote.name && !wrongOptions.includes(randomNote.name)) {
+          wrongOptions.push(randomNote.name);
+        }
+      }
+
+      return wrongOptions;
+    }
+
+    function displayNote(note) {
+      const noteElement = document.getElementById('note');
+      const ledgerLine = document.getElementById('ledger-line');
+
+      noteElement.style.top = note.position + 'px';
+
+      if (note.ledger) {
+        ledgerLine.style.display = 'block';
+        ledgerLine.style.top = note.ledgerPos + 'px';
+      } else {
+        ledgerLine.style.display = 'none';
+      }
+    }
+
+    function displayClef() {
+      const trebleClef = document.getElementById('treble-clef');
+      const bassClef = document.getElementById('bass-clef');
+
+      if (currentClef === 'treble') {
+        trebleClef.style.display = 'block';
+        bassClef.style.display = 'none';
+      } else {
+        trebleClef.style.display = 'none';
+        bassClef.style.display = 'block';
+      }
+    }
+
+    function createOptions(correctNote) {
+      const optionsContainer = document.getElementById('options');
+      const wrongOptions = generateWrongOptions(correctNote, 3);
+      const allOptions = [correctNote.name, ...wrongOptions];
+
+      // シャッフル
+      for (let i = allOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+      }
+
+      optionsContainer.innerHTML = '';
+
+      allOptions.forEach(option => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => selectAnswer(option, correctNote.name);
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    function selectAnswer(selectedAnswer, correctAnswer) {
+      if (gameState === 'answered') return;
+
+      gameState = 'answered';
+      totalQuestions++;
+
+      const buttons = document.querySelectorAll('.option-btn');
+      const feedback = document.getElementById('feedback');
+
+      buttons.forEach(button => {
+        button.disabled = true;
+        if (button.textContent === correctAnswer) {
+          button.classList.add('correct');
+        } else if (button.textContent === selectedAnswer && selectedAnswer !== correctAnswer) {
+          button.classList.add('incorrect');
+        }
+      });
+
+      if (selectedAnswer === correctAnswer) {
+        score++;
+        feedback.textContent = '正解！🎉 素晴らしいです！';
+        feedback.className = 'feedback correct';
+      } else {
+        feedback.textContent = `不正解 😔 正解は「${correctAnswer}」でした。`;
+        feedback.className = 'feedback incorrect';
+      }
+
+      feedback.style.display = 'flex';
+      updateScore();
+
+      // 2秒後に新しい問題を出す
+      setTimeout(() => {
+        newQuestion();
+      }, 2000);
+    }
+
+    function updateScore() {
+      document.getElementById('score').textContent = score;
+      document.getElementById('total').textContent = totalQuestions;
+      const accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+      document.getElementById('accuracy').textContent = accuracy + '%';
+    }
+
+    function newQuestion() {
+      gameState = 'waiting';
+      currentNote = getRandomNote();
+
+      displayClef();
+      displayNote(currentNote);
+      createOptions(currentNote);
+
+      // フィードバックを隠す
+      document.getElementById('feedback').style.display = 'none';
+
+      // ボタンの状態をリセット
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(button => {
+        button.disabled = false;
+        button.classList.remove('correct', 'incorrect');
+      });
+    }
+
+    function resetGame() {
+      score = 0;
+      totalQuestions = 0;
+      updateScore();
+      newQuestion();
+    }
+
+    // 初期化
+    window.onload = function () {
+      updateScore();
+      changeClef();
+    };
+  </script>
+</body>
+
+</html>
