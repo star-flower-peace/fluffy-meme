@@ -1,0 +1,561 @@
+<html lang="ja">
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ルービックシャッフル</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 100%);
+      min-height: 100vh;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: opacity 0.2s;
+      user-select: none;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    .btn-blue {
+      background: #2563eb;
+      color: white;
+    }
+
+    .btn-red {
+      background: #dc2626;
+      color: white;
+    }
+
+    .btn-green {
+      background: #16a34a;
+      color: white;
+    }
+
+    .btn-gray {
+      background: #4b5563;
+      color: white;
+    }
+
+    .btn-full {
+      width: 100%;
+      justify-content: center;
+    }
+
+    .scramble-text {
+      font-family: 'Courier New', monospace;
+      font-size: 1.125rem;
+      background: #f3f4f6;
+      padding: 1rem;
+      border-radius: 0.25rem;
+      word-wrap: break-word;
+    }
+
+    .timer-display {
+      font-family: 'Courier New', monospace;
+      font-size: 3rem;
+      text-align: center;
+      margin: 1rem 0;
+      color: #1f2937;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+    }
+
+    .cube-net {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .cube-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .cube-face {
+      display: inline-block;
+    }
+
+    .face-label {
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin-bottom: 0.25rem;
+    }
+
+    .face-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 32px);
+      gap: 2px;
+      background: black;
+      padding: 4px;
+    }
+
+    .sticker {
+      width: 32px;
+      height: 32px;
+      border: 1px solid #374151;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      color: #1f2937;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>ルービックシャッフル</h1>
+
+    <div class="card">
+      <button class="btn btn-blue btn-full" onclick="generateScramble()">
+        🔄 新しいスクランブル
+      </button>
+    </div>
+
+    <div id="scrambleCard" class="card" style="display: none;">
+      <h2>スクランブル:</h2>
+      <div id="scrambleText" class="scramble-text"></div>
+    </div>
+
+    <div id="cubeCard" class="card" style="display: none;">
+      <h2>キューブ展開図</h2>
+      <div id="cubeNet" class="cube-net"></div>
+    </div>
+
+    <div class="card">
+      <h2>タイマー</h2>
+      <div id="timerDisplay" class="timer-display">0:00.00</div>
+      <div class="button-group">
+        <button id="startBtn" class="btn btn-blue" onmousedown="handleStartPress()" onmouseup="handleStartRelease()"
+          onmouseleave="handleStartCancel()" ontouchstart="handleStartPress(event)"
+          ontouchend="handleStartRelease(event)">
+          ▶ 開始 (押して離す)
+        </button>
+        <button id="stopBtn" class="btn btn-green" style="display: none;" onclick="stopTimer()">
+          ⏸ 停止
+        </button>
+        <button class="btn btn-gray" onclick="resetTimer()">
+          ↻ リセット
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let cube = null;
+    let time = 0;
+    let isRunning = false;
+    let isPressed = false;
+    let timerInterval = null;
+
+    const colorMap = {
+      white: '#FFFFFF',
+      yellow: '#FFFF00',
+      green: '#00D000',
+      blue: '#0000FF',
+      red: '#FF0000',
+      orange: '#FF8800'
+    };
+
+    function initCube() {
+      // 標準配色: U(白) D(黄) F(緑) B(青) R(赤) L(橙)
+      return {
+        U: Array(9).fill('white'),
+        D: Array(9).fill('yellow'),
+        F: Array(9).fill('green'),
+        B: Array(9).fill('blue'),
+        R: Array(9).fill('red'),
+        L: Array(9).fill('orange')
+      };
+    }
+
+    // 面の時計回り回転
+    function rotateClockwise(face) {
+      // 6 -> 3 -> 0
+      // 7 -> 4 -> 1
+      // 8 -> 5 -> 2
+      return [face[6], face[3], face[0], face[7], face[4], face[1], face[8], face[5], face[2]];
+    }
+
+    // 面の反時計回り回転
+    function rotateCounterClockwise(face) {
+      // 2 -> 5 -> 8
+      // 1 -> 4 -> 7
+      // 0 -> 3 -> 6
+      return [face[2], face[5], face[8], face[1], face[4], face[7], face[0], face[3], face[6]];
+    }
+
+    function applyMove(cubeState, move) {
+      const c = JSON.parse(JSON.stringify(cubeState));
+
+      // --- U/U' (U -> R -> B -> L -> U)
+      if (move === 'U') {
+        c.U = rotateClockwise(c.U);
+        const temp = [c.F[0], c.F[1], c.F[2]];
+        c.F[0] = c.R[0]; c.F[1] = c.R[1]; c.F[2] = c.R[2]; // F ← R
+        c.R[0] = c.B[0]; c.R[1] = c.B[1]; c.R[2] = c.B[2]; // R ← B
+        c.B[0] = c.L[0]; c.B[1] = c.L[1]; c.B[2] = c.L[2]; // B ← L
+        c.L[0] = temp[0]; c.L[1] = temp[1]; c.L[2] = temp[2]; // L ← F
+      } else if (move === "U'") {
+        c.U = rotateCounterClockwise(c.U);
+        const temp = [c.F[0], c.F[1], c.F[2]];
+        c.F[0] = c.L[0]; c.F[1] = c.L[1]; c.F[2] = c.L[2]; // F ← L
+        c.L[0] = c.B[0]; c.L[1] = c.B[1]; c.L[2] = c.B[2]; // L ← B
+        c.B[0] = c.R[0]; c.B[1] = c.R[1]; c.B[2] = c.R[2]; // B ← R
+        c.R[0] = temp[0]; c.R[1] = temp[1]; c.R[2] = temp[2]; // R ← F
+      }
+      // --- D/D' (D -> L -> B -> R -> D)
+      else if (move === 'D') {
+        c.D = rotateClockwise(c.D);
+        const temp = [c.F[6], c.F[7], c.F[8]];
+        c.F[6] = c.L[6]; c.F[7] = c.L[7]; c.F[8] = c.L[8]; // F ← L
+        c.L[6] = c.B[6]; c.L[7] = c.B[7]; c.L[8] = c.B[8]; // L ← B
+        c.B[6] = c.R[6]; c.B[7] = c.R[7]; c.B[8] = c.R[8]; // B ← R
+        c.R[6] = temp[0]; c.R[7] = temp[1]; c.R[8] = temp[2]; // R ← F
+      } else if (move === "D'") {
+        c.D = rotateCounterClockwise(c.D);
+        const temp = [c.F[6], c.F[7], c.F[8]];
+        c.F[6] = c.R[6]; c.F[7] = c.R[7]; c.F[8] = c.R[8]; // F ← R
+        c.R[6] = c.B[6]; c.R[7] = c.B[7]; c.R[8] = c.B[8]; // R ← B
+        c.B[6] = c.L[6]; c.B[7] = c.L[7]; c.B[8] = c.L[8]; // B ← L
+        c.L[6] = temp[0]; c.L[7] = temp[1]; c.L[8] = temp[2]; // L ← F
+      }
+      // --- F/F' (F -> U -> R -> D -> L -> F)
+      else if (move === 'F') {
+        c.F = rotateClockwise(c.F);
+        const temp_U = [c.U[6], c.U[7], c.U[8]]; // U面の底辺
+        const temp_R = [c.R[0], c.R[3], c.R[6]]; // R面の左辺
+        const temp_D = [c.D[2], c.D[1], c.D[0]]; // D面の奥辺 (反時計回り)
+        const temp_L = [c.L[8], c.L[5], c.L[2]]; // L面の右辺 (反時計回り)
+
+        // U <- L (Lの右辺がUの底辺へ) L[2]がU[8]になることに注意
+        c.U[6] = temp_L[2]; c.U[7] = temp_L[1]; c.U[8] = temp_L[0];
+        // R <- U (Uの底辺がRの左辺へ)
+        c.R[0] = temp_U[0]; c.R[3] = temp_U[1]; c.R[6] = temp_U[2];
+        // D <- R (Rの左辺がDの奥辺へ)
+        c.D[2] = temp_R[0]; c.D[1] = temp_R[1]; c.D[0] = temp_R[2];
+        // L <- D (Dの奥辺がLの右辺へ)
+        c.L[8] = temp_D[0]; c.L[5] = temp_D[1]; c.L[2] = temp_D[2];
+
+      } else if (move === "F'") {
+        c.F = rotateCounterClockwise(c.F);
+        const temp_U = [c.U[6], c.U[7], c.U[8]]; // U面の底辺
+        const temp_R = [c.R[0], c.R[3], c.R[6]]; // R面の左辺
+        const temp_D = [c.D[2], c.D[1], c.D[0]]; // D面の奥辺 (反時計回り)
+        const temp_L = [c.L[8], c.L[5], c.L[2]]; // L面の右辺 (反時計回り)
+
+        // U <- R (Rの左辺がUの底辺へ)
+        c.U[6] = temp_R[0]; c.U[7] = temp_R[1]; c.U[8] = temp_R[2];
+        // R <- D (Dの奥辺がRの左辺へ)
+        c.R[0] = temp_D[2]; c.R[3] = temp_D[1]; c.R[6] = temp_D[0];
+        // D <- L (Lの右辺がDの奥辺へ)
+        c.D[2] = temp_L[0]; c.D[1] = temp_L[1]; c.D[0] = temp_L[2];
+        // L <- U (Uの底辺がLの右辺へ)
+        c.L[8] = temp_U[0]; c.L[5] = temp_U[1]; c.L[2] = temp_U[2];
+      }
+      // --- B/B' (B -> U -> L -> D -> R -> B)
+      else if (move === 'B') {
+        c.B = rotateClockwise(c.B);
+        const temp_U = [c.U[0], c.U[1], c.U[2]]; // U面の奥辺
+        const temp_R = [c.R[2], c.R[5], c.R[8]]; // R面の右辺
+        const temp_D = [c.D[8], c.D[7], c.D[6]]; // D面の手前辺 (反時計回り)
+        const temp_L = [c.L[6], c.L[3], c.L[0]]; // L面の左辺 (反時計回り)
+
+        // U <- R (Rの右辺がUの奥辺へ) B面基準で見るため、順序が逆転
+        c.U[0] = temp_R[2]; c.U[1] = temp_R[1]; c.U[2] = temp_R[0];
+        // R <- D (Dの手前辺がRの右辺へ)
+        c.R[2] = temp_D[2]; c.R[5] = temp_D[1]; c.R[8] = temp_D[0];
+        // D <- L (Lの左辺がDの手前辺へ) B面基準で見るため、順序が逆転
+        c.D[8] = temp_L[2]; c.D[7] = temp_L[1]; c.D[6] = temp_L[0];
+        // L <- U (Uの奥辺がLの左辺へ)
+        c.L[6] = temp_U[0]; c.L[3] = temp_U[1]; c.L[0] = temp_U[2];
+      } else if (move === "B'") {
+        c.B = rotateCounterClockwise(c.B);
+        const temp_U = [c.U[0], c.U[1], c.U[2]]; // U面の奥辺
+        const temp_R = [c.R[2], c.R[5], c.R[8]]; // R面の右辺
+        const temp_D = [c.D[8], c.D[7], c.D[6]]; // D面の手前辺 (反時計回り)
+        const temp_L = [c.L[6], c.L[3], c.L[0]]; // L面の左辺 (反時計回り)
+
+        // U <- L (Lの左辺がUの奥辺へ)
+        c.U[0] = temp_L[2]; c.U[1] = temp_L[1]; c.U[2] = temp_L[0];
+        // L <- D (Dの手前辺がLの左辺へ) B面基準で見るため、順序が逆転
+        c.L[6] = temp_D[0]; c.L[3] = temp_D[1]; c.L[0] = temp_D[2];
+        // D <- R (Rの右辺がDの手前辺へ)
+        c.D[8] = temp_R[2]; c.D[7] = temp_R[1]; c.D[6] = temp_R[0];
+        // R <- U (Uの奥辺がRの右辺へ) B面基準で見るため、順序が逆転
+        c.R[2] = temp_U[0]; c.R[5] = temp_U[1]; c.R[8] = temp_U[2];
+      }
+      // --- R/R' (R -> U -> B -> D -> F -> R)
+      else if (move === 'R') {
+        c.R = rotateClockwise(c.R);
+        const temp_F = [c.F[2], c.F[5], c.F[8]]; // F面の右辺
+        const temp_U = [c.U[2], c.U[5], c.U[8]]; // U面の右辺
+        const temp_B = [c.B[6], c.B[3], c.B[0]]; // B面の左辺 (反時計回り)
+        const temp_D = [c.D[2], c.D[5], c.D[8]]; // D面の右辺
+
+        // F <- D
+        c.F[2] = temp_D[0]; c.F[5] = temp_D[1]; c.F[8] = temp_D[2];
+        // D <- B (Bの左辺がDの右辺へ)
+        c.D[2] = temp_B[2]; c.D[5] = temp_B[1]; c.D[8] = temp_B[0];
+        // B <- U (Uの右辺がBの左辺へ)
+        c.B[6] = temp_U[0]; c.B[3] = temp_U[1]; c.B[0] = temp_U[2];
+        // U <- F
+        c.U[2] = temp_F[0]; c.U[5] = temp_F[1]; c.U[8] = temp_F[2];
+
+      } else if (move === "R'") {
+        c.R = rotateCounterClockwise(c.R);
+        const temp_F = [c.F[2], c.F[5], c.F[8]]; // F面の右辺
+        const temp_U = [c.U[2], c.U[5], c.U[8]]; // U面の右辺
+        const temp_B = [c.B[6], c.B[3], c.B[0]]; // B面の左辺 (反時計回り)
+        const temp_D = [c.D[2], c.D[5], c.D[8]]; // D面の右辺
+
+        // F <- U
+        c.F[2] = temp_U[0]; c.F[5] = temp_U[1]; c.F[8] = temp_U[2];
+        // U <- B (Bの左辺がUの右辺へ)
+        c.U[2] = temp_B[2]; c.U[5] = temp_B[1]; c.U[8] = temp_B[0];
+        // B <- D (Dの右辺がBの左辺へ)
+        c.B[6] = temp_D[0]; c.B[3] = temp_D[1]; c.B[0] = temp_D[2];
+        // D <- F
+        c.D[2] = temp_F[0]; c.D[5] = temp_F[1]; c.D[8] = temp_F[2];
+      }
+      // --- L/L' (L -> U -> F -> D -> B -> L)
+      else if (move === 'L') {
+        c.L = rotateClockwise(c.L);
+        const temp_F = [c.F[0], c.F[3], c.F[6]]; // F面の左辺
+        const temp_U = [c.U[0], c.U[3], c.U[6]]; // U面の左辺
+        const temp_B = [c.B[8], c.B[5], c.B[2]]; // B面の右辺 (反時計回り)
+        const temp_D = [c.D[0], c.D[3], c.D[6]]; // D面の左辺
+
+        // F <- U
+        c.F[0] = temp_U[0]; c.F[3] = temp_U[1]; c.F[6] = temp_U[2];
+        // U <- B (Bの右辺がUの左辺へ)
+        c.U[0] = temp_B[2]; c.U[3] = temp_B[1]; c.U[6] = temp_B[0];
+        // B <- D (Dの左辺がBの右辺へ)
+        c.B[8] = temp_D[0]; c.B[5] = temp_D[1]; c.B[2] = temp_D[2];
+        // D <- F
+        c.D[0] = temp_F[0]; c.D[3] = temp_F[1]; c.D[6] = temp_F[2];
+
+      } else if (move === "L'") {
+        c.L = rotateCounterClockwise(c.L);
+        const temp_F = [c.F[0], c.F[3], c.F[6]]; // F面の左辺
+        const temp_U = [c.U[0], c.U[3], c.U[6]]; // U面の左辺
+        const temp_B = [c.B[8], c.B[5], c.B[2]]; // B面の右辺 (反時計回り)
+        const temp_D = [c.D[0], c.D[3], c.D[6]]; // D面の左辺
+
+        // F <- D
+        c.F[0] = temp_D[0]; c.F[3] = temp_D[1]; c.F[6] = temp_D[2];
+        // D <- B (Bの右辺がDの左辺へ)
+        c.D[0] = temp_B[2]; c.D[3] = temp_B[1]; c.D[6] = temp_B[0];
+        // B <- U (Uの左辺がBの右辺へ)
+        c.B[8] = temp_U[0]; c.B[5] = temp_U[1]; c.B[2] = temp_U[2];
+        // U <- F
+        c.U[0] = temp_F[0]; c.U[3] = temp_F[1]; c.U[6] = temp_F[2];
+      }
+
+      return c;
+    }
+
+    function generateScramble() {
+      const movesList = ['U', "U'", 'D', "D'", 'F', "F'", 'B', "B'", 'R', "R'", 'L', "L'"];
+      const scrambleMoves = [];
+      let lastMove = '';
+
+      for (let i = 0; i < 20; i++) {
+        let move;
+        do {
+          move = movesList[Math.floor(Math.random() * movesList.length)];
+        } while (move[0] === lastMove[0]);
+
+        scrambleMoves.push(move);
+        lastMove = move;
+      }
+
+      const scrambleStr = scrambleMoves.join(' ');
+      document.getElementById('scrambleText').textContent = scrambleStr;
+      document.getElementById('scrambleCard').style.display = 'block';
+
+      cube = initCube();
+      scrambleMoves.forEach(function (move) {
+        cube = applyMove(cube, move);
+      });
+
+      renderCube();
+      document.getElementById('cubeCard').style.display = 'block';
+
+      resetTimer();
+    }
+
+    function renderFace(face, label) {
+      const faceDiv = document.createElement('div');
+      faceDiv.className = 'cube-face';
+
+      const labelDiv = document.createElement('div');
+      labelDiv.className = 'face-label';
+      labelDiv.textContent = label;
+      faceDiv.appendChild(labelDiv);
+
+      const gridDiv = document.createElement('div');
+      gridDiv.className = 'face-grid';
+
+      face.forEach(function (color) {
+        const sticker = document.createElement('div');
+        sticker.className = 'sticker';
+        sticker.style.backgroundColor = colorMap[color];
+        gridDiv.appendChild(sticker);
+      });
+
+      faceDiv.appendChild(gridDiv);
+      return faceDiv;
+    }
+
+    function renderCube() {
+      const cubeNet = document.getElementById('cubeNet');
+      cubeNet.innerHTML = '';
+
+      // 1. 上面(U)
+      cubeNet.appendChild(renderFace(cube.U, '上(U)'));
+
+      // 2. 中間行: 左(L) - 前(F) - 右(R)
+      const middleRow = document.createElement('div');
+      middleRow.className = 'cube-row';
+      middleRow.appendChild(renderFace(cube.L, '左(L)'));
+      middleRow.appendChild(renderFace(cube.F, '前(F)'));
+      middleRow.appendChild(renderFace(cube.R, '右(R)'));
+      // B面を削除または別の場所に配置する場合はここから削除
+      // middleRow.appendChild(renderFace(cube.B, '後(B)')); 
+      cubeNet.appendChild(middleRow);
+
+      // 3. 下面(D)
+      cubeNet.appendChild(renderFace(cube.D, '下(D)'));
+
+      // 4. B面（オプション：F面の上か下に単独で配置）
+      const backRow = document.createElement('div');
+      backRow.className = 'cube-row';
+      backRow.appendChild(document.createElement('div')); // F面の下にB面を配置するためにスペースを空ける
+      backRow.appendChild(renderFace(cube.B, '後(B)'));
+      cubeNet.appendChild(backRow);
+    }
+
+    function formatTime(ms) {
+      var minutes = Math.floor(ms / 60000);
+      var seconds = Math.floor((ms % 60000) / 1000);
+      var centiseconds = Math.floor((ms % 1000) / 10);
+      var secStr = seconds < 10 ? '0' + seconds : seconds.toString();
+      var csStr = centiseconds < 10 ? '0' + centiseconds : centiseconds.toString();
+      return minutes + ':' + secStr + '.' + csStr;
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById('timerDisplay').textContent = formatTime(time);
+    }
+
+    function handleStartPress(event) {
+      if (event) event.preventDefault();
+      isPressed = true;
+      const btn = document.getElementById('startBtn');
+      btn.className = 'btn btn-red';
+      btn.textContent = '▶ 離してスタート';
+    }
+
+    function handleStartRelease(event) {
+      if (event) event.preventDefault();
+      if (!isPressed) return;
+
+      isPressed = false;
+      time = 0;
+      updateTimerDisplay();
+
+      document.getElementById('startBtn').style.display = 'none';
+      document.getElementById('stopBtn').style.display = 'inline-flex';
+
+      isRunning = true;
+      timerInterval = setInterval(function () {
+        time += 10;
+        updateTimerDisplay();
+      }, 10);
+    }
+
+    function handleStartCancel() {
+      if (isPressed) {
+        isPressed = false;
+        const btn = document.getElementById('startBtn');
+        btn.className = 'btn btn-blue';
+        btn.textContent = '▶ 開始 (押して離す)';
+      }
+    }
+
+    function stopTimer() {
+      isRunning = false;
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+
+      document.getElementById('stopBtn').style.display = 'none';
+      const startBtn = document.getElementById('startBtn');
+      startBtn.style.display = 'inline-flex';
+      startBtn.className = 'btn btn-blue';
+      startBtn.textContent = '▶ 開始 (押して離す)';
+    }
+
+    function resetTimer() {
+      stopTimer();
+      time = 0;
+      updateTimerDisplay();
+      isPressed = false;
+    }
+  </script>
+</body>
+
+</html>
