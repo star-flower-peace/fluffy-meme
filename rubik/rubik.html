@@ -247,100 +247,100 @@
         if (isPrime) {
           c.U = rotateFaceCCW(c.U);
           const t = [c.F[0], c.F[1], c.F[2]];
-          [c.F[0], c.F[1], c.F[2]] = [c.L[0], c.L[1], c.L[2]];
-          [c.L[0], c.L[1], c.L[2]] = [c.B[0], c.B[1], c.B[2]];
-          [c.B[0], c.B[1], c.B[2]] = [c.R[0], c.R[1], c.R[2]];
-          [c.R[0], c.R[1], c.R[2]] = t;
+          c.F[0] = c.L[0]; c.F[1] = c.L[1]; c.F[2] = c.L[2];
+          c.L[0] = c.B[0]; c.L[1] = c.B[1]; c.L[2] = c.B[2];
+          c.B[0] = c.R[0]; c.B[1] = c.R[1]; c.B[2] = c.R[2];
+          c.R[0] = t[0]; c.R[1] = t[1]; c.R[2] = t[2];
         } else {
           c.U = rotateFaceCW(c.U);
           const t = [c.F[0], c.F[1], c.F[2]];
-          [c.F[0], c.F[1], c.F[2]] = [c.R[0], c.R[1], c.R[2]];
-          [c.R[0], c.R[1], c.R[2]] = [c.B[0], c.B[1], c.B[2]];
-          [c.B[0], c.B[1], c.B[2]] = [c.L[0], c.L[1], c.L[2]];
-          [c.L[0], c.L[1], c.L[2]] = t;
+          c.F[0] = c.R[0]; c.F[1] = c.R[1]; c.F[2] = c.R[2];
+          c.R[0] = c.B[0]; c.R[1] = c.B[1]; c.R[2] = c.B[2];
+          c.B[0] = c.L[0]; c.B[1] = c.L[1]; c.B[2] = c.L[2];
+          c.L[0] = t[0]; c.L[1] = t[1]; c.L[2] = t[2];
         }
       } else if (face === 'D') {
         if (isPrime) {
           c.D = rotateFaceCCW(c.D);
           const t = [c.F[6], c.F[7], c.F[8]];
-          [c.F[6], c.F[7], c.F[8]] = [c.R[6], c.R[7], c.R[8]];
-          [c.R[6], c.R[7], c.R[8]] = [c.B[6], c.B[7], c.B[8]];
-          [c.B[6], c.B[7], c.B[8]] = [c.L[6], c.L[7], c.L[8]];
-          [c.L[6], c.L[7], c.L[8]] = t;
+          c.F[6] = c.R[6]; c.F[7] = c.R[7]; c.F[8] = c.R[8];
+          c.R[6] = c.B[6]; c.R[7] = c.B[7]; c.R[8] = c.B[8];
+          c.B[6] = c.L[6]; c.B[7] = c.L[7]; c.B[8] = c.L[8];
+          c.L[6] = t[0]; c.L[7] = t[1]; c.L[8] = t[2];
         } else {
           c.D = rotateFaceCW(c.D);
           const t = [c.F[6], c.F[7], c.F[8]];
-          [c.F[6], c.F[7], c.F[8]] = [c.L[6], c.L[7], c.L[8]];
-          [c.L[6], c.L[7], c.L[8]] = [c.B[6], c.B[7], c.B[8]];
-          [c.B[6], c.B[7], c.B[8]] = [c.R[6], c.R[7], c.R[8]];
-          [c.R[6], c.R[7], c.R[8]] = t;
+          c.F[6] = c.L[6]; c.F[7] = c.L[7]; c.F[8] = c.L[8];
+          c.L[6] = c.B[6]; c.L[7] = c.B[7]; c.L[8] = c.B[8];
+          c.B[6] = c.R[6]; c.B[7] = c.R[7]; c.B[8] = c.R[8];
+          c.R[6] = t[0]; c.R[7] = t[1]; c.R[8] = t[2];
         }
       } else if (face === 'F') {
         if (isPrime) {
           c.F = rotateFaceCCW(c.F);
           const t = [c.U[6], c.U[7], c.U[8]];
-          [c.U[6], c.U[7], c.U[8]] = [c.R[0], c.R[3], c.R[6]];
-          [c.R[0], c.R[3], c.R[6]] = [c.D[2], c.D[1], c.D[0]];
-          [c.D[0], c.D[1], c.D[2]] = [c.L[2], c.L[5], c.L[8]];
-          [c.L[2], c.L[5], c.L[8]] = [c.U[8], c.U[7], c.U[6]];
+          c.U[6] = c.R[0]; c.U[7] = c.R[3]; c.U[8] = c.R[6];
+          c.R[0] = c.D[2]; c.R[3] = c.D[1]; c.R[6] = c.D[0];
+          c.D[0] = c.L[2]; c.D[1] = c.L[5]; c.D[2] = c.L[8];
+          c.L[2] = t[2]; c.L[5] = t[1]; c.L[8] = t[0];
         } else {
           c.F = rotateFaceCW(c.F);
           const t = [c.U[6], c.U[7], c.U[8]];
-          [c.U[6], c.U[7], c.U[8]] = [c.L[8], c.L[5], c.L[2]];
-          [c.L[2], c.L[5], c.L[8]] = [c.D[0], c.D[1], c.D[2]];
-          [c.D[0], c.D[1], c.D[2]] = [c.R[6], c.R[3], c.R[0]];
-          [c.R[0], c.R[3], c.R[6]] = [t[0], t[1], t[2]];
+          c.U[6] = c.L[8]; c.U[7] = c.L[5]; c.U[8] = c.L[2];
+          c.L[2] = c.D[0]; c.L[5] = c.D[1]; c.L[8] = c.D[2];
+          c.D[0] = c.R[6]; c.D[1] = c.R[3]; c.D[2] = c.R[0];
+          c.R[0] = t[0]; c.R[3] = t[1]; c.R[6] = t[2];
         }
       } else if (face === 'B') {
         if (isPrime) {
           c.B = rotateFaceCCW(c.B);
           const t = [c.U[0], c.U[1], c.U[2]];
-          [c.U[0], c.U[1], c.U[2]] = [c.L[6], c.L[3], c.L[0]];
-          [c.L[0], c.L[3], c.L[6]] = [c.D[6], c.D[7], c.D[8]];
-          [c.D[6], c.D[7], c.D[8]] = [c.R[8], c.R[5], c.R[2]];
-          [c.R[2], c.R[5], c.R[8]] = [t[0], t[1], t[2]];
+          c.U[0] = c.L[6]; c.U[1] = c.L[3]; c.U[2] = c.L[0];
+          c.L[0] = c.D[6]; c.L[3] = c.D[7]; c.L[6] = c.D[8];
+          c.D[6] = c.R[8]; c.D[7] = c.R[5]; c.D[8] = c.R[2];
+          c.R[2] = t[0]; c.R[5] = t[1]; c.R[8] = t[2];
         } else {
           c.B = rotateFaceCW(c.B);
           const t = [c.U[0], c.U[1], c.U[2]];
-          [c.U[0], c.U[1], c.U[2]] = [c.R[2], c.R[5], c.R[8]];
-          [c.R[2], c.R[5], c.R[8]] = [c.D[8], c.D[7], c.D[6]];
-          [c.D[6], c.D[7], c.D[8]] = [c.L[0], c.L[3], c.L[6]];
-          [c.L[0], c.L[3], c.L[6]] = [t[2], t[1], t[0]];
+          c.U[0] = c.R[2]; c.U[1] = c.R[5]; c.U[2] = c.R[8];
+          c.R[2] = c.D[8]; c.R[5] = c.D[7]; c.R[8] = c.D[6];
+          c.D[6] = c.L[0]; c.D[7] = c.L[3]; c.D[8] = c.L[6];
+          c.L[0] = t[2]; c.L[3] = t[1]; c.L[6] = t[0];
         }
       } else if (face === 'R') {
         if (isPrime) {
           c.R = rotateFaceCCW(c.R);
           const t = [c.F[2], c.F[5], c.F[8]];
-          [c.F[2], c.F[5], c.F[8]] = [c.U[2], c.U[5], c.U[8]];
-          [c.U[2], c.U[5], c.U[8]] = [c.B[6], c.B[3], c.B[0]];
-          [c.B[0], c.B[3], c.B[6]] = [c.D[8], c.D[5], c.D[2]];
-          [c.D[2], c.D[5], c.D[8]] = t;
+          c.F[2] = c.U[2]; c.F[5] = c.U[5]; c.F[8] = c.U[8];
+          c.U[2] = c.B[6]; c.U[5] = c.B[3]; c.U[8] = c.B[0];
+          c.B[0] = c.D[8]; c.B[3] = c.D[5]; c.B[6] = c.D[2];
+          c.D[2] = t[0]; c.D[5] = t[1]; c.D[8] = t[2];
         } else {
           c.R = rotateFaceCW(c.R);
           const t = [c.F[2], c.F[5], c.F[8]];
-          [c.F[2], c.F[5], c.F[8]] = [c.D[2], c.D[5], c.D[8]];
-          [c.D[2], c.D[5], c.D[8]] = [c.B[6], c.B[3], c.B[0]];
-          [c.B[0], c.B[3], c.B[6]] = [c.U[8], c.U[5], c.U[2]];
-          [c.U[2], c.U[5], c.U[8]] = t;
+          c.F[2] = c.D[2]; c.F[5] = c.D[5]; c.F[8] = c.D[8];
+          c.D[2] = c.B[6]; c.D[5] = c.B[3]; c.D[8] = c.B[0];
+          c.B[0] = c.U[8]; c.B[3] = c.U[5]; c.B[6] = c.U[2];
+          c.U[2] = t[0]; c.U[5] = t[1]; c.U[8] = t[2];
         }
       } else if (face === 'L') {
         if (isPrime) {
           c.L = rotateFaceCCW(c.L);
           const t = [c.F[0], c.F[3], c.F[6]];
-          [c.F[0], c.F[3], c.F[6]] = [c.D[0], c.D[3], c.D[6]];
-          [c.D[0], c.D[3], c.D[6]] = [c.B[8], c.B[5], c.B[2]];
-          [c.B[2], c.B[5], c.B[8]] = [c.U[6], c.U[3], c.U[0]];
-          [c.U[0], c.U[3], c.U[6]] = t;
+          c.F[0] = c.D[0]; c.F[3] = c.D[3]; c.F[6] = c.D[6];
+          c.D[0] = c.B[8]; c.D[3] = c.B[5]; c.D[6] = c.B[2];
+          c.B[2] = c.U[6]; c.B[5] = c.U[3]; c.B[8] = c.U[0];
+          c.U[0] = t[0]; c.U[3] = t[1]; c.U[6] = t[2];
         } else {
           c.L = rotateFaceCW(c.L);
           const t = [c.F[0], c.F[3], c.F[6]];
-          [c.F[0], c.F[3], c.F[6]] = [c.U[0], c.U[3], c.U[6]];
-          [c.U[0], c.U[3], c.U[6]] = [c.B[8], c.B[5], c.B[2]];
-          [c.B[2], c.B[5], c.B[8]] = [c.D[6], c.D[3], c.D[0]];
-          [c.D[0], c.D[3], c.D[6]] = t;
+          c.F[0] = c.U[0]; c.F[3] = c.U[3]; c.F[6] = c.U[6];
+          c.U[0] = c.B[8]; c.U[3] = c.B[5]; c.U[6] = c.B[2];
+          c.B[2] = c.D[6]; c.B[5] = c.D[3]; c.B[8] = c.D[0];
+          c.D[0] = t[0]; c.D[3] = t[1]; c.D[6] = t[2];
         }
       }
-
+      
       return c;
     }
 
