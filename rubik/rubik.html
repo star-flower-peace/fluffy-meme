@@ -54,6 +54,12 @@
       user-select: none;
     }
 
+    .btn-large {
+      padding: 4.25rem 2rem;
+      font-size: 1.25rem;
+      min-width: 200px;
+    }
+
     .btn:hover {
       opacity: 0.9;
     }
@@ -163,12 +169,12 @@
       </button>
     </div>
 
-    <div id="scrambleCard" class="card" style="display: none;">
+    <div id="scrambleCard" class="card">
       <h2>スクランブル:</h2>
       <div id="scrambleText" class="scramble-text"></div>
     </div>
 
-    <div id="cubeCard" class="card" style="display: none;">
+    <div id="cubeCard" class="card">
       <h2>キューブ展開図</h2>
       <div id="cubeNet" class="cube-net"></div>
     </div>
@@ -177,15 +183,15 @@
       <h2>タイマー</h2>
       <div id="timerDisplay" class="timer-display">0:00.00</div>
       <div class="button-group">
-        <button id="startBtn" class="btn btn-blue" onmousedown="handleStartPress()" onmouseup="handleStartRelease()"
-          onmouseleave="handleStartCancel()" ontouchstart="handleStartPress(event)"
+        <button id="startBtn" class="btn btn-blue btn-large" onmousedown="handleStartPress()"
+          onmouseup="handleStartRelease()" onmouseleave="handleStartCancel()" ontouchstart="handleStartPress(event)"
           ontouchend="handleStartRelease(event)">
           ▶ 開始 (押して離す)
         </button>
-        <button id="stopBtn" class="btn btn-green" style="display: none;" onclick="stopTimer()">
-          ⏸ 停止
+        <button id="stopBtn" class="btn btn-green btn-large" style="display: none;" onclick="stopTimer()">
+          ■ 停止
         </button>
-        <button class="btn btn-gray" onclick="resetTimer()">
+        <button class="btn btn-gray btn-large" onclick="resetTimer()">
           ↻ リセット
         </button>
       </div>
@@ -340,7 +346,7 @@
           c.D[0] = t[0]; c.D[3] = t[1]; c.D[6] = t[2];
         }
       }
-      
+
       return c;
     }
 
@@ -492,6 +498,8 @@
       updateTimerDisplay();
       isPressed = false;
     }
+
+    generateScramble();
   </script>
 </body>
 
