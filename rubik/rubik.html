@@ -52,6 +52,7 @@
       gap: 0.5rem;
       transition: opacity 0.2s;
       user-select: none;
+      width: 100%;
     }
 
     .btn-large {
@@ -190,9 +191,6 @@
         </button>
         <button id="stopBtn" class="btn btn-green btn-large" style="display: none;" onclick="stopTimer()">
           ■ 停止
-        </button>
-        <button class="btn btn-gray btn-large" onclick="resetTimer()">
-          ↻ リセット
         </button>
       </div>
     </div>
@@ -447,7 +445,7 @@
       if (event) event.preventDefault();
       isPressed = true;
       const btn = document.getElementById('startBtn');
-      btn.className = 'btn btn-red';
+      btn.className = 'btn btn-red btn-large';
       btn.textContent = '▶ 離してスタート';
     }
 
@@ -473,7 +471,7 @@
       if (isPressed) {
         isPressed = false;
         const btn = document.getElementById('startBtn');
-        btn.className = 'btn btn-blue';
+        btn.className = 'btn btn-blue btn-large';
         btn.textContent = '▶ 開始 (押して離す)';
       }
     }
@@ -488,7 +486,7 @@
       document.getElementById('stopBtn').style.display = 'none';
       const startBtn = document.getElementById('startBtn');
       startBtn.style.display = 'inline-flex';
-      startBtn.className = 'btn btn-blue';
+      startBtn.className = 'btn btn-blue btn-large';
       startBtn.textContent = '▶ 開始 (押して離す)';
     }
 
