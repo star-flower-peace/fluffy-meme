@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta name=”robots” content=”noindex”>
+  <meta name=”robots” content=”nofollow”>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>きらきら鉱物ワールド</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Hiragino Kaku Gothic Pro', 'メイリオ', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #333;
+      line-height: 1.8;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 30px;
+      text-align: center;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .header h1 {
+      color: white;
+      font-size: 3em;
+      text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+      margin-bottom: 10px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    .header p {
+      color: white;
+      font-size: 1.3em;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 30px 20px;
+    }
+
+    .mineral-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 30px;
+    }
+
+    .mineral-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+
+    .mineral-card:hover {
+      transform: translateY(-10px) rotate(1deg);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+    }
+
+    .mineral-card:hover svg {
+      transform: scale(1.05) rotate(5deg);
+    }
+
+    .mineral-image {
+      width: 100%;
+      height: 220px;
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .mineral-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 15px;
+    }
+
+    .mineral-image svg {
+      width: 180px;
+      height: 180px;
+      transition: transform 0.3s ease;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+    }
+
+    .mineral-image::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(45deg,
+          transparent,
+          rgba(255, 255, 255, 0.3),
+          transparent);
+      animation: shine 3s infinite;
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+      }
+
+      100% {
+        transform: translateX(100%) translateY(100%) rotate(45deg);
+      }
+    }
+
+    .mineral-card h2 {
+      color: #764ba2;
+      font-size: 1.8em;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .mineral-card h3 {
+      color: #f5576c;
+      font-size: 1.3em;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .mineral-info {
+      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .mineral-info p {
+      margin: 8px 0;
+      font-size: 1.1em;
+    }
+
+    .fun-fact {
+      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+      border-left: 5px solid #f5576c;
+    }
+
+    .fun-fact strong {
+      color: #764ba2;
+      font-size: 1.2em;
+    }
+
+    .sparkle {
+      display: inline-block;
+      animation: sparkle 1.5s infinite;
+    }
+
+    @keyframes sparkle {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(1.2);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <h1>✨ きらきら鉱物ワールド ✨</h1>
+    <p>ふしぎでキレイな石のひみつをさがそう！</p>
+  </div>
+
+  <div class="container">
+    <div class="mineral-grid">
+
+      <!-- 天青石 -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);">
+          <img src="tenseiseki.jpg" alt="天青石の写真">
+        </div>
+        <h2>てんせいせき</h2>
+        <h3>(天青石 / Celestite)</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ:</strong>そらいろ・あおいろ</p>
+          <p>✨ <strong>かたさ:</strong>★★★☆☆☆☆☆☆☆</p>
+          <p>📍 <strong>どこで:</strong>マダガスカル、アメリカ</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント!</strong><br>
+          てんしのいしってよばれてるよ!そらみたいにやさしいあおいろがとってもきれい!
+        </div>
+      </div>
+
+      <!-- アメジスト -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);">
+          <img src="Amethyst.jpg" alt="アメジストの写真">
+        </div>
+        <h2>アメジスト</h2>
+        <h3>（紫水晶 / Amethyst）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>むらさき</p>
+          <p>✨ <strong>かたさ：</strong>★★★★★★★☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>ブラジル、ウルグアイ</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          きれいなむらさきいろ！おうさまやおひめさまがつけていたほうせきだよ！
+        </div>
+      </div>
+
+      <!-- 水晶 -->
+      <div class="mineral-card">
+        <div class="mineral-image">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="quartzGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.9" />
+                <stop offset="50%" style="stop-color:#e0f2fe;stop-opacity:0.8" />
+                <stop offset="100%" style="stop-color:#bae6fd;stop-opacity:0.9" />
+              </linearGradient>
+              <linearGradient id="quartzGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#dbeafe;stop-opacity:0.95" />
+                <stop offset="100%" style="stop-color:#93c5fd;stop-opacity:0.85" />
+              </linearGradient>
+            </defs>
+            <!-- 六角柱の水晶 -->
+            <polygon points="100,30 130,50 130,120 100,140 70,120 70,50" fill="url(#quartzGrad1)" stroke="#60a5fa"
+              stroke-width="2" />
+            <polygon points="100,30 130,50 100,70" fill="url(#quartzGrad2)" opacity="0.9" />
+            <polygon points="70,50 100,30 100,70" fill="#f0f9ff" opacity="0.8" />
+            <polygon points="70,50 70,120 100,140 100,70" fill="url(#quartzGrad1)" opacity="0.7" />
+            <polygon points="130,50 130,120 100,140 100,70" fill="url(#quartzGrad2)" opacity="0.75" />
+            <line x1="100" y1="70" x2="100" y2="140" stroke="#bfdbfe" stroke-width="1.5" opacity="0.6" />
+          </svg>
+        </div>
+        <h2>すいしょう</h2>
+        <h3>（水晶 / Quartz）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>とうめい・しろ</p>
+          <p>✨ <strong>かたさ：</strong>★★★★★★★☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>にほんのやまでもとれるよ</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          ガラスみたいにとうめいでキラキラ！むかしの人は「こおったこおり」だとおもっていたんだって！
+        </div>
+      </div>
+
+      <!-- ローズクォーツ -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #ffe4e6 0%, #fecdd3 100%);">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="roseGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#fce7f3;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#fbcfe8;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#f9a8d4;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="roseGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#fda4af;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#fb7185;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <polygon points="100,35 125,50 125,115 100,135 75,115 75,50" fill="url(#roseGrad1)" stroke="#f472b6"
+              stroke-width="2" />
+            <polygon points="100,35 125,50 100,65" fill="url(#roseGrad2)" />
+            <polygon points="75,50 100,35 100,65" fill="#fce7f3" />
+            <polygon points="75,50 75,115 100,135 100,65" fill="url(#roseGrad1)" opacity="0.85" />
+            <polygon points="125,50 125,115 100,135 100,65" fill="url(#roseGrad2)" opacity="0.8" />
+            <circle cx="90" cy="80" r="6" fill="#fff1f2" opacity="0.6" />
+            <circle cx="105" cy="95" r="5" fill="#fff1f2" opacity="0.5" />
+          </svg>
+        </div>
+        <h2>ローズクォーツ</h2>
+        <h3>（紅水晶 / Rose Quartz）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>ピンク</p>
+          <p>✨ <strong>かたさ：</strong>★★★★★★★☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>マダガスカル、ブラジル</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          やさしいピンクいろ！「あいのいし」ともよばれているよ！
+        </div>
+      </div>
+
+      <!-- パイライト -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="pyriteGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#fde047;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#facc15;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#eab308;stop-opacity:1" />
+              </linearGradient>
+              <linearGradient id="pyriteGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#d97706;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <!-- 立方体 -->
+            <polygon points="100,50 140,70 140,110 100,130" fill="url(#pyriteGrad1)" stroke="#d97706"
+              stroke-width="2.5" />
+            <polygon points="60,70 100,50 100,130 60,110" fill="url(#pyriteGrad2)" stroke="#d97706"
+              stroke-width="2.5" />
+            <polygon points="60,70 100,50 140,70 100,90" fill="#fef08a" stroke="#d97706" stroke-width="2.5" />
+            <!-- キラキラ線 -->
+            <line x1="75" y1="85" x2="85" y2="95" stroke="#fef3c7" stroke-width="2" opacity="0.8" />
+            <line x1="115" y1="85" x2="125" y2="95" stroke="#fef3c7" stroke-width="2" opacity="0.8" />
+            <circle cx="100" cy="75" r="3" fill="#fef3c7" opacity="0.9" />
+          </svg>
+        </div>
+        <h2>パイライト</h2>
+        <h3>（黄鉄鉱 / Pyrite）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>きんいろ</p>
+          <p>✨ <strong>かたさ：</strong>★★★★★★☆☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>せかいじゅう</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          きんみたいにキラキラ！「ぐうじんこう（おろかなひとのきん）」ってよばれたこともあるよ！
+        </div>
+      </div>
+
+      <!-- 蛍石 -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="fluoriteGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#6ee7b7;stop-opacity:0.9" />
+                <stop offset="50%" style="stop-color:#34d399;stop-opacity:0.9" />
+                <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.9" />
+              </linearGradient>
+              <linearGradient id="fluoriteGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:0.8" />
+                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+              </linearGradient>
+            </defs>
+            <!-- 立方体 -->
+            <polygon points="100,45 145,70 145,115 100,140" fill="url(#fluoriteGrad1)" stroke="#059669"
+              stroke-width="2" />
+            <polygon points="55,70 100,45 100,140 55,115" fill="url(#fluoriteGrad1)" opacity="0.85" stroke="#059669"
+              stroke-width="2" />
+            <polygon points="55,70 100,45 145,70 100,95" fill="#d1fae5" stroke="#059669" stroke-width="2" />
+            <!-- 紫のグラデーション -->
+            <polygon points="100,75 125,90 125,115 100,130" fill="url(#fluoriteGrad2)" opacity="0.6" />
+            <circle cx="85" cy="90" r="8" fill="#ffffff" opacity="0.4" />
+            <circle cx="115" cy="100" r="6" fill="#ffffff" opacity="0.3" />
+          </svg>
+        </div>
+        <h2>ほたるいし</h2>
+        <h3>（蛍石 / Fluorite）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>みどり・むらさき・いろいろ</p>
+          <p>✨ <strong>かたさ：</strong>★★★★☆☆☆☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>ちゅうごく、メキシコ</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          くらいところでひかることがあるよ！まるでほたるみたい！
+        </div>
+      </div>
+
+      <!-- ラピスラズリ -->
+      <div class="mineral-card">
+        <div class="mineral-image" style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="lapisGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <!-- 不規則な形 -->
+            <ellipse cx="100" cy="90" rx="50" ry="55" fill="url(#lapisGrad1)" stroke="#1e3a8a" stroke-width="2.5" />
+            <ellipse cx="80" cy="75" rx="25" ry="30" fill="#1e40af" opacity="0.6" />
+            <ellipse cx="115" cy="100" rx="20" ry="25" fill="#2563eb" opacity="0.5" />
+            <!-- 金のつぶつぶ -->
+            <circle cx="85" cy="80" r="3" fill="#fbbf24" />
+            <circle cx="105" cy="70" r="2.5" fill="#fde047" />
+            <circle cx="95" cy="95" r="2" fill="#fbbf24" />
+            <circle cx="115" cy="85" r="2.5" fill="#fde047" />
+            <circle cx="75" cy="100" r="2" fill="#fbbf24" />
+            <circle cx="120" cy="105" r="3" fill="#fde047" />
+            <circle cx="90" cy="110" r="2" fill="#fbbf24" />
+            <circle cx="110" cy="95" r="2" fill="#fde047" />
+          </svg>
+        </div>
+        <h2>ラピスラズリ</h2>
+        <h3>（瑠璃 / Lapis Lazuli）</h3>
+        <div class="mineral-info">
+          <p>🌈 <strong>いろ：</strong>ふかいあおいろ（きんのつぶつぶ入り）</p>
+          <p>✨ <strong>かたさ：</strong>★★★★★☆☆☆☆☆</p>
+          <p>📍 <strong>どこで：</strong>アフガニスタン</p>
+        </div>
+        <div class="fun-fact">
+          <strong>🎉 おもしろポイント！</strong><br>
+          よぞらみたいなあおいろ！むかしのえのぐにもつかわれたよ！
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+
+    document.querySelectorAll('.mineral-card').forEach(card => {
+      card.addEventListener('click', function () {
+        this.style.animation = 'none';
+        setTimeout(() => {
+          this.style.animation = '';
+        }, 10);
+      });
+    });
+  </script>
+</body>
+
+</html>
