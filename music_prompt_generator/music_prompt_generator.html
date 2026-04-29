@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name=”robots” content=”noindex”>
+<meta name=”robots” content=”nofollow”>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>楽曲プロンプト・ジェネレーター</title>
+<!--
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+-->
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #12121a;
+    --surface2: #1a1a26;
+    --border: #2a2a40;
+    --accent: #7c3aed;
+    --accent2: #a855f7;
+    --accent3: #22d3ee;
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --selected-bg: #2d1b69;
+    --selected-border: #7c3aed;
+    --selected-text: #c4b5fd;
+    --row-hover: #1e1e30;
+    --cat-guitar: #f59e0b;
+    --cat-bass: #10b981;
+    --cat-drum: #ef4444;
+    --cat-vocal: #ec4899;
+    --cat-keys: #3b82f6;
+    --cat-orch: #8b5cf6;
+    --cat-bright: #facc15;
+    --cat-mid: #a3e635;
+    --cat-dark: #60a5fa;
+    --cat-dance: #f97316;
+    --cat-dark2: #94a3b8;
+    --cat-ecl: #d946ef;
+    --cat-emo: #f43f5e;
+    --cat-hard: #ef4444;
+    --cat-lyr: #a78bfa;
+    --cat-mag: #34d399;
+    --cat-min: #67e8f9;
+    --cat-par: #fb923c;
+    --cat-soft: #e879f9;
+    --cat-wei: #84cc16;
+    --cat-world: #fbbf24;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Background effect */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(124,58,237,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(34,211,238,0.07) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px 60px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2rem, 6vw, 3.8rem);
+    letter-spacing: 0.08em;
+    background: linear-gradient(135deg, #a855f7 0%, #22d3ee 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .subtitle {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* Textarea section */
+  .prompt-section {
+    margin-bottom: 16px;
+  }
+
+  .prompt-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .prompt-label::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--accent2);
+    border-radius: 2px;
+    display: block;
+  }
+
+  #promptArea {
+    width: 100%;
+    min-height: 100px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', monospace;
+    font-size: 0.95rem;
+    padding: 14px 16px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    line-height: 1.7;
+  }
+
+  #promptArea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(124,58,237,0.18);
+  }
+
+  #promptArea::placeholder {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  /* Controls area */
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .controls-left {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+
+  #resetBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  #resetBtn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: rgba(239,68,68,0.08);
+  }
+
+  #resetBtn svg { width: 14px; height: 14px; }
+
+  /* Random panel */
+  .random-panel {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+  }
+
+  .random-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .random-input-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .random-input-group label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .random-input-group input[type="number"] {
+    width: 52px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.85rem;
+    padding: 4px 7px;
+    outline: none;
+    text-align: center;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+
+  .random-input-group input[type="number"]::-webkit-inner-spin-button,
+  .random-input-group input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+  }
+
+  .random-input-group input[type="number"]:focus {
+    border-color: var(--accent2);
+  }
+
+  .random-sep {
+    color: var(--border);
+    font-size: 0.8rem;
+  }
+
+  #randomBtn {
+    background: linear-gradient(135deg, #7c3aed 0%, #22d3ee 100%);
+    border: none;
+    color: #fff;
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    padding: 6px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+  }
+
+  #randomBtn:hover { opacity: 0.85; }
+  #randomBtn:active { transform: scale(0.97); }
+  #randomBtn svg { width: 13px; height: 13px; }
+
+  .count-badge {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .count-badge span {
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  /* Random-selected row highlight (different tint) */
+  tbody tr.random-selected {
+    background: #1a2a3a;
+  }
+  tbody tr.random-selected td { color: #7dd3fc; }
+  tbody tr.random-selected .kw-badge {
+    background: rgba(34,211,238,0.15);
+    color: #7dd3fc;
+    border-color: rgba(34,211,238,0.35);
+  }
+
+  /* Tables section */
+  .tables-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .table-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .table-icon {
+    font-size: 1.1rem;
+  }
+
+  .table-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.12em;
+    color: var(--text);
+  }
+
+  .table-count {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    background: var(--border);
+    padding: 2px 8px;
+    border-radius: 10px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead tr {
+    background: rgba(255,255,255,0.02);
+  }
+
+  thead th {
+    padding: 10px 14px;
+    font-size: 0.65rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 500;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr {
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+    border-bottom: 1px solid rgba(42,42,64,0.5);
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody tr:hover {
+    background: var(--row-hover);
+  }
+
+  tbody tr.selected {
+    background: var(--selected-bg);
+    border-color: rgba(124,58,237,0.3);
+  }
+
+  tbody tr.selected td { color: var(--selected-text); }
+
+  tbody tr.selected .kw-badge {
+    background: rgba(124,58,237,0.3);
+    color: #c4b5fd;
+    border-color: rgba(124,58,237,0.5);
+  }
+
+  td {
+    padding: 9px 14px;
+    font-size: 0.85rem;
+    vertical-align: middle;
+  }
+
+  .cat-cell {
+    width: 110px;
+    min-width: 80px;
+  }
+
+  .cat-tag {
+    display: inline-block;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .kw-badge {
+    display: inline-block;
+    font-family: 'Courier New', monospace;
+    font-size: 0.82rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.03em;
+  }
+
+  .jp-cell {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+  }
+
+  .meaning-cell {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    max-width: 220px;
+  }
+
+  .checkmark {
+    width: 22px;
+    color: var(--accent2);
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  /* Tap ripple animation */
+  @keyframes ripple {
+    0% { opacity: 0.4; transform: scale(0); }
+    100% { opacity: 0; transform: scale(2.5); }
+  }
+
+  tbody tr.just-selected {
+    animation: rowFlash 0.25s ease;
+  }
+
+  @keyframes rowFlash {
+    0% { background: rgba(124,58,237,0.35); }
+    100% { background: var(--selected-bg); }
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  @media (max-width: 600px) {
+    .meaning-cell { display: none; }
+    td { padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="title">楽曲プロンプト・ジェネレーター</div>
+    <div class="subtitle">Click keywords to build your music prompt</div>
+  </header>
+
+  <div class="prompt-section">
+    <div class="prompt-label">生成プロンプト</div>
+    <textarea id="promptArea" placeholder="テーブルの行をクリックしてキーワードを追加…"></textarea>
+  </div>
+
+  <div class="controls">
+    <div class="controls-left">
+      <button id="resetBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"></polyline>
+          <path d="M3.51 15a9 9 0 1 0 .49-3.56"></path>
+        </svg>
+        リセット
+      </button>
+      <div class="random-panel">
+        <span class="random-label">ランダム：</span>
+        <div class="random-input-group">
+          <label for="rndInstruments">🎸 楽器</label>
+          <input type="number" id="rndInstruments" value="2" min="0" max="20">
+        </div>
+        <span class="random-sep">｜</span>
+        <div class="random-input-group">
+          <label for="rndExpressions">🎭 表現</label>
+          <input type="number" id="rndExpressions" value="2" min="0" max="20">
+        </div>
+        <button id="randomBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line>
+          </svg>
+          ランダム
+        </button>
+      </div>
+    </div>
+    <div class="count-badge">選択中: <span id="selCount">0</span> キーワード</div>
+  </div>
+
+  <div class="tables-wrapper" id="tablesWrapper"></div>
+</div>
+
+<script>
+// ===== DATA =====
+const data = {
+  instruments: {
+    title: '楽器',
+    icon: '🎸',
+    categories: [
+      { cat: 'ギター', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)', items: [
+        { en: 'guitar', jp: 'ギター' },
+        { en: 'electric guitar', jp: 'エレクトリック・ギター' },
+        { en: 'acoustic guitar', jp: 'アコースティック・ギター' },
+        { en: 'steel guitar', jp: 'スティール・ギター' },
+        { en: 'slide guitar', jp: 'スライド・ギター' },
+        { en: 'distorted guitar', jp: 'ディストーション・ギター' },
+      ]},
+      { cat: 'ベース', color: '#10b981', bg: 'rgba(16,185,129,0.15)', items: [
+        { en: 'bass', jp: 'ベース' },
+        { en: 'slap bass', jp: 'スラップ・ベース' },
+        { en: 'acoustic bass', jp: 'アコースティック・ベース' },
+        { en: 'finger-style bass', jp: 'フィンガースタイル・ベース' },
+        { en: 'fretless bass', jp: 'フレットレス・ベース' },
+        { en: '303', jp: 'ローランド TB-303' },
+      ]},
+      { cat: 'ドラム', color: '#ef4444', bg: 'rgba(239,68,68,0.15)', items: [
+        { en: 'drums', jp: 'ドラム' },
+        { en: 'brush drums', jp: 'ブラシ・ドラム' },
+        { en: 'percussion', jp: 'パーカッション' },
+        { en: 'bongos', jp: 'ボンゴ' },
+        { en: 'congas', jp: 'コンガ' },
+        { en: 'steel drums', jp: 'スチールドラム' },
+        { en: 'drum machine', jp: 'ドラムマシン' },
+        { en: '808', jp: 'ローランド TR-808' },
+        { en: '909', jp: 'ローランド TR-909' },
+        { en: 'linn', jp: 'リンドラム' },
+      ]},
+      { cat: 'ボーカル', color: '#ec4899', bg: 'rgba(236,72,153,0.15)', items: [
+        { en: 'vocal', jp: 'ボーカル' },
+        { en: 'natural vocal', jp: 'ナチュラル・ボーカル' },
+        { en: 'male vocal', jp: '男性ボーカル' },
+        { en: 'male singer', jp: '男性シンガー' },
+        { en: 'female vocal', jp: '女性ボーカル' },
+        { en: 'female singer', jp: '女性シンガー' },
+        { en: 'duet', jp: 'デュエット' },
+        { en: 'male and female vocals', jp: '男女ボーカル' },
+        { en: 'male and female duet', jp: '男女デュエット' },
+        { en: 'romantic duet', jp: 'ロマンティック・デュエット' },
+        { en: 'chorus', jp: 'コーラス' },
+        { en: 'vocaloid', jp: 'ボーカロイド' },
+      ]},
+      { cat: 'キーボード', color: '#3b82f6', bg: 'rgba(59,130,246,0.15)', items: [
+        { en: 'piano', jp: 'ピアノ' },
+        { en: 'acoustic piano', jp: 'アコースティック・ピアノ' },
+        { en: 'grand piano', jp: 'グランド・ピアノ' },
+        { en: 'rhodes', jp: 'ローズ' },
+        { en: 'organ', jp: 'オルガン' },
+        { en: 'hammond', jp: 'ハモンドオルガン' },
+        { en: 'pipe organ', jp: 'パイプオルガン' },
+        { en: 'synthesizer', jp: 'シンセサイザー' },
+        { en: 'synth', jp: 'シンセ' },
+        { en: 'moog', jp: 'モーグ' },
+        { en: 'minimoog', jp: 'ミニモーグ' },
+        { en: 'mellotron', jp: 'メロトロン' },
+      ]},
+      { cat: 'オーケストラ', color: '#8b5cf6', bg: 'rgba(139,92,246,0.15)', items: [
+        { en: 'orchestra', jp: 'オーケストラ' },
+        { en: 'orchestra and chorus', jp: 'オーケストラとコーラス' },
+        { en: 'violin', jp: 'バイオリン' },
+        { en: 'cello', jp: 'チェロ' },
+        { en: 'horn', jp: 'ホルン' },
+        { en: 'trumpet', jp: 'トランペット' },
+        { en: 'clarinet', jp: 'クラリネット' },
+        { en: 'flute', jp: 'フルート' },
+        { en: 'saxophone', jp: 'サックス' },
+        { en: 'xylophone', jp: 'シロフォン' },
+      ]},
+    ]
+  },
+  effects: {
+    title: '効果的ワード',
+    icon: '✨',
+    categories: [
+      { cat: '明るい', color: '#facc15', bg: 'rgba(250,204,21,0.15)', items: [
+        { en: 'Aggressive', jp: 'アグレッシブ', meaning: '攻撃的な、積極的な' },
+        { en: 'Anthemic', jp: 'アンセミック', meaning: '国歌的な、訴求力のある' },
+        { en: 'Upbeat', jp: 'アップビート', meaning: '明るく元気な' },
+        { en: 'Groovy', jp: 'グルーヴィ', meaning: 'リズムが心地よい' },
+        { en: 'Happy', jp: 'ハッピー', meaning: '幸せな、楽しい' },
+      ]},
+      { cat: '中間', color: '#a3e635', bg: 'rgba(163,230,53,0.15)', items: [
+        { en: 'Intimate', jp: 'インティメイト', meaning: '親密な、プライベートな' },
+        { en: 'Dramatic', jp: 'ドラマティック', meaning: '劇的な、感動的な' },
+        { en: 'Cinematic', jp: 'シネマティック', meaning: '映画のような、壮大な' },
+        { en: 'Atmospheric', jp: 'アトモスフェリック', meaning: '雰囲気のある' },
+        { en: 'Dreamy', jp: 'ドリーミー', meaning: '夢のような、幻想的な' },
+      ]},
+      { cat: '暗い', color: '#60a5fa', bg: 'rgba(96,165,250,0.15)', items: [
+        { en: 'Ethereal', jp: 'エテリアル', meaning: '霊的な、空想的な' },
+        { en: 'Slow', jp: 'スロウ', meaning: 'ゆっくりした、遅い' },
+        { en: 'Sad', jp: 'サッド', meaning: '悲しい、哀しい' },
+        { en: 'Haunted', jp: 'ホーンテッド', meaning: '幽霊のような' },
+      ]},
+    ]
+  },
+  expressions: {
+    title: '表現',
+    icon: '🎭',
+    categories: [
+      { cat: 'ダンサブル', color: '#f97316', bg: 'rgba(249,115,22,0.15)', items: [
+        { en: 'Danceable', jp: 'ダンサブル', meaning: '踊りやすい' },
+        { en: 'Dance', jp: 'ダンス', meaning: 'ダンス、舞踏' },
+        { en: 'Festive', jp: 'フェスティブ', meaning: '祝祭的な、華やかな' },
+        { en: 'Groovy', jp: 'グルーヴィ', meaning: 'グルーヴのある' },
+        { en: 'Mid-Tempo', jp: 'ミッドテンポ', meaning: '中間のテンポ' },
+        { en: 'Syncopated', jp: 'シンコペイテッド', meaning: 'リズムが予想外な' },
+        { en: 'Tipsy', jp: 'ティプシー', meaning: 'ふらふらした' },
+      ]},
+      { cat: 'ダーク', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)', items: [
+        { en: 'Dark', jp: 'ダーク', meaning: '暗い、陰鬱な' },
+        { en: 'Atmospheric', jp: 'アトモスフェリック', meaning: '雰囲気のある' },
+        { en: 'Cold', jp: 'コールド', meaning: '冷たい、冷淡な' },
+        { en: 'Doom', jp: 'ドゥーム', meaning: '破滅的な、運命的な' },
+        { en: 'Dramatic', jp: 'ドラマティック', meaning: '劇的な、感情的な' },
+        { en: 'Sinister', jp: 'シニスター', meaning: '不気味な、陰険な' },
+      ]},
+      { cat: 'エクレクティック', color: '#d946ef', bg: 'rgba(217,70,239,0.15)', items: [
+        { en: 'Eclectic', jp: 'エクレクティック', meaning: '折衷的な、多様な' },
+        { en: 'Adjunct', jp: 'アジャンクト', meaning: '付加的な、補足的な' },
+        { en: 'Art', jp: 'アート', meaning: '芸術的な' },
+        { en: 'Capriccio', jp: 'カプリッチョ', meaning: '気まぐれな' },
+        { en: 'Mellifluous', jp: 'メリフルアス', meaning: 'なめらかな、流れるような' },
+        { en: 'Nü', jp: 'ニュー', meaning: '新しい、新進の' },
+        { en: 'Progressive', jp: 'プログレッシブ', meaning: '進歩的な、前衛的な' },
+        { en: 'Unusual', jp: 'アンユージュアル', meaning: '珍しい、普通でない' },
+      ]},
+      { cat: 'エモーション', color: '#f43f5e', bg: 'rgba(244,63,94,0.15)', items: [
+        { en: 'Emotion', jp: 'エモーション', meaning: '感情、情熱' },
+        { en: 'Anthemic', jp: 'アンセミック', meaning: '壮大な' },
+        { en: 'Emotional', jp: 'エモーショナル', meaning: '感情豊かな' },
+        { en: 'Happy', jp: 'ハッピー', meaning: '幸せな、楽しい' },
+        { en: 'Jubilant', jp: 'ジュビラント', meaning: '歓喜の、喜びに満ちた' },
+        { en: 'Melancholy', jp: 'メランコリー', meaning: '憂鬱な' },
+        { en: 'Sad', jp: 'サッド', meaning: '悲しい、哀しい' },
+      ]},
+      { cat: 'ハード', color: '#ef4444', bg: 'rgba(239,68,68,0.15)', items: [
+        { en: 'Hard', jp: 'ハード', meaning: '硬い、ハードな' },
+        { en: 'Aggressive', jp: 'アグレッシブ', meaning: '攻撃的な' },
+        { en: 'Banger', jp: 'バンガー', meaning: '爆発的な' },
+        { en: 'Power', jp: 'パワー', meaning: '力強い、強力な' },
+        { en: 'Stadium', jp: 'スタジアム', meaning: 'スタジアム向けの' },
+        { en: 'Stomp', jp: 'ストンプ', meaning: '踏みつけるような' },
+      ]},
+      { cat: 'リリカル', color: '#a78bfa', bg: 'rgba(167,139,250,0.15)', items: [
+        { en: 'Lyrical', jp: 'リリカル', meaning: '叙情的な' },
+        { en: 'Broadway', jp: 'ブロードウェイ', meaning: 'ブロードウェイ風の' },
+        { en: 'Cabaret', jp: 'キャバレー', meaning: 'キャバレー風の' },
+        { en: 'Lounge', jp: 'ラウンジ', meaning: 'ラウンジ風の' },
+        { en: 'Operatic', jp: 'オペラティック', meaning: 'オペラ風の' },
+        { en: 'Storytelling', jp: 'ストーリーテリング', meaning: '物語調の' },
+        { en: 'Torch-Lounge', jp: 'トーチ・ラウンジ', meaning: 'トーチソング風の' },
+        { en: 'Theatrical', jp: 'シアトリカル', meaning: '劇場的な' },
+        { en: 'Troubadour', jp: 'トルバドール', meaning: 'トルバドール風の' },
+        { en: 'Vegas', jp: 'ベガス', meaning: 'ラスベガス風の' },
+      ]},
+      { cat: 'マジカル', color: '#34d399', bg: 'rgba(52,211,153,0.15)', items: [
+        { en: 'Magical', jp: 'マジカル', meaning: '魔法の、不思議な' },
+        { en: 'Ethereal', jp: 'エセリアル', meaning: '霊的な、空想的な' },
+        { en: 'Majestic', jp: 'マジェスティック', meaning: '壮大な、威厳のある' },
+        { en: 'Mysterious', jp: 'ミステリアス', meaning: '神秘的な、不可解な' },
+      ]},
+      { cat: 'ミニマル', color: '#67e8f9', bg: 'rgba(103,232,249,0.15)', items: [
+        { en: 'Minimal', jp: 'ミニマル', meaning: '最小限の、簡素な' },
+        { en: 'Ambient', jp: 'アンビエント', meaning: '環境音の' },
+        { en: 'Cinematic', jp: 'シネマティック', meaning: '映画音楽の' },
+        { en: 'Heat', jp: 'ヒート', meaning: '熱い、熱狂的な' },
+        { en: 'Slow', jp: 'スロウ', meaning: '遅い、ゆっくりした' },
+        { en: 'Sparse', jp: 'スパース', meaning: '希薄な、わずかな' },
+      ]},
+      { cat: 'パーティ', color: '#fb923c', bg: 'rgba(251,146,60,0.15)', items: [
+        { en: 'Party', jp: 'パーティ', meaning: 'パーティー、宴会' },
+        { en: 'German Schlager', jp: 'ジャーマン・シュラガー', meaning: 'ドイツのシュラガー音楽' },
+        { en: 'Glam', jp: 'グラム', meaning: 'グラム（華やかなロック）' },
+        { en: 'Glitter', jp: 'グリッター', meaning: 'キラキラした' },
+        { en: 'Groovy', jp: 'グルーヴィ', meaning: 'グルーヴのある' },
+      ]},
+      { cat: 'ソフト', color: '#e879f9', bg: 'rgba(232,121,249,0.15)', items: [
+        { en: 'Soft', jp: 'ソフト', meaning: '柔らかい、穏やかな' },
+        { en: 'Bedroom', jp: 'ベッドルーム', meaning: '寝室の、プライベートな' },
+        { en: 'Chillwave', jp: 'チルウェーブ', meaning: 'リラックスした雰囲気' },
+        { en: 'Intimate', jp: 'インティメイト', meaning: '親密な、プライベートな' },
+        { en: 'Sadcore', jp: 'サドコア', meaning: '悲しげな雰囲気の音楽' },
+      ]},
+      { cat: 'ウィアード', color: '#84cc16', bg: 'rgba(132,204,22,0.15)', items: [
+        { en: 'Weird', jp: 'ウィアード', meaning: '奇妙な、変わった' },
+        { en: 'Carnival', jp: 'カーニバル', meaning: 'カーニバル、お祭り' },
+        { en: 'Distorted', jp: 'ディストーテッド', meaning: '歪んだ、ひずんだ' },
+        { en: 'Glitchy', jp: 'グリッチー', meaning: 'グリッチのある、不具合のある' },
+        { en: 'Haunted', jp: 'ホーンテッド', meaning: '幽霊の出る、呪われた' },
+        { en: 'Hollow', jp: 'ホロウ', meaning: '空洞の、虚ろな' },
+        { en: 'Musicbox', jp: 'ミュージックボックス', meaning: 'オルゴールの' },
+        { en: 'Random', jp: 'ランダム', meaning: '無作為の、ランダムな' },
+      ]},
+      { cat: 'ワールド/エスニック', color: '#fbbf24', bg: 'rgba(251,191,36,0.15)', items: [
+        { en: 'World/Ethnic', jp: 'ワールド/エスニック', meaning: '世界の、民族の' },
+        { en: 'Arabian', jp: 'アラビアン', meaning: 'アラビアの、アラブの' },
+        { en: 'Bangra', jp: 'バングラ', meaning: 'バングラ（インドの踊り）' },
+        { en: 'Calypso', jp: 'カリプソ', meaning: '西インド諸島の音楽' },
+        { en: 'Chalga', jp: 'チャルガ', meaning: 'ブルガリアのポピュラー音楽' },
+        { en: 'Egyptian', jp: 'エジプシャン', meaning: 'エジプトの' },
+        { en: 'Hindustani', jp: 'ヒンドゥスタニ', meaning: 'インドの音楽' },
+        { en: 'Hōgaku', jp: '邦楽', meaning: '日本の伝統音楽' },
+        { en: 'Jewish Music', jp: 'ユダヤ音楽', meaning: 'ユダヤの音楽' },
+        { en: 'Klezmer', jp: 'クレズマー', meaning: '東欧ユダヤの音楽' },
+        { en: 'Matsuri', jp: 'マツリ', meaning: '祭りの、まつり' },
+        { en: 'Middle East', jp: 'ミドルイースト', meaning: '中東の' },
+        { en: 'Polka', jp: 'ポルカ', meaning: 'ポルカ（中欧の踊り）' },
+        { en: 'Russian Navy Song', jp: 'ロシア海軍の歌', meaning: 'ロシア海軍の歌' },
+        { en: 'Suomipop', jp: 'スオミポップ', meaning: 'フィンランドのポップ音楽' },
+        { en: 'Tribal', jp: 'トライバル', meaning: '部族の、トライバル' },
+      ]},
+    ]
+  }
+};
+
+// ===== STATE =====
+const selectedRows = new Set();
+
+// ===== BUILD TABLES =====
+function buildTables() {
+  const wrapper = document.getElementById('tablesWrapper');
+  wrapper.innerHTML = '';
+
+  const sections = ['instruments', 'effects', 'expressions'];
+
+  sections.forEach(key => {
+    const section = data[key];
+    const div = document.createElement('div');
+    div.className = 'table-section';
+
+    // Count total items
+    let total = 0;
+    section.categories.forEach(c => total += c.items.length);
+
+    const hasMeaning = key !== 'instruments';
+
+    div.innerHTML = `
+      <div class="table-header">
+        <span class="table-icon">${section.icon}</span>
+        <span class="table-title">${section.title}</span>
+        <span class="table-count">${total} items</span>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:28px"></th>
+            <th class="cat-cell">カテゴリ</th>
+            <th>キーワード (EN)</th>
+            <th>日本語</th>
+            ${hasMeaning ? '<th class="meaning-cell">意味</th>' : ''}
+          </tr>
+        </thead>
+        <tbody id="tbody-${key}"></tbody>
+      </table>
+    `;
+    wrapper.appendChild(div);
+
+    const tbody = div.querySelector(`#tbody-${key}`);
+
+    section.categories.forEach(cat => {
+      cat.items.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        const rowId = `${key}::${item.en}`;
+        tr.dataset.rowId = rowId;
+        tr.dataset.keyword = item.en;
+
+        tr.innerHTML = `
+          <td class="checkmark"></td>
+          <td class="cat-cell">
+            ${idx === 0 ? `<span class="cat-tag" style="color:${cat.color};background:${cat.bg}">${cat.cat}</span>` : ''}
+          </td>
+          <td><span class="kw-badge">${item.en}</span></td>
+          <td class="jp-cell">${item.jp}</td>
+          ${hasMeaning ? `<td class="meaning-cell">${item.meaning || ''}</td>` : ''}
+        `;
+
+        tr.addEventListener('click', () => toggleRow(tr, rowId, item.en));
+        tbody.appendChild(tr);
+      });
+    });
+  });
+}
+
+function toggleRow(tr, rowId, keyword) {
+  if (selectedRows.has(rowId)) {
+    selectedRows.delete(rowId);
+    tr.classList.remove('selected');
+    tr.querySelector('.checkmark').textContent = '';
+    removeKeyword(keyword);
+  } else {
+    selectedRows.add(rowId);
+    tr.classList.add('selected', 'just-selected');
+    tr.querySelector('.checkmark').textContent = '✓';
+    addKeyword(keyword);
+    setTimeout(() => tr.classList.remove('just-selected'), 300);
+  }
+  updateCount();
+}
+
+function addKeyword(kw) {
+  const ta = document.getElementById('promptArea');
+  const val = ta.value.trim();
+  ta.value = val ? val + ', ' + kw : kw;
+}
+
+function removeKeyword(kw) {
+  // Rebuild from selected + random-selected
+  const ta = document.getElementById('promptArea');
+  const keywords = [];
+  const seen = new Set();
+  document.querySelectorAll('tbody tr.selected, tbody tr.random-selected').forEach(tr => {
+    const k = tr.dataset.keyword;
+    if (!seen.has(k)) { seen.add(k); keywords.push(k); }
+  });
+  ta.value = keywords.join(', ');
+}
+
+function updateCount() {
+  document.getElementById('selCount').textContent = selectedRows.size;
+}
+
+document.getElementById('resetBtn').addEventListener('click', () => {
+  document.getElementById('promptArea').value = '';
+  selectedRows.clear();
+  document.querySelectorAll('tbody tr').forEach(tr => {
+    tr.classList.remove('selected', 'just-selected', 'random-selected');
+    tr.querySelector('.checkmark').textContent = '';
+  });
+  updateCount();
+});
+
+// ===== RANDOM =====
+function pickRandom(arr, n) {
+  const shuffled = [...arr].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(n, shuffled.length));
+}
+
+document.getElementById('randomBtn').addEventListener('click', () => {
+  const nInstruments = Math.max(0, parseInt(document.getElementById('rndInstruments').value) || 0);
+  const nExpressions = Math.max(0, parseInt(document.getElementById('rndExpressions').value) || 0);
+
+  // Remove previously random-selected rows
+  document.querySelectorAll('tbody tr.random-selected').forEach(tr => {
+    selectedRows.delete(tr.dataset.rowId);
+    tr.classList.remove('random-selected');
+    tr.querySelector('.checkmark').textContent = '';
+  });
+
+  const pick = (sectionKey, count) => {
+    const allRows = Array.from(document.querySelectorAll('#tbody-' + sectionKey + ' tr'));
+    const available = allRows.filter(tr => !tr.classList.contains('selected'));
+    const chosen = pickRandom(available, count);
+    chosen.forEach(tr => {
+      selectedRows.add(tr.dataset.rowId);
+      tr.classList.add('random-selected', 'just-selected');
+      tr.querySelector('.checkmark').textContent = '◈';
+      setTimeout(() => tr.classList.remove('just-selected'), 300);
+    });
+  };
+
+  pick('instruments', nInstruments);
+  pick('expressions', nExpressions);
+
+  // Rebuild textarea: manual first, then random
+  const keywords = [];
+  const seen = new Set();
+  document.querySelectorAll('tbody tr.selected, tbody tr.random-selected').forEach(tr => {
+    const kw = tr.dataset.keyword;
+    if (!seen.has(kw)) { seen.add(kw); keywords.push(kw); }
+  });
+  document.getElementById('promptArea').value = keywords.join(', ');
+
+  updateCount();
+});
+
+// Init
+buildTables();
+</script>
+</body>
+</html>
