@@ -117,15 +117,54 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     margin-bottom: 8px;
+    justify-content: space-between;
   }
 
-  .prompt-label::before {
+  .prompt-label-text {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .prompt-label-text::before {
     content: '';
     width: 3px;
     height: 14px;
     background: var(--accent2);
     border-radius: 2px;
     display: block;
+  }
+
+  #copyBtn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'Noto Sans JP', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: none;
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  #copyBtn svg { width: 13px; height: 13px; }
+
+  #copyBtn:hover {
+    border-color: var(--accent2);
+    color: var(--accent2);
+    background: rgba(168,85,247,0.08);
+  }
+
+  #copyBtn.copied {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34,197,94,0.1);
   }
 
   #promptArea {
@@ -227,28 +266,63 @@
     white-space: nowrap;
   }
 
-  .random-input-group input[type="number"] {
-    width: 52px;
+  .random-checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .random-checkbox-group input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--accent2);
+    cursor: pointer;
+    margin: 0;
+  }
+
+  .random-checkbox-group label {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .random-input-group select {
+    width: auto;
+    min-width: 48px;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 5px;
     color: var(--text);
     font-family: 'Noto Sans JP', sans-serif;
     font-size: 0.85rem;
-    padding: 4px 7px;
+    padding: 4px 24px 4px 9px;
     outline: none;
     text-align: center;
+    text-align-last: center;
     transition: border-color 0.2s;
-    -moz-appearance: textfield;
-  }
-
-  .random-input-group input[type="number"]::-webkit-inner-spin-button,
-  .random-input-group input[type="number"]::-webkit-outer-spin-button {
+    cursor: pointer;
+    appearance: none;
     -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 13px;
   }
 
-  .random-input-group input[type="number"]:focus {
+  .random-input-group select:focus {
     border-color: var(--accent2);
+  }
+
+  .random-input-group select:hover {
+    border-color: var(--accent2);
+  }
+
+  .random-input-group select option {
+    background: var(--surface);
+    color: var(--text);
   }
 
   .random-sep {
@@ -472,7 +546,16 @@
   </header>
 
   <div class="prompt-section">
-    <div class="prompt-label">生成プロンプト</div>
+    <div class="prompt-label">
+      <span class="prompt-label-text">生成プロンプト</span>
+      <button id="copyBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+        </svg>
+        <span id="copyBtnLabel">コピー</span>
+      </button>
+    </div>
     <textarea id="promptArea" placeholder="テーブルの行をクリックしてキーワードを追加…"></textarea>
   </div>
 
@@ -489,12 +572,16 @@
         <span class="random-label">ランダム：</span>
         <div class="random-input-group">
           <label for="rndInstruments">🎸 楽器</label>
-          <input type="number" id="rndInstruments" value="2" min="0" max="20">
+          <select id="rndInstruments"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option></select>
+        </div>
+        <div class="random-checkbox-group">
+          <input type="checkbox" id="rndIncludeVocal">
+          <label for="rndIncludeVocal">ボーカルを含める</label>
         </div>
         <span class="random-sep">｜</span>
         <div class="random-input-group">
           <label for="rndExpressions">🎭 表現</label>
-          <input type="number" id="rndExpressions" value="2" min="0" max="20">
+          <select id="rndExpressions"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option></select>
         </div>
         <button id="randomBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -784,6 +871,7 @@ function buildTables() {
         const rowId = `${key}::${item.en}`;
         tr.dataset.rowId = rowId;
         tr.dataset.keyword = item.en;
+        tr.dataset.category = cat.cat;
 
         tr.innerHTML = `
           <td class="checkmark"></td>
@@ -805,27 +893,22 @@ function buildTables() {
 function toggleRow(tr, rowId, keyword) {
   if (selectedRows.has(rowId)) {
     selectedRows.delete(rowId);
-    tr.classList.remove('selected');
+    tr.classList.remove('selected', 'random-selected');
     tr.querySelector('.checkmark').textContent = '';
-    removeKeyword(keyword);
   } else {
     selectedRows.add(rowId);
     tr.classList.add('selected', 'just-selected');
+    tr.classList.remove('random-selected');
     tr.querySelector('.checkmark').textContent = '✓';
-    addKeyword(keyword);
     setTimeout(() => tr.classList.remove('just-selected'), 300);
   }
+  rebuildPrompt();
   updateCount();
 }
 
-function addKeyword(kw) {
-  const ta = document.getElementById('promptArea');
-  const val = ta.value.trim();
-  ta.value = val ? val + ', ' + kw : kw;
-}
-
-function removeKeyword(kw) {
-  // Rebuild from selected + random-selected
+// 選択中（手動・ランダム問わず）の全行からプロンプトを再構築する
+// クリックでの追加・削除、ランダム選択のどちらの後でも常にこの関数で同期する
+function rebuildPrompt() {
   const ta = document.getElementById('promptArea');
   const keywords = [];
   const seen = new Set();
@@ -859,6 +942,7 @@ function pickRandom(arr, n) {
 document.getElementById('randomBtn').addEventListener('click', () => {
   const nInstruments = Math.max(0, parseInt(document.getElementById('rndInstruments').value) || 0);
   const nExpressions = Math.max(0, parseInt(document.getElementById('rndExpressions').value) || 0);
+  const includeVocal = document.getElementById('rndIncludeVocal').checked;
 
   // Remove previously random-selected rows
   document.querySelectorAll('tbody tr.random-selected').forEach(tr => {
@@ -867,9 +951,12 @@ document.getElementById('randomBtn').addEventListener('click', () => {
     tr.querySelector('.checkmark').textContent = '';
   });
 
-  const pick = (sectionKey, count) => {
+  const pick = (sectionKey, count, excludeCategory) => {
     const allRows = Array.from(document.querySelectorAll('#tbody-' + sectionKey + ' tr'));
-    const available = allRows.filter(tr => !tr.classList.contains('selected'));
+    const available = allRows.filter(tr =>
+      !tr.classList.contains('selected') &&
+      (!excludeCategory || tr.dataset.category !== excludeCategory)
+    );
     const chosen = pickRandom(available, count);
     chosen.forEach(tr => {
       selectedRows.add(tr.dataset.rowId);
@@ -879,19 +966,46 @@ document.getElementById('randomBtn').addEventListener('click', () => {
     });
   };
 
-  pick('instruments', nInstruments);
+  pick('instruments', nInstruments, includeVocal ? null : 'ボーカル');
   pick('expressions', nExpressions);
 
-  // Rebuild textarea: manual first, then random
-  const keywords = [];
-  const seen = new Set();
-  document.querySelectorAll('tbody tr.selected, tbody tr.random-selected').forEach(tr => {
-    const kw = tr.dataset.keyword;
-    if (!seen.has(kw)) { seen.add(kw); keywords.push(kw); }
-  });
-  document.getElementById('promptArea').value = keywords.join(', ');
-
+  rebuildPrompt();
   updateCount();
+});
+
+// ===== COPY =====
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  const text = document.getElementById('promptArea').value;
+  if (!text) return;
+
+  const showCopied = () => {
+    const btn = document.getElementById('copyBtn');
+    const label = document.getElementById('copyBtnLabel');
+    const prevLabel = label.textContent;
+    btn.classList.add('copied');
+    label.textContent = 'コピーしました';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      label.textContent = prevLabel;
+    }, 1500);
+  };
+
+  try {
+    await navigator.clipboard.writeText(text);
+    showCopied();
+  } catch (err) {
+    // Fallback for environments without Clipboard API access
+    const ta = document.getElementById('promptArea');
+    const { selectionStart, selectionEnd } = ta;
+    ta.select();
+    try {
+      document.execCommand('copy');
+      showCopied();
+    } catch (e) {
+      console.error('Copy failed:', e);
+    }
+    ta.setSelectionRange(selectionStart, selectionEnd);
+  }
 });
 
 // Init
