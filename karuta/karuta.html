@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta name=”robots” content=”noindex”>
+<meta name=”robots” content=”nofollow”>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>百人一首 上の句・下の句マッチング</title>
+<style>
+  body {
+    font-family: "Hiragino Mincho ProN", "Yu Mincho", serif;
+    background: #f7f5f0;
+    color: #333;
+    margin: 0;
+    padding: 16px;
+  }
+  h1 {
+    font-size: 1.3em;
+    text-align: center;
+    margin: 0 0 12px;
+  }
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.95em;
+  }
+  button {
+    font-size: 1em;
+    padding: 8px 18px;
+    border: 1px solid #888;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) {
+    background: #eee;
+  }
+  button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  select {
+    font-size: 1em;
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid #888;
+  }
+  .timer {
+    font-size: 1.2em;
+    font-weight: bold;
+    min-width: 90px;
+    text-align: center;
+  }
+  .status {
+    text-align: center;
+    margin-bottom: 6px;
+    font-size: 1em;
+  }
+  .status .remain {
+    font-weight: bold;
+  }
+  .answer-msg {
+    text-align: center;
+    min-height: 1.4em;
+    margin-bottom: 8px;
+    font-size: 1em;
+    color: #1a5fa8;
+    font-weight: bold;
+  }
+  .clear-msg {
+    text-align: center;
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #c0392b;
+    margin-bottom: 10px;
+  }
+  .table-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow-x: auto;
+  }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 640px;
+    background: #fff;
+  }
+  th {
+    background: #4a4a4a;
+    color: #fff;
+    padding: 8px;
+    position: sticky;
+    top: 0;
+  }
+  td {
+    border: 1px solid #ccc;
+    padding: 8px 10px;
+    font-size: 0.95em;
+    line-height: 1.4;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+  td.no {
+    width: 36px;
+    text-align: center;
+    color: #999;
+    cursor: default;
+    background: #fafafa;
+  }
+  tr:nth-child(even) td:not(.no) {
+    background: #fbfbf8;
+  }
+  td.selected {
+    background: #ffe9a8 !important;
+    outline: 2px solid #d99a00;
+  }
+  td.correct {
+    background: #bfe8bf !important;
+  }
+  td.wrong {
+    background: #f5b3b3 !important;
+  }
+  td.answer-hint {
+    background: #bcdcf7 !important;
+    outline: 2px solid #1a5fa8;
+  }
+  td.disabled-cell {
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+
+<h1>百人一首 上の句・下の句マッチング</h1>
+
+<div class="controls">
+  <div class="control-group">
+    <label for="rangeSelect">出題範囲:</label>
+    <select id="rangeSelect">
+      <option value="all">全100首</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label><input type="radio" name="mode" id="modeKanji" value="kanji" checked> 漢字あり</label>
+    <label><input type="radio" name="mode" id="modeKana" value="kana"> ひらがなのみ</label>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="startBtn">開始</button>
+  <button id="shuffleBtn">シャッフル</button>
+  <button id="answerBtn" disabled>答えを見る</button>
+  <button id="resetBtn">リセット</button>
+  <span class="timer" id="timer">00:00</span>
+</div>
+
+<div class="status">
+  残り <span class="remain" id="remainCount">100</span> 組 / 全<span id="totalCount">100</span>組
+</div>
+
+<div class="answer-msg" id="answerMsg"></div>
+
+<div class="clear-msg" id="clearMsg" style="display:none;"></div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:36px;">#</th>
+        <th>上の句</th>
+        <th>下の句</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+const POEMS = [
+  {id:1, kami:"秋の田の かりほの庵の 苫をあらみ", shimo:"わが衣手は 露にぬれつつ", kanaKami:"あきのたの かりほのいほの とまをあらみ", kanaShimo:"わがころもでは つゆにぬれつつ"},
+  {id:2, kami:"春すぎて 夏来にけらし 白妙の", shimo:"衣ほすてふ 天の香具山", kanaKami:"はるすぎて なつきにけらし しろたへの", kanaShimo:"ころもほすてふ あまのかぐやま"},
+  {id:3, kami:"あしびきの 山鳥の尾の しだり尾の", shimo:"ながながし夜を ひとりかも寝む", kanaKami:"あしびきの やまどりのをの しだりをの", kanaShimo:"ながながしよを ひとりかもねむ"},
+  {id:4, kami:"田子の浦に うち出でてみれば 白妙の", shimo:"富士の高嶺に 雪はふりつつ", kanaKami:"たごのうらに うちいでてみれば しろたへの", kanaShimo:"ふじのたかねに ゆきはふりつつ"},
+  {id:5, kami:"奥山に 紅葉ふみわけ 鳴く鹿の", shimo:"声きく時ぞ 秋は悲しき", kanaKami:"おくやまに もみぢふみわけ なくしかの", kanaShimo:"こゑきくときぞ あきはかなしき"},
+  {id:6, kami:"かささぎの 渡せる橋に おく霜の", shimo:"白きを見れば 夜ぞふけにける", kanaKami:"かささぎの わたせるはしに おくしもの", kanaShimo:"しろきをみれば よぞふけにける"},
+  {id:7, kami:"天の原 ふりさけ見れば 春日なる", shimo:"三笠の山に いでし月かも", kanaKami:"あまのはら ふりさけみれば かすがなる", kanaShimo:"みかさのやまに いでしつきかも"},
+  {id:8, kami:"わが庵は 都のたつみ しかぞすむ", shimo:"世をうぢ山と 人はいふなり", kanaKami:"わがいほは みやこのたつみ しかぞすむ", kanaShimo:"よをうぢやまと ひとはいふなり"},
+  {id:9, kami:"花の色は うつりにけりな いたづらに", shimo:"わが身世にふる ながめせしまに", kanaKami:"はなのいろは うつりにけりな いたづらに", kanaShimo:"わがみよにふる ながめせしまに"},
+  {id:10, kami:"これやこの 行くも帰るも 別れては", shimo:"知るも知らぬも 逢坂の関", kanaKami:"これやこの いくもかへるも わかれては", kanaShimo:"しるもしらぬも あふさかのせき"},
+  {id:11, kami:"わたの原 八十島かけて 漕ぎ出でぬと", shimo:"人には告げよ 海人の釣舟", kanaKami:"わたのはら やそしまかけて こぎいでぬと", kanaShimo:"ひとにはつげよ あまのつりぶね"},
+  {id:12, kami:"天つ風 雲の通ひ路 吹きとぢよ", shimo:"をとめの姿 しばしとどめむ", kanaKami:"あまつかぜ くものかよひぢ ふきとぢよ", kanaShimo:"をとめのすがた しばしとどめむ"},
+  {id:13, kami:"筑波嶺の 峰より落つる みなの川", shimo:"恋ぞつもりて 淵となりぬる", kanaKami:"つくばねの みねよりおつる みなのがは", kanaShimo:"こひぞつもりて ふちとなりぬる"},
+  {id:14, kami:"陸奥の しのぶもぢずり 誰ゆゑに", shimo:"乱れそめにし われならなくに", kanaKami:"みちのくの しのぶもぢずり たれゆゑに", kanaShimo:"みだれそめにし われならなくに"},
+  {id:15, kami:"君がため 春の野に出でて 若菜つむ", shimo:"わが衣手に 雪はふりつつ", kanaKami:"きみがため はるののにいでて わかなつむ", kanaShimo:"わがころもでに ゆきはふりつつ"},
+  {id:16, kami:"立ち別れ いなばの山の 峰に生ふる", shimo:"まつとし聞かば 今帰り来む", kanaKami:"たちわかれ いなばのやまの みねにおふる", kanaShimo:"まつとしきかば いまかへりこむ"},
+  {id:17, kami:"ちはやぶる 神代も聞かず 竜田川", shimo:"からくれなゐに 水くくるとは", kanaKami:"ちはやぶる かみよもきかず たつたがは", kanaShimo:"からくれなゐに みづくくるとは"},
+  {id:18, kami:"住の江の 岸による波 よるさへや", shimo:"夢の通ひ路 人めよくらむ", kanaKami:"すみのえの きしによるなみ よるさへや", kanaShimo:"ゆめのかよひぢ ひとめよくらむ"},
+  {id:19, kami:"難波潟 みじかき芦の ふしのまも", shimo:"あはでこの世を すぐしてよとや", kanaKami:"なにはがた みじかきあしの ふしのまも", kanaShimo:"あはでこのよを すぐしてよとや"},
+  {id:20, kami:"わびぬれば 今はた同じ 難波なる", shimo:"みをつくしても 逢はむとぞ思ふ", kanaKami:"わびぬれば いまはたおなじ なにはなる", kanaShimo:"みをつくしても あはむとぞおもふ"},
+  {id:21, kami:"今来むと いひしばかりに 長月の", shimo:"有明の月を 待ち出でつるかな", kanaKami:"いまこむと いひしばかりに ながつきの", kanaShimo:"ありあけのつきを まちいでつるかな"},
+  {id:22, kami:"吹くからに 秋の草木の しをるれば", shimo:"むべ山風を 嵐といふらむ", kanaKami:"ふくからに あきのくさきの しをるれば", kanaShimo:"むべやまかぜを あらしといふらむ"},
+  {id:23, kami:"月見れば ちぢに物こそ 悲しけれ", shimo:"わが身ひとつの 秋にはあらねど", kanaKami:"つきみれば ちぢにものこそ かなしけれ", kanaShimo:"わがみひとつの あきにはあらねど"},
+  {id:24, kami:"このたびは ぬさもとりあへず 手向山", shimo:"紅葉のにしき 神のまにまに", kanaKami:"このたびは ぬさもとりあへず たむけやま", kanaShimo:"もみぢのにしき かみのまにまに"},
+  {id:25, kami:"名にし負はば 逢坂山の さねかづら", shimo:"人に知られで くるよしもがな", kanaKami:"なにしおはば あふさかやまの さねかづら", kanaShimo:"ひとにしられで くるよしもがな"},
+  {id:26, kami:"小倉山 峰のもみぢ葉 心あらば", shimo:"今ひとたびの みゆき待たなむ", kanaKami:"をぐらやま みねのもみぢば こころあらば", kanaShimo:"いまひとたびの みゆきまたなむ"},
+  {id:27, kami:"みかの原 わきて流るる いづみ川", shimo:"いつ見きとてか 恋しかるらむ", kanaKami:"みかのはら わきてながるる いづみがは", kanaShimo:"いつみきとてか こひしかるらむ"},
+  {id:28, kami:"山里は 冬ぞ寂しさ まさりける", shimo:"人めも草も かれぬと思へば", kanaKami:"やまざとは ふゆぞさびしさ まさりける", kanaShimo:"ひとめもくさも かれぬとおもへば"},
+  {id:29, kami:"心あてに 折らばや折らむ 初霜の", shimo:"おきまどはせる 白菊の花", kanaKami:"こころあてに をらばやをらむ はつしもの", kanaShimo:"おきまどはせる しらぎくのはな"},
+  {id:30, kami:"有明の つれなく見えし 別れより", shimo:"暁ばかり 憂きものはなし", kanaKami:"ありあけの つれなくみえし わかれより", kanaShimo:"あかつきばかり うきものはなし"},
+  {id:31, kami:"朝ぼらけ 有明の月と 見るまでに", shimo:"吉野の里に ふれる白雪", kanaKami:"あさぼらけ ありあけのつきと みるまでに", kanaShimo:"よしののさとに ふれるしらゆき"},
+  {id:32, kami:"山川に 風のかけたる しがらみは", shimo:"流れもあへぬ 紅葉なりけり", kanaKami:"やまがはに かぜのかけたる しがらみは", kanaShimo:"ながれもあへぬ もみぢなりけり"},
+  {id:33, kami:"ひさかたの 光のどけき 春の日に", shimo:"しづ心なく 花の散るらむ", kanaKami:"ひさかたの ひかりのどけき はるのひに", kanaShimo:"しづこころなく はなのちるらむ"},
+  {id:34, kami:"誰をかも 知る人にせむ 高砂の", shimo:"松も昔の 友ならなくに", kanaKami:"たれをかも しるひとにせむ たかさごの", kanaShimo:"まつもむかしの ともならなくに"},
+  {id:35, kami:"人はいさ 心も知らず ふるさとは", shimo:"花ぞ昔の 香ににほひける", kanaKami:"ひとはいさ こころもしらず ふるさとは", kanaShimo:"はなぞむかしの かににほひける"},
+  {id:36, kami:"夏の夜は まだ宵ながら 明けぬるを", shimo:"雲のいづこに 月やどるらむ", kanaKami:"なつのよは まだよひながら あけぬるを", kanaShimo:"くものいづこに つきやどるらむ"},
+  {id:37, kami:"白露に 風の吹きしく 秋の野は", shimo:"つらぬきとめぬ 玉ぞ散りける", kanaKami:"しらつゆに かぜのふきしく あきののは", kanaShimo:"つらぬきとめぬ たまぞちりける"},
+  {id:38, kami:"忘らるる 身をば思はず 誓ひてし", shimo:"人の命の 惜しくもあるかな", kanaKami:"わすらるる みをばおもはず ちかひてし", kanaShimo:"ひとのいのちの をしくもあるかな"},
+  {id:39, kami:"浅茅生の 小野の篠原 しのぶれど", shimo:"あまりてなどか 人の恋しき", kanaKami:"あさぢふの をののしのはら しのぶれど", kanaShimo:"あまりてなどか ひとのこひしき"},
+  {id:40, kami:"忍ぶれど 色に出でにけり わが恋は", shimo:"ものや思ふと 人の問ふまで", kanaKami:"しのぶれど いろにいでにけり わがこひは", kanaShimo:"ものやおもふと ひとのとふまで"},
+  {id:41, kami:"恋すてふ わが名はまだき 立ちにけり", shimo:"人知れずこそ 思ひそめしか", kanaKami:"こひすてふ わがなはまだき たちにけり", kanaShimo:"ひとしれずこそ おもひそめしか"},
+  {id:42, kami:"契りきな かたみに袖を しぼりつつ", shimo:"末の松山 波こさじとは", kanaKami:"ちぎりきな かたみにそでを しぼりつつ", kanaShimo:"すゑのまつやま なみこさじとは"},
+  {id:43, kami:"逢ひ見ての のちの心に くらぶれば", shimo:"昔はものを 思はざりけり", kanaKami:"あひみての のちのこころに くらぶれば", kanaShimo:"むかしはものを おもはざりけり"},
+  {id:44, kami:"逢ふことの 絶えてしなくば なかなかに", shimo:"人をも身をも 恨みざらまし", kanaKami:"あふことの たえてしなくは なかなかに", kanaShimo:"ひとをもみをも うらみざらまし"},
+  {id:45, kami:"あはれとも いふべき人は 思ほえで", shimo:"身のいたづらに なりぬべきかな", kanaKami:"あはれとも いふべきひとは おもほえで", kanaShimo:"みのいたづらに なりぬべきかな"},
+  {id:46, kami:"由良の門を 渡る舟人 かぢをたえ", shimo:"ゆくへも知らぬ 恋の道かな", kanaKami:"ゆらのとを わたるふなびと かぢをたえ", kanaShimo:"ゆくへもしらぬ こひのみちかな"},
+  {id:47, kami:"八重むぐら しげれる宿の さびしきに", shimo:"人こそ見えね 秋は来にけり", kanaKami:"やへむぐら しげれるやどの さびしきに", kanaShimo:"ひとこそみえね あきはきにけり"},
+  {id:48, kami:"風をいたみ 岩うつ波の おのれのみ", shimo:"くだけて物を 思ふころかな", kanaKami:"かぜをいたみ いはうつなみの おのれのみ", kanaShimo:"くだけてものを おもふころかな"},
+  {id:49, kami:"みかきもり 衛士のたく火の 夜は燃え", shimo:"昼は消えつつ ものをこそ思へ", kanaKami:"みかきもり ゑじのたくひの よるはもえ", kanaShimo:"ひるはきえつつ ものをこそおもへ"},
+  {id:50, kami:"君がため 惜しからざりし 命さへ", shimo:"長くもがなと 思ひけるかな", kanaKami:"きみがため をしからざりし いのちさへ", kanaShimo:"ながくもがなと おもひけるかな"},
+  {id:51, kami:"かくとだに えやはいぶきの さしも草", shimo:"さしも知らじな 燃ゆる思ひを", kanaKami:"かくとだに えやはいぶきの さしもぐさ", kanaShimo:"さしもしらじな もゆるおもひを"},
+  {id:52, kami:"明けぬれば 暮るるものとは 知りながら", shimo:"なほ恨めしき 朝ぼらけかな", kanaKami:"あけぬれば くるるものとは しりながら", kanaShimo:"なほうらめしき あさぼらけかな"},
+  {id:53, kami:"嘆きつつ ひとり寝る夜の 明くる間は", shimo:"いかに久しき ものとかは知る", kanaKami:"なげきつつ ひとりねるよの あくるまは", kanaShimo:"いかにひさしき ものとかはしる"},
+  {id:54, kami:"忘れじの 行末までは かたければ", shimo:"今日を限りの 命ともがな", kanaKami:"わすれじの ゆくすゑまでは かたければ", kanaShimo:"けふをかぎりの いのちともがな"},
+  {id:55, kami:"滝の音は 絶えて久しく なりぬれど", shimo:"名こそ流れて なほ聞こえけれ", kanaKami:"たきのおとは たえてひさしく なりぬれど", kanaShimo:"なこそながれて なほきこえけれ"},
+  {id:56, kami:"あらざらむ この世のほかの 思ひ出に", shimo:"いまひとたびの 逢ふこともがな", kanaKami:"あらざらむ このよのほかの おもひでに", kanaShimo:"いまひとたびの あふこともがな"},
+  {id:57, kami:"めぐりあひて 見しやそれとも わかぬ間に", shimo:"雲がくれにし 夜半の月かな", kanaKami:"めぐりあひて みしやそれとも わかぬまに", kanaShimo:"くもがくれにし よはのつきかな"},
+  {id:58, kami:"有馬山 猪名の笹原 風吹けば", shimo:"いでそよ人を 忘れやはする", kanaKami:"ありまやま ゐなのささはら かぜふけば", kanaShimo:"いでそよひとを わすれやはする"},
+  {id:59, kami:"やすらはで 寝なましものを さ夜ふけて", shimo:"かたぶくまでの 月を見しかな", kanaKami:"やすらはで ねなましものを さよふけて", kanaShimo:"かたぶくまでの つきをみしかな"},
+  {id:60, kami:"大江山 いく野の道の 遠ければ", shimo:"まだふみもみず 天の橋立", kanaKami:"おほえやま いくののみちの とほければ", kanaShimo:"まだふみもみず あまのはしだて"},
+  {id:61, kami:"いにしへの 奈良の都の 八重桜", shimo:"けふ九重に にほひぬるかな", kanaKami:"いにしへの ならのみやこの やへざくら", kanaShimo:"けふここのへに にほひぬるかな"},
+  {id:62, kami:"夜をこめて 鳥のそら音は はかるとも", shimo:"よに逢坂の 関はゆるさじ", kanaKami:"よをこめて とりのそらねは はかるとも", kanaShimo:"よにあふさかの せきはゆるさじ"},
+  {id:63, kami:"今はただ 思ひ絶えなむ とばかりを", shimo:"人づてならで いふよしもがな", kanaKami:"いまはただ おもひたえなむ とばかりを", kanaShimo:"ひとづてならで いふよしもがな"},
+  {id:64, kami:"朝ぼらけ 宇治の川霧 たえだえに", shimo:"あらはれわたる 瀬々の網代木", kanaKami:"あさぼらけ うぢのかはぎり たえだえに", kanaShimo:"あらはれわたる せぜのあじろぎ"},
+  {id:65, kami:"恨みわび ほさぬ袖だに あるものを", shimo:"恋に朽ちなむ 名こそ惜しけれ", kanaKami:"うらみわび ほさぬそでだに あるものを", kanaShimo:"こひにくちなむ なこそをしけれ"},
+  {id:66, kami:"もろともに あはれと思へ 山桜", shimo:"花よりほかに 知る人もなし", kanaKami:"もろともに あはれとおもへ やまざくら", kanaShimo:"はなよりほかに しるひともなし"},
+  {id:67, kami:"春の夜の 夢ばかりなる 手枕に", shimo:"かひなく立たむ 名こそ惜しけれ", kanaKami:"はるのよの ゆめばかりなる たまくらに", kanaShimo:"かひなくたたむ なこそをしけれ"},
+  {id:68, kami:"心にも あらでうき世に ながらへば", shimo:"恋しかるべき 夜半の月かな", kanaKami:"こころにも あらでうきよに ながらへば", kanaShimo:"こひしかるべき よはのつきかな"},
+  {id:69, kami:"嵐吹く 三室の山の もみぢ葉は", shimo:"竜田の川の 錦なりけり", kanaKami:"あらしふく みむろのやまの もみぢばは", kanaShimo:"たつたのかはの にしきなりけり"},
+  {id:70, kami:"さびしさに 宿を立ち出でて ながむれば", shimo:"いづこも同じ 秋の夕暮", kanaKami:"さびしさに やどをたちいでて ながむれば", kanaShimo:"いづこもおなじ あきのゆふぐれ"},
+  {id:71, kami:"夕されば 門田の稲葉 おとづれて", shimo:"蘆のまろやに 秋風ぞ吹く", kanaKami:"ゆふされば かどたのいなば おとづれて", kanaShimo:"あしのまろやに あきかぜぞふく"},
+  {id:72, kami:"音に聞く 高師の浜の あだ波は", shimo:"かけじや袖の 濡れもこそすれ", kanaKami:"おとにきく たかしのはまの あだなみは", kanaShimo:"かけじやそでの ぬれもこそすれ"},
+  {id:73, kami:"高砂の 尾の上の桜 咲きにけり", shimo:"外山の霞 たたずもあらなむ", kanaKami:"たかさごの をのへのさくら さきにけり", kanaShimo:"とやまのかすみ たたずもあらなむ"},
+  {id:74, kami:"うかりける 人を初瀬の 山おろしよ", shimo:"はげしかれとは 祈らぬものを", kanaKami:"うかりける ひとをはつせの やまおろしよ", kanaShimo:"はげしかれとは いのらぬものを"},
+  {id:75, kami:"ちぎりおきし させもが露を いのちにて", shimo:"あはれ今年の 秋もいぬめり", kanaKami:"ちぎりおきし させもがつゆを いのちにて", kanaShimo:"あはれことしの あきもいぬめり"},
+  {id:76, kami:"わたの原 漕ぎ出でて見れば ひさかたの", shimo:"雲居にまがふ 沖つ白波", kanaKami:"わたのはら こぎいでてみれば ひさかたの", kanaShimo:"くもゐにまがふ おきつしらなみ"},
+  {id:77, kami:"瀬をはやみ 岩にせかるる 滝川の", shimo:"われても末に 逢はむとぞ思ふ", kanaKami:"せをはやみ いはにせかるる たきがはの", kanaShimo:"われてもすゑに あはむとぞおもふ"},
+  {id:78, kami:"淡路島 かよふ千鳥の 鳴く声に", shimo:"いく夜寝ざめぬ 須磨の関守", kanaKami:"あはぢしま かよふちどりの なくこゑに", kanaShimo:"いくよねざめぬ すまのせきもり"},
+  {id:79, kami:"秋風に たなびく雲の 絶え間より", shimo:"もれ出づる月の 影のさやけさ", kanaKami:"あきかぜに たなびくくもの たえまより", kanaShimo:"もれいづるつきの かげのさやけさ"},
+  {id:80, kami:"長からむ 心も知らず 黒髪の", shimo:"みだれて今朝は ものをこそ思へ", kanaKami:"ながからむ こころもしらず くろかみの", kanaShimo:"みだれてけさは ものをこそおもへ"},
+  {id:81, kami:"ほととぎす 鳴きつる方を ながむれば", shimo:"ただ有明の 月ぞ残れる", kanaKami:"ほととぎす なきつるかたを ながむれば", kanaShimo:"ただありあけの つきぞのこれる"},
+  {id:82, kami:"思ひわび さても命は あるものを", shimo:"憂きに堪へぬは 涙なりけり", kanaKami:"おもひわび さてもいのちは あるものを", kanaShimo:"うきにたへぬは なみだなりけり"},
+  {id:83, kami:"世の中よ 道こそなけれ 思ひ入る", shimo:"山の奥にも 鹿ぞ鳴くなる", kanaKami:"よのなかよ みちこそなけれ おもひいる", kanaShimo:"やまのおくにも しかぞなくなる"},
+  {id:84, kami:"ながらへば またこのごろや しのばれむ", shimo:"憂しと見し世ぞ 今は恋しき", kanaKami:"ながらへば またこのごろや しのばれむ", kanaShimo:"うしとみしよぞ いまはこひしき"},
+  {id:85, kami:"夜もすがら もの思ふころは 明けやらで", shimo:"ねやのひまさへ つれなかりけり", kanaKami:"よもすがら ものおもふころは あけやらで", kanaShimo:"ねやのひまさへ つれなかりけり"},
+  {id:86, kami:"嘆けとて 月やはものを 思はする", shimo:"かこち顔なる わが涙かな", kanaKami:"なげけとて つきやはものを おもはする", kanaShimo:"かこちがほなる わがなみだかな"},
+  {id:87, kami:"村雨の 露もまだひぬ 槇の葉に", shimo:"霧たちのぼる 秋の夕暮", kanaKami:"むらさめの つゆもまだひぬ まきのはに", kanaShimo:"きりたちのぼる あきのゆふぐれ"},
+  {id:88, kami:"難波江の 蘆のかりねの ひとよゆゑ", shimo:"みをつくしてや 恋ひわたるべき", kanaKami:"なにはえの あしのかりねの ひとよゆゑ", kanaShimo:"みをつくしてや こひわたるべき"},
+  {id:89, kami:"玉の緒よ 絶えなば絶えね ながらへば", shimo:"忍ぶることの 弱りもぞする", kanaKami:"たまのをよ たえなばたえね ながらへば", kanaShimo:"しのぶることの よわりもぞする"},
+  {id:90, kami:"見せばやな 雄島のあまの 袖だにも", shimo:"ぬれにぞぬれし 色はかはらず", kanaKami:"みせばやな をじまのあまの そでだにも", kanaShimo:"ぬれにぞぬれし いろはかはらず"},
+  {id:91, kami:"きりぎりす 鳴くや霜夜の さむしろに", shimo:"衣かたしき ひとりかも寝む", kanaKami:"きりぎりす なくやしもよの さむしろに", kanaShimo:"ころもかたしき ひとりかもねむ"},
+  {id:92, kami:"わが袖は 潮干に見えぬ 沖の石の", shimo:"人こそ知らね 乾く間もなし", kanaKami:"わがそでは しほひにみえぬ おきのいしの", kanaShimo:"ひとこそしらね かわくまもなし"},
+  {id:93, kami:"世の中は 常にもがもな 渚こぐ", shimo:"あまの小舟の 綱手かなしも", kanaKami:"よのなかは つねにもがもな なぎさこぐ", kanaShimo:"あまのをぶねの つなでかなしも"},
+  {id:94, kami:"み吉野の 山の秋風 小夜ふけて", shimo:"ふるさと寒く 衣うつなり", kanaKami:"みよしのの やまのあきかぜ さよふけて", kanaShimo:"ふるさとさむく ころもうつなり"},
+  {id:95, kami:"おほけなく うき世の民に おほふかな", shimo:"わが立つ杣に 墨染の袖", kanaKami:"おほけなく うきよのたみに おほふかな", kanaShimo:"わがたつそまに すみぞめのそで"},
+  {id:96, kami:"花さそふ 嵐の庭の 雪ならで", shimo:"ふりゆくものは わが身なりけり", kanaKami:"はなさそふ あらしのにはの ゆきならで", kanaShimo:"ふりゆくものは わがみなりけり"},
+  {id:97, kami:"来ぬ人を まつほの浦の 夕なぎに", shimo:"焼くや藻塩の 身もこがれつつ", kanaKami:"こぬひとを まつほのうらの ゆふなぎに", kanaShimo:"やくやもしほの みもこがれつつ"},
+  {id:98, kami:"風そよぐ ならの小川の 夕暮は", shimo:"みそぎぞ夏の しるしなりける", kanaKami:"かぜそよぐ ならのをがはの ゆふぐれは", kanaShimo:"みそぎぞなつの しるしなりける"},
+  {id:99, kami:"人もをし 人も恨めし あぢきなく", shimo:"世を思ふゆゑに もの思ふ身は", kanaKami:"ひともをし ひともうらめし あぢきなく", kanaShimo:"よをおもふゆゑに ものおもふみは"},
+  {id:100, kami:"ももしきや 古き軒端の しのぶにも", shimo:"なほあまりある 昔なりけり", kanaKami:"ももしきや ふるきのきばの しのぶにも", kanaShimo:"なほあまりある むかしなりけり"}
+];
+
+let kamiList = [];   // {id, text, kana}
+let shimoList = [];  // {id, text, kana}
+let selectedKamiIdx = null;
+let selectedShimoIdx = null;
+let started = false;
+let timerInterval = null;
+let elapsedSec = 0;
+let displayMode = 'kanji'; // 'kanji' or 'kana'
+
+const tbody = document.getElementById('tbody');
+const timerEl = document.getElementById('timer');
+const remainEl = document.getElementById('remainCount');
+const totalEl = document.getElementById('totalCount');
+const clearMsg = document.getElementById('clearMsg');
+const answerMsg = document.getElementById('answerMsg');
+const startBtn = document.getElementById('startBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+const resetBtn = document.getElementById('resetBtn');
+const answerBtn = document.getElementById('answerBtn');
+const rangeSelect = document.getElementById('rangeSelect');
+const modeKanji = document.getElementById('modeKanji');
+const modeKana = document.getElementById('modeKana');
+
+// 出題範囲の選択肢を組み立て（全100首 + 1-10, 11-20, ... 91-100）
+function buildRangeOptions() {
+  for (let start = 1; start <= 91; start += 10) {
+    const end = start + 9;
+    const opt = document.createElement('option');
+    opt.value = start + '-' + end;
+    opt.textContent = start + '〜' + end + '番';
+    rangeSelect.appendChild(opt);
+  }
+}
+buildRangeOptions();
+
+function getRangeIds() {
+  const val = rangeSelect.value;
+  if (val === 'all') {
+    return POEMS.map(p => p.id);
+  }
+  const [start, end] = val.split('-').map(Number);
+  const ids = [];
+  for (let i = start; i <= end; i++) ids.push(i);
+  return ids;
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+}
+
+function initLists() {
+  const ids = getRangeIds();
+  const poemsInRange = POEMS.filter(p => ids.includes(p.id));
+  kamiList = poemsInRange.map(p => ({id: p.id, text: p.kami, kana: p.kanaKami}));
+  shimoList = poemsInRange.map(p => ({id: p.id, text: p.shimo, kana: p.kanaShimo}));
+  shuffleArray(shimoList);
+  totalEl.textContent = poemsInRange.length;
+}
+
+function formatTime(sec) {
+  const m = Math.floor(sec / 60).toString().padStart(2, '0');
+  const s = (sec % 60).toString().padStart(2, '0');
+  return m + ':' + s;
+}
+
+function cellText(item) {
+  return displayMode === 'kana' ? item.kana : item.text;
+}
+
+function render() {
+  tbody.innerHTML = '';
+  const rowCount = Math.max(kamiList.length, shimoList.length);
+  for (let i = 0; i < rowCount; i++) {
+    const tr = document.createElement('tr');
+
+    const tdNo = document.createElement('td');
+    tdNo.className = 'no';
+    tdNo.textContent = (i + 1);
+    tr.appendChild(tdNo);
+
+    const tdKami = document.createElement('td');
+    if (i < kamiList.length) {
+      tdKami.textContent = cellText(kamiList[i]);
+      tdKami.dataset.idx = i;
+      tdKami.dataset.col = 'kami';
+      if (!started) tdKami.classList.add('disabled-cell');
+      if (i === selectedKamiIdx) tdKami.classList.add('selected');
+      tdKami.addEventListener('click', onCellClick);
+    }
+    tr.appendChild(tdKami);
+
+    const tdShimo = document.createElement('td');
+    if (i < shimoList.length) {
+      tdShimo.textContent = cellText(shimoList[i]);
+      tdShimo.dataset.idx = i;
+      tdShimo.dataset.col = 'shimo';
+      if (!started) tdShimo.classList.add('disabled-cell');
+      if (i === selectedShimoIdx) tdShimo.classList.add('selected');
+      tdShimo.addEventListener('click', onCellClick);
+    }
+    tr.appendChild(tdShimo);
+
+    tbody.appendChild(tr);
+  }
+  remainEl.textContent = kamiList.length;
+  updateAnswerBtnState();
+}
+
+function updateAnswerBtnState() {
+  const exactlyOneSelected =
+    (selectedKamiIdx !== null && selectedShimoIdx === null) ||
+    (selectedKamiIdx === null && selectedShimoIdx !== null);
+  answerBtn.disabled = !(started && exactlyOneSelected);
+}
+
+function onCellClick(e) {
+  if (!started) return;
+  const col = e.currentTarget.dataset.col;
+  const idx = parseInt(e.currentTarget.dataset.idx, 10);
+
+  answerMsg.textContent = '';
+
+  if (col === 'kami') {
+    selectedKamiIdx = (selectedKamiIdx === idx) ? null : idx;
+  } else {
+    selectedShimoIdx = (selectedShimoIdx === idx) ? null : idx;
+  }
+  render();
+
+  if (selectedKamiIdx !== null && selectedShimoIdx !== null) {
+    checkMatch();
+  }
+}
+
+function checkMatch() {
+  const kamiItem = kamiList[selectedKamiIdx];
+  const shimoItem = shimoList[selectedShimoIdx];
+  const isMatch = kamiItem.id === shimoItem.id;
+
+  const kamiCell = tbody.querySelector('td[data-col="kami"][data-idx="' + selectedKamiIdx + '"]');
+  const shimoCell = tbody.querySelector('td[data-col="shimo"][data-idx="' + selectedShimoIdx + '"]');
+
+  if (isMatch) {
+    if (kamiCell) kamiCell.classList.add('correct');
+    if (shimoCell) shimoCell.classList.add('correct');
+    setTimeout(() => {
+      kamiList.splice(selectedKamiIdx, 1);
+      shimoList.splice(selectedShimoIdx, 1);
+      selectedKamiIdx = null;
+      selectedShimoIdx = null;
+      render();
+      if (kamiList.length === 0 && shimoList.length === 0) {
+        finish();
+      }
+    }, 250);
+  } else {
+    if (kamiCell) kamiCell.classList.add('wrong');
+    if (shimoCell) shimoCell.classList.add('wrong');
+    setTimeout(() => {
+      selectedKamiIdx = null;
+      selectedShimoIdx = null;
+      render();
+    }, 500);
+  }
+}
+
+function showAnswer() {
+  if (!started) return;
+  if (selectedKamiIdx !== null && selectedShimoIdx === null) {
+    const targetId = kamiList[selectedKamiIdx].id;
+    const targetIdx = shimoList.findIndex(s => s.id === targetId);
+    if (targetIdx === -1) return;
+    const cell = tbody.querySelector('td[data-col="shimo"][data-idx="' + targetIdx + '"]');
+    if (cell) {
+      cell.classList.add('answer-hint');
+      answerMsg.textContent = '正解の下の句: ' + cellText(shimoList[targetIdx]);
+      setTimeout(() => cell.classList.remove('answer-hint'), 2500);
+    }
+  } else if (selectedShimoIdx !== null && selectedKamiIdx === null) {
+    const targetId = shimoList[selectedShimoIdx].id;
+    const targetIdx = kamiList.findIndex(k => k.id === targetId);
+    if (targetIdx === -1) return;
+    const cell = tbody.querySelector('td[data-col="kami"][data-idx="' + targetIdx + '"]');
+    if (cell) {
+      cell.classList.add('answer-hint');
+      answerMsg.textContent = '正解の上の句: ' + cellText(kamiList[targetIdx]);
+      setTimeout(() => cell.classList.remove('answer-hint'), 2500);
+    }
+  }
+}
+
+function startTimer() {
+  elapsedSec = 0;
+  timerEl.textContent = formatTime(elapsedSec);
+  timerInterval = setInterval(() => {
+    elapsedSec++;
+    timerEl.textContent = formatTime(elapsedSec);
+  }, 1000);
+}
+
+function stopTimer() {
+  if (timerInterval) {
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
+
+function setLockedControls(locked) {
+  // 開始中はシャッフルと出題範囲変更を禁止
+  shuffleBtn.disabled = locked;
+  rangeSelect.disabled = locked;
+}
+
+function finish() {
+  stopTimer();
+  clearMsg.textContent = '🎉 全問正解！ タイム: ' + formatTime(elapsedSec);
+  clearMsg.style.display = 'block';
+  started = false;
+  startBtn.disabled = false;
+  startBtn.textContent = '開始';
+  setLockedControls(false);
+  updateAnswerBtnState();
+}
+
+startBtn.addEventListener('click', () => {
+  if (started) return;
+  started = true;
+  clearMsg.style.display = 'none';
+  answerMsg.textContent = '';
+  selectedKamiIdx = null;
+  selectedShimoIdx = null;
+  startTimer();
+  setLockedControls(true);
+  startBtn.disabled = true;
+  render();
+});
+
+shuffleBtn.addEventListener('click', () => {
+  if (started) return; // 開始中はシャッフル不可（念のための二重ガード）
+  shuffleArray(kamiList);
+  shuffleArray(shimoList);
+  selectedKamiIdx = null;
+  selectedShimoIdx = null;
+  render();
+});
+
+answerBtn.addEventListener('click', showAnswer);
+
+resetBtn.addEventListener('click', () => {
+  stopTimer();
+  elapsedSec = 0;
+  timerEl.textContent = formatTime(elapsedSec);
+  clearMsg.style.display = 'none';
+  answerMsg.textContent = '';
+  started = false;
+  startBtn.disabled = false;
+  startBtn.textContent = '開始';
+  selectedKamiIdx = null;
+  selectedShimoIdx = null;
+  setLockedControls(false);
+  initLists();
+  render();
+});
+
+rangeSelect.addEventListener('change', () => {
+  if (started) return; // 開始中は変更不可（selectがdisabledなので通常発火しない）
+  stopTimer();
+  elapsedSec = 0;
+  timerEl.textContent = formatTime(elapsedSec);
+  clearMsg.style.display = 'none';
+  answerMsg.textContent = '';
+  selectedKamiIdx = null;
+  selectedShimoIdx = null;
+  initLists();
+  render();
+});
+
+modeKanji.addEventListener('change', () => {
+  if (modeKanji.checked) {
+    displayMode = 'kanji';
+    render();
+  }
+});
+modeKana.addEventListener('change', () => {
+  if (modeKana.checked) {
+    displayMode = 'kana';
+    render();
+  }
+});
+
+// 初期化
+initLists();
+render();
+</script>
+
+</body>
+</html>
