@@ -148,6 +148,7 @@
     <label for="rangeSelect">出題範囲:</label>
     <select id="rangeSelect">
       <option value="all">全100首</option>
+      <option value="random10">ランダム10首</option>
     </select>
   </div>
   <div class="control-group">
@@ -329,10 +330,20 @@ function getRangeIds() {
   if (val === 'all') {
     return POEMS.map(p => p.id);
   }
+  if (val === 'random10') {
+    return pickRandomIds(10);
+  }
   const [start, end] = val.split('-').map(Number);
   const ids = [];
   for (let i = start; i <= end; i++) ids.push(i);
   return ids;
+}
+
+// 全100首からランダムにn首分のidを重複なく選ぶ
+function pickRandomIds(n) {
+  const allIds = POEMS.map(p => p.id);
+  shuffleArray(allIds);
+  return allIds.slice(0, n);
 }
 
 function shuffleArray(arr) {
@@ -531,10 +542,17 @@ startBtn.addEventListener('click', () => {
 
 shuffleBtn.addEventListener('click', () => {
   if (started) return; // 開始中はシャッフル不可（念のための二重ガード）
-  shuffleArray(kamiList);
-  shuffleArray(shimoList);
+  answerMsg.textContent = '';
   selectedKamiIdx = null;
   selectedShimoIdx = null;
+
+  if (rangeSelect.value === 'random10') {
+    // ランダム10首モードでは、100首の中から改めて10首を選び直す
+    initLists();
+  } else {
+    shuffleArray(kamiList);
+    shuffleArray(shimoList);
+  }
   render();
 });
 
