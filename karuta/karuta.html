@@ -137,6 +137,11 @@
   td.disabled-cell {
     cursor: not-allowed;
   }
+  td.hidden-cell {
+    color: transparent;
+    background: #e0e0e0 !important;
+    cursor: default;
+  }
 </style>
 </head>
 <body>
@@ -156,6 +161,9 @@
   <div class="control-group">
     <label><input type="radio" name="mode" id="modeKanji" value="kanji" checked> 漢字あり</label>
     <label><input type="radio" name="mode" id="modeKana" value="kana"> ひらがなのみ</label>
+  </div>
+  <div class="control-group">
+    <label><input type="checkbox" id="hideShimoBeforeStart"> 開始前は下の句を表示しない</label>
   </div>
 </div>
 
@@ -192,7 +200,7 @@
 const POEMS = [
   {id:1, kami:"秋の田の かりほの庵の 苫をあらみ", shimo:"わが衣手は 露にぬれつつ", kanaKami:"あきのたの かりほのいほの とまをあらみ", kanaShimo:"わがころもでは つゆにぬれつつ"},
   {id:2, kami:"春すぎて 夏来にけらし 白妙の", shimo:"衣ほすてふ 天の香具山", kanaKami:"はるすぎて なつきにけらし しろたへの", kanaShimo:"ころもほすてふ あまのかぐやま"},
-  {id:3, kami:"あしびきの 山鳥の尾の しだり尾の", shimo:"ながながし夜を ひとりかも寝む", kanaKami:"あしびきの やまどりのをの しだりをの", kanaShimo:"ながながしよを ひとりかもねむ"},
+  {id:3, kami:"あしびきの 山鳥の尾の しだり尾の", shimo:"ながながし夜を ひとりかも寝む", kanaKami:"あしびきの やまどりの을の しだりをの", kanaShimo:"ながながしよを ひとりかもねむ"},
   {id:4, kami:"田子の浦に うち出でてみれば 白妙の", shimo:"富士の高嶺に 雪はふりつつ", kanaKami:"たごのうらに うちいでてみれば しろたへの", kanaShimo:"ふじのたかねに ゆきはふりつつ"},
   {id:5, kami:"奥山に 紅葉ふみわけ 鳴く鹿の", shimo:"声きく時ぞ 秋は悲しき", kanaKami:"おくやまに もみぢふみわけ なくしかの", kanaShimo:"こゑきくときぞ あきはかなしき"},
   {id:6, kami:"かささぎの 渡せる橋に おく霜の", shimo:"白きを見れば 夜ぞふけにける", kanaKami:"かささぎの わたせるはしに おくしもの", kanaShimo:"しろきをみれば よぞふけにける"},
@@ -261,7 +269,7 @@ const POEMS = [
   {id:69, kami:"嵐吹く 三室の山の もみぢ葉は", shimo:"竜田の川の 錦なりけり", kanaKami:"あらしふく みむろのやまの もみぢばは", kanaShimo:"たつたのかはの にしきなりけり"},
   {id:70, kami:"さびしさに 宿を立ち出でて ながむれば", shimo:"いづこも同じ 秋の夕暮", kanaKami:"さびしさに やどをたちいでて ながむれば", kanaShimo:"いづこもおなじ あきのゆふぐれ"},
   {id:71, kami:"夕されば 門田の稲葉 おとづれて", shimo:"蘆のまろやに 秋風ぞ吹く", kanaKami:"ゆふされば かどたのいなば おとづれて", kanaShimo:"あしのまろやに あきかぜぞふく"},
-  {id:72, kami:"音に聞く 高師の浜の あだ波は", shimo:"かけじや袖の 濡れもこそすれ", kanaKami:"おとにきく たかしのはまの あだなみは", kanaShimo:"かけじやそでの ぬれもこそすれ"},
+  {id:72, kami:"音に聞く 高師の浜の あだ波は", shimo:"かけじや袖の 濡れもこそすれ", kanaKami:"おとにきく たかしのはまの あだなみは", kanaShimo:"かけじやそでの 濡れもこそすれ"},
   {id:73, kami:"高砂の 尾の上の桜 咲きにけり", shimo:"外山の霞 たたずもあらなむ", kanaKami:"たかさごの をのへのさくら さきにけり", kanaShimo:"とやまのかすみ たたずもあらなむ"},
   {id:74, kami:"うかりける 人を初瀬の 山おろしよ", shimo:"はげしかれとは 祈らぬものを", kanaKami:"うかりける ひとをはつせの やまおろしよ", kanaShimo:"はげしかれとは いのらぬものを"},
   {id:75, kami:"ちぎりおきし させもが露を いのちにて", shimo:"あはれ今年の 秋もいぬめり", kanaKami:"ちぎりおきし させもがつゆを いのちにて", kanaShimo:"あはれことしの あきもいぬめり"},
@@ -300,7 +308,7 @@ let started = false;
 let timerInterval = null;
 let elapsedSec = 0;
 let displayMode = 'kanji'; // 'kanji' or 'kana'
-let isJudging = false; // 正解/不正解の判定演出中（この間はセル操作を受け付けない）
+let isJudging = false;
 
 const tbody = document.getElementById('tbody');
 const timerEl = document.getElementById('timer');
@@ -315,8 +323,19 @@ const answerBtn = document.getElementById('answerBtn');
 const rangeSelect = document.getElementById('rangeSelect');
 const modeKanji = document.getElementById('modeKanji');
 const modeKana = document.getElementById('modeKana');
+const hideShimoBeforeStart = document.getElementById('hideShimoBeforeStart');
 
-// 出題範囲の選択肢を組み立て（全100首 + 1-10, 11-20, ... 91-100）
+function getUniquePoems() {
+  const seen = new Set();
+  return POEMS.filter(p => {
+    if (seen.has(p.id)) return false;
+    seen.add(p.id);
+    return true;
+  });
+}
+
+const uniquePoems = getUniquePoems();
+
 function buildRangeOptions() {
   for (let start = 1; start <= 91; start += 10) {
     const end = start + 9;
@@ -331,7 +350,7 @@ buildRangeOptions();
 function getRangeIds() {
   const val = rangeSelect.value;
   if (val === 'all') {
-    return POEMS.map(p => p.id);
+    return uniquePoems.map(p => p.id);
   }
   if (val.startsWith('random')) {
     const n = parseInt(val.replace('random', ''), 10);
@@ -343,9 +362,8 @@ function getRangeIds() {
   return ids;
 }
 
-// 全100首からランダムにn首分のidを重複なく選ぶ
 function pickRandomIds(n) {
-  const allIds = POEMS.map(p => p.id);
+  const allIds = uniquePoems.map(p => p.id);
   shuffleArray(allIds);
   return allIds.slice(0, n);
 }
@@ -358,17 +376,12 @@ function shuffleArray(arr) {
 }
 
 function initLists() {
-  const val = rangeSelect.value;
-  const isRandomMode = val.startsWith('random');
   const ids = getRangeIds();
-  const poemsInRange = POEMS.filter(p => ids.includes(p.id));
+  const poemsInRange = uniquePoems.filter(p => ids.includes(p.id));
+  
   kamiList = poemsInRange.map(p => ({id: p.id, text: p.kami, kana: p.kanaKami}));
   shimoList = poemsInRange.map(p => ({id: p.id, text: p.shimo, kana: p.kanaShimo}));
-  if (isRandomMode) {
-    // ランダム出題モードでは、選ばれた首の中での上の句の表示順もランダムにする
-    shuffleArray(kamiList);
-  }
-  shuffleArray(shimoList);
+  
   totalEl.textContent = poemsInRange.length;
 }
 
@@ -406,12 +419,18 @@ function render() {
 
     const tdShimo = document.createElement('td');
     if (i < shimoList.length) {
-      tdShimo.textContent = cellText(shimoList[i]);
+      const isHidden = !started && hideShimoBeforeStart.checked;
+      tdShimo.textContent = isHidden ? '？？？？？' : cellText(shimoList[i]);
       tdShimo.dataset.idx = i;
       tdShimo.dataset.col = 'shimo';
-      if (!started || isJudging) tdShimo.classList.add('disabled-cell');
-      if (i === selectedShimoIdx) tdShimo.classList.add('selected');
-      tdShimo.addEventListener('click', onCellClick);
+      if (isHidden) {
+        tdShimo.classList.add('hidden-cell');
+      }
+      if (!started || isJudging || isHidden) tdShimo.classList.add('disabled-cell');
+      if (!isHidden && i === selectedShimoIdx) tdShimo.classList.add('selected');
+      if (!isHidden) {
+        tdShimo.addEventListener('click', onCellClick);
+      }
     }
     tr.appendChild(tdShimo);
 
@@ -448,10 +467,6 @@ function onCellClick(e) {
 }
 
 function checkMatch() {
-  // 判定確定時点のインデックスをローカルにコピーしておく。
-  // これをしないと、setTimeoutの待機中に次のセルを選択された場合、
-  // 「今の」selectedKamiIdx/selectedShimoIdxを参照してしまい、
-  // 無関係な行を誤って削除してしまうバグになる。
   const kamiIdx = selectedKamiIdx;
   const shimoIdx = selectedShimoIdx;
   const kamiItem = kamiList[kamiIdx];
@@ -461,7 +476,7 @@ function checkMatch() {
   const kamiCell = tbody.querySelector('td[data-col="kami"][data-idx="' + kamiIdx + '"]');
   const shimoCell = tbody.querySelector('td[data-col="shimo"][data-idx="' + shimoIdx + '"]');
 
-  isJudging = true; // 判定演出が終わるまでセル操作を禁止
+  isJudging = true;
 
   if (isMatch) {
     if (kamiCell) kamiCell.classList.add('correct');
@@ -531,9 +546,9 @@ function stopTimer() {
 }
 
 function setLockedControls(locked) {
-  // 開始中はシャッフルと出題範囲変更を禁止
   shuffleBtn.disabled = locked;
   rangeSelect.disabled = locked;
+  hideShimoBeforeStart.disabled = locked;
 }
 
 function finish() {
@@ -562,13 +577,12 @@ startBtn.addEventListener('click', () => {
 });
 
 shuffleBtn.addEventListener('click', () => {
-  if (started) return; // 開始中はシャッフル不可（念のための二重ガード）
+  if (started) return;
   answerMsg.textContent = '';
   selectedKamiIdx = null;
   selectedShimoIdx = null;
 
   if (rangeSelect.value.startsWith('random')) {
-    // ランダムN首モードでは、100首の中から改めてN首を選び直す
     initLists();
   } else {
     shuffleArray(kamiList);
@@ -597,7 +611,7 @@ resetBtn.addEventListener('click', () => {
 });
 
 rangeSelect.addEventListener('change', () => {
-  if (started) return; // 開始中は変更不可（selectがdisabledなので通常発火しない）
+  if (started) return;
   stopTimer();
   elapsedSec = 0;
   timerEl.textContent = formatTime(elapsedSec);
@@ -618,6 +632,12 @@ modeKanji.addEventListener('change', () => {
 modeKana.addEventListener('change', () => {
   if (modeKana.checked) {
     displayMode = 'kana';
+    render();
+  }
+});
+
+hideShimoBeforeStart.addEventListener('change', () => {
+  if (!started) {
     render();
   }
 });
