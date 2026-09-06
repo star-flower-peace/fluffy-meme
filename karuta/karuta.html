@@ -298,6 +298,7 @@ let started = false;
 let timerInterval = null;
 let elapsedSec = 0;
 let displayMode = 'kanji'; // 'kanji' or 'kana'
+let isJudging = false; // 正解/不正解の判定演出中（この間はセル操作を受け付けない）
 
 const tbody = document.getElementById('tbody');
 const timerEl = document.getElementById('timer');
@@ -388,7 +389,7 @@ function render() {
       tdKami.textContent = cellText(kamiList[i]);
       tdKami.dataset.idx = i;
       tdKami.dataset.col = 'kami';
-      if (!started) tdKami.classList.add('disabled-cell');
+      if (!started || isJudging) tdKami.classList.add('disabled-cell');
       if (i === selectedKamiIdx) tdKami.classList.add('selected');
       tdKami.addEventListener('click', onCellClick);
     }
@@ -399,7 +400,7 @@ function render() {
       tdShimo.textContent = cellText(shimoList[i]);
       tdShimo.dataset.idx = i;
       tdShimo.dataset.col = 'shimo';
-      if (!started) tdShimo.classList.add('disabled-cell');
+      if (!started || isJudging) tdShimo.classList.add('disabled-cell');
       if (i === selectedShimoIdx) tdShimo.classList.add('selected');
       tdShimo.addEventListener('click', onCellClick);
     }
@@ -415,11 +416,11 @@ function updateAnswerBtnState() {
   const exactlyOneSelected =
     (selectedKamiIdx !== null && selectedShimoIdx === null) ||
     (selectedKamiIdx === null && selectedShimoIdx !== null);
-  answerBtn.disabled = !(started && exactlyOneSelected);
+  answerBtn.disabled = !(started && !isJudging && exactlyOneSelected);
 }
 
 function onCellClick(e) {
-  if (!started) return;
+  if (!started || isJudging) return;
   const col = e.currentTarget.dataset.col;
   const idx = parseInt(e.currentTarget.dataset.idx, 10);
 
@@ -438,21 +439,30 @@ function onCellClick(e) {
 }
 
 function checkMatch() {
-  const kamiItem = kamiList[selectedKamiIdx];
-  const shimoItem = shimoList[selectedShimoIdx];
+  // 判定確定時点のインデックスをローカルにコピーしておく。
+  // これをしないと、setTimeoutの待機中に次のセルを選択された場合、
+  // 「今の」selectedKamiIdx/selectedShimoIdxを参照してしまい、
+  // 無関係な行を誤って削除してしまうバグになる。
+  const kamiIdx = selectedKamiIdx;
+  const shimoIdx = selectedShimoIdx;
+  const kamiItem = kamiList[kamiIdx];
+  const shimoItem = shimoList[shimoIdx];
   const isMatch = kamiItem.id === shimoItem.id;
 
-  const kamiCell = tbody.querySelector('td[data-col="kami"][data-idx="' + selectedKamiIdx + '"]');
-  const shimoCell = tbody.querySelector('td[data-col="shimo"][data-idx="' + selectedShimoIdx + '"]');
+  const kamiCell = tbody.querySelector('td[data-col="kami"][data-idx="' + kamiIdx + '"]');
+  const shimoCell = tbody.querySelector('td[data-col="shimo"][data-idx="' + shimoIdx + '"]');
+
+  isJudging = true; // 判定演出が終わるまでセル操作を禁止
 
   if (isMatch) {
     if (kamiCell) kamiCell.classList.add('correct');
     if (shimoCell) shimoCell.classList.add('correct');
     setTimeout(() => {
-      kamiList.splice(selectedKamiIdx, 1);
-      shimoList.splice(selectedShimoIdx, 1);
+      kamiList.splice(kamiIdx, 1);
+      shimoList.splice(shimoIdx, 1);
       selectedKamiIdx = null;
       selectedShimoIdx = null;
+      isJudging = false;
       render();
       if (kamiList.length === 0 && shimoList.length === 0) {
         finish();
@@ -464,13 +474,14 @@ function checkMatch() {
     setTimeout(() => {
       selectedKamiIdx = null;
       selectedShimoIdx = null;
+      isJudging = false;
       render();
     }, 500);
   }
 }
 
 function showAnswer() {
-  if (!started) return;
+  if (!started || isJudging) return;
   if (selectedKamiIdx !== null && selectedShimoIdx === null) {
     const targetId = kamiList[selectedKamiIdx].id;
     const targetIdx = shimoList.findIndex(s => s.id === targetId);
@@ -530,6 +541,7 @@ function finish() {
 startBtn.addEventListener('click', () => {
   if (started) return;
   started = true;
+  isJudging = false;
   clearMsg.style.display = 'none';
   answerMsg.textContent = '';
   selectedKamiIdx = null;
@@ -565,6 +577,7 @@ resetBtn.addEventListener('click', () => {
   clearMsg.style.display = 'none';
   answerMsg.textContent = '';
   started = false;
+  isJudging = false;
   startBtn.disabled = false;
   startBtn.textContent = '開始';
   selectedKamiIdx = null;
