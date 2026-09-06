@@ -149,6 +149,8 @@
     <select id="rangeSelect">
       <option value="all">全100首</option>
       <option value="random10">ランダム10首</option>
+      <option value="random30">ランダム30首</option>
+      <option value="random50">ランダム50首</option>
     </select>
   </div>
   <div class="control-group">
@@ -331,8 +333,9 @@ function getRangeIds() {
   if (val === 'all') {
     return POEMS.map(p => p.id);
   }
-  if (val === 'random10') {
-    return pickRandomIds(10);
+  if (val.startsWith('random')) {
+    const n = parseInt(val.replace('random', ''), 10);
+    return pickRandomIds(n);
   }
   const [start, end] = val.split('-').map(Number);
   const ids = [];
@@ -355,10 +358,16 @@ function shuffleArray(arr) {
 }
 
 function initLists() {
+  const val = rangeSelect.value;
+  const isRandomMode = val.startsWith('random');
   const ids = getRangeIds();
   const poemsInRange = POEMS.filter(p => ids.includes(p.id));
   kamiList = poemsInRange.map(p => ({id: p.id, text: p.kami, kana: p.kanaKami}));
   shimoList = poemsInRange.map(p => ({id: p.id, text: p.shimo, kana: p.kanaShimo}));
+  if (isRandomMode) {
+    // ランダム出題モードでは、選ばれた首の中での上の句の表示順もランダムにする
+    shuffleArray(kamiList);
+  }
   shuffleArray(shimoList);
   totalEl.textContent = poemsInRange.length;
 }
@@ -558,8 +567,8 @@ shuffleBtn.addEventListener('click', () => {
   selectedKamiIdx = null;
   selectedShimoIdx = null;
 
-  if (rangeSelect.value === 'random10') {
-    // ランダム10首モードでは、100首の中から改めて10首を選び直す
+  if (rangeSelect.value.startsWith('random')) {
+    // ランダムN首モードでは、100首の中から改めてN首を選び直す
     initLists();
   } else {
     shuffleArray(kamiList);
