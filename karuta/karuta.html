@@ -159,8 +159,20 @@
     </select>
   </div>
   <div class="control-group">
-    <label><input type="radio" name="mode" id="modeKanji" value="kanji" checked> 漢字あり</label>
-    <label><input type="radio" name="mode" id="modeKana" value="kana"> ひらがなのみ</label>
+    <label for="kamiModeSelect">上の句:</label>
+    <select id="kamiModeSelect">
+      <option value="kana" selected>ひらがな</option>
+      <option value="kanji">漢字あり</option>
+      <option value="kimariji">決まり字</option>
+    </select>
+  </div>
+  <div class="control-group">
+    <label for="shimoModeSelect">下の句:</label>
+    <select id="shimoModeSelect">
+      <option value="kana" selected>ひらがな</option>
+      <option value="kanji">漢字あり</option>
+      <option value="kimariji">決まり字</option>
+    </select>
   </div>
   <div class="control-group">
     <label><input type="checkbox" id="hideShimoBeforeStart"> 開始前は下の句を表示しない</label>
@@ -198,106 +210,106 @@
 
 <script>
 const POEMS = [
-  {id:1, kami:"秋の田の かりほの庵の 苫をあらみ", shimo:"わが衣手は 露にぬれつつ", kanaKami:"あきのたの かりほのいほの とまをあらみ", kanaShimo:"わがころもでは つゆにぬれつつ"},
-  {id:2, kami:"春すぎて 夏来にけらし 白妙の", shimo:"衣ほすてふ 天の香具山", kanaKami:"はるすぎて なつきにけらし しろたへの", kanaShimo:"ころもほすてふ あまのかぐやま"},
-  {id:3, kami:"あしびきの 山鳥の尾の しだり尾の", shimo:"ながながし夜を ひとりかも寝む", kanaKami:"あしびきの やまどりのおの しだりをの", kanaShimo:"ながながしよを ひとりかもねむ"},
-  {id:4, kami:"田子の浦に うち出でてみれば 白妙の", shimo:"富士の高嶺に 雪はふりつつ", kanaKami:"たごのうらに うちいでてみれば しろたへの", kanaShimo:"ふじのたかねに ゆきはふりつつ"},
-  {id:5, kami:"奥山に 紅葉ふみわけ 鳴く鹿の", shimo:"声きく時ぞ 秋は悲しき", kanaKami:"おくやまに もみぢふみわけ なくしかの", kanaShimo:"こゑきくときぞ あきはかなしき"},
-  {id:6, kami:"かささぎの 渡せる橋に おく霜の", shimo:"白きを見れば 夜ぞふけにける", kanaKami:"かささぎの わたせるはしに おくしもの", kanaShimo:"しろきをみれば よぞふけにける"},
-  {id:7, kami:"天の原 ふりさけ見れば 春日なる", shimo:"三笠の山に いでし月かも", kanaKami:"あまのはら ふりさけみれば かすがなる", kanaShimo:"みかさのやまに いでしつきかも"},
-  {id:8, kami:"わが庵は 都のたつみ しかぞすむ", shimo:"世をうぢ山と 人はいふなり", kanaKami:"わがいほは みやこのたつみ しかぞすむ", kanaShimo:"よをうぢやまと ひとはいふなり"},
-  {id:9, kami:"花の色は うつりにけりな いたづらに", shimo:"わが身世にふる ながめせしまに", kanaKami:"はなのいろは うつりにけりな いたづらに", kanaShimo:"わがみよにふる ながめせしまに"},
-  {id:10, kami:"これやこの 行くも帰るも 別れては", shimo:"知るも知らぬも 逢坂の関", kanaKami:"これやこの いくもかへるも わかれては", kanaShimo:"しるもしらぬも あふさかのせき"},
-  {id:11, kami:"わたの原 八十島かけて 漕ぎ出でぬと", shimo:"人には告げよ 海人の釣舟", kanaKami:"わたのはら やそしまかけて こぎいでぬと", kanaShimo:"ひとにはつげよ あまのつりぶね"},
-  {id:12, kami:"天つ風 雲の通ひ路 吹きとぢよ", shimo:"をとめの姿 しばしとどめむ", kanaKami:"あまつかぜ くものかよひぢ ふきとぢよ", kanaShimo:"をとめのすがた しばしとどめむ"},
-  {id:13, kami:"筑波嶺の 峰より落つる みなの川", shimo:"恋ぞつもりて 淵となりぬる", kanaKami:"つくばねの みねよりおつる みなのがは", kanaShimo:"こひぞつもりて ふちとなりぬる"},
-  {id:14, kami:"陸奥の しのぶもぢずり 誰ゆゑに", shimo:"乱れそめにし われならなくに", kanaKami:"みちのくの しのぶもぢずり たれゆゑに", kanaShimo:"みだれそめにし われならなくに"},
-  {id:15, kami:"君がため 春の野に出でて 若菜つむ", shimo:"わが衣手に 雪はふりつつ", kanaKami:"きみがため はるののにいでて わかなつむ", kanaShimo:"わがころもでに ゆきはふりつつ"},
-  {id:16, kami:"立ち別れ いなばの山の 峰に生ふる", shimo:"まつとし聞かば 今帰り来む", kanaKami:"たちわかれ いなばのやまの みねにおふる", kanaShimo:"まつとしきかば いまかへりこむ"},
-  {id:17, kami:"ちはやぶる 神代も聞かず 竜田川", shimo:"からくれなゐに 水くくるとは", kanaKami:"ちはやぶる かみよもきかず たつたがは", kanaShimo:"からくれなゐに みづくくるとは"},
-  {id:18, kami:"住の江の 岸による波 よるさへや", shimo:"夢の通ひ路 人めよくらむ", kanaKami:"すみのえの きしによるなみ よるさへや", kanaShimo:"ゆめのかよひぢ ひとめよくらむ"},
-  {id:19, kami:"難波潟 みじかき芦の ふしのまも", shimo:"あはでこの世を すぐしてよとや", kanaKami:"なにはがた みじかきあしの ふしのまも", kanaShimo:"あはでこのよを すぐしてよとや"},
-  {id:20, kami:"わびぬれば 今はた同じ 難波なる", shimo:"みをつくしても 逢はむとぞ思ふ", kanaKami:"わびぬれば いまはたおなじ なにはなる", kanaShimo:"みをつくしても あはむとぞおもふ"},
-  {id:21, kami:"今来むと いひしばかりに 長月の", shimo:"有明の月を 待ち出でつるかな", kanaKami:"いまこむと いひしばかりに ながつきの", kanaShimo:"ありあけのつきを まちいでつるかな"},
-  {id:22, kami:"吹くからに 秋の草木の しをるれば", shimo:"むべ山風を 嵐といふらむ", kanaKami:"ふくからに あきのくさきの しをるれば", kanaShimo:"むべやまかぜを あらしといふらむ"},
-  {id:23, kami:"月見れば ちぢに物こそ 悲しけれ", shimo:"わが身ひとつの 秋にはあらねど", kanaKami:"つきみれば ちぢにものこそ かなしけれ", kanaShimo:"わがみひとつの あきにはあらねど"},
-  {id:24, kami:"このたびは ぬさもとりあへず 手向山", shimo:"紅葉のにしき 神のまにまに", kanaKami:"このたびは ぬさもとりあへず たむけやま", kanaShimo:"もみぢのにしき かみのまにまに"},
-  {id:25, kami:"名にし負はば 逢坂山の さねかづら", shimo:"人に知られで くるよしもがな", kanaKami:"なにしおはば あふさかやまの さねかづら", kanaShimo:"ひとにしられで くるよしもがな"},
-  {id:26, kami:"小倉山 峰のもみぢ葉 心あらば", shimo:"今ひとたびの みゆき待たなむ", kanaKami:"をぐらやま みねのもみぢば こころあらば", kanaShimo:"いまひとたびの みゆきまたなむ"},
-  {id:27, kami:"みかの原 わきて流るる いづみ川", shimo:"いつ見きとてか 恋しかるらむ", kanaKami:"みかのはら わきてながるる いづみがは", kanaShimo:"いつみきとてか こひしかるらむ"},
-  {id:28, kami:"山里は 冬ぞ寂しさ まさりける", shimo:"人めも草も かれぬと思へば", kanaKami:"やまざとは ふゆぞさびしさ まさりける", kanaShimo:"ひとめもくさも かれぬとおもへば"},
-  {id:29, kami:"心あてに 折らばや折らむ 初霜の", shimo:"おきまどはせる 白菊の花", kanaKami:"こころあてに をらばやをらむ はつしもの", kanaShimo:"おきまどはせる しらぎくのはな"},
-  {id:30, kami:"有明の つれなく見えし 別れより", shimo:"暁ばかり 憂きものはなし", kanaKami:"ありあけの つれなくみえし わかれより", kanaShimo:"あかつきばかり うきものはなし"},
-  {id:31, kami:"朝ぼらけ 有明の月と 見るまでに", shimo:"吉野の里に ふれる白雪", kanaKami:"あさぼらけ ありあけのつきと みるまでに", kanaShimo:"よしののさとに ふれるしらゆき"},
-  {id:32, kami:"山川に 風のかけたる しがらみは", shimo:"流れもあへぬ 紅葉なりけり", kanaKami:"やまがはに かぜのかけたる しがらみは", kanaShimo:"ながれもあへぬ もみぢなりけり"},
-  {id:33, kami:"ひさかたの 光のどけき 春の日に", shimo:"しづ心なく 花の散るらむ", kanaKami:"ひさかたの ひかりのどけき はるのひに", kanaShimo:"しづこころなく はなのちるらむ"},
-  {id:34, kami:"誰をかも 知る人にせむ 高砂の", shimo:"松も昔の 友ならなくに", kanaKami:"たれをかも しるひとにせむ たかさごの", kanaShimo:"まつもむかしの ともならなくに"},
-  {id:35, kami:"人はいさ 心も知らず ふるさとは", shimo:"花ぞ昔の 香ににほひける", kanaKami:"ひとはいさ こころもしらず ふるさとは", kanaShimo:"はなぞむかしの かににほひける"},
-  {id:36, kami:"夏の夜は まだ宵ながら 明けぬるを", shimo:"雲のいづこに 月やどるらむ", kanaKami:"なつのよは まだよひながら あけぬるを", kanaShimo:"くものいづこに つきやどるらむ"},
-  {id:37, kami:"白露に 風の吹きしく 秋の野は", shimo:"つらぬきとめぬ 玉ぞ散りける", kanaKami:"しらつゆに かぜのふきしく あきののは", kanaShimo:"つらぬきとめぬ たまぞちりける"},
-  {id:38, kami:"忘らるる 身をば思はず 誓ひてし", shimo:"人の命の 惜しくもあるかな", kanaKami:"わすらるる みをばおもはず ちかひてし", kanaShimo:"ひとのいのちの をしくもあるかな"},
-  {id:39, kami:"浅茅生の 小野の篠原 しのぶれど", shimo:"あまりてなどか 人の恋しき", kanaKami:"あさぢふの をののしのはら しのぶれど", kanaShimo:"あまりてなどか ひとのこひしき"},
-  {id:40, kami:"忍ぶれど 色に出でにけり わが恋は", shimo:"ものや思ふと 人の問ふまで", kanaKami:"しのぶれど いろにいでにけり わがこひは", kanaShimo:"ものやおもふと ひとのとふまで"},
-  {id:41, kami:"恋すてふ わが名はまだき 立ちにけり", shimo:"人知れずこそ 思ひそめしか", kanaKami:"こひすてふ わがなはまだき たちにけり", kanaShimo:"ひとしれずこそ おもひそめしか"},
-  {id:42, kami:"契りきな かたみに袖を しぼりつつ", shimo:"末の松山 波こさじとは", kanaKami:"ちぎりきな かたみにそでを しぼりつつ", kanaShimo:"すゑのまつやま なみこさじとは"},
-  {id:43, kami:"逢ひ見ての のちの心に くらぶれば", shimo:"昔はものを 思はざりけり", kanaKami:"あひみての のちのこころに くらぶれば", kanaShimo:"むかしはものを おもはざりけり"},
-  {id:44, kami:"逢ふことの 絶えてしなくば なかなかに", shimo:"人をも身をも 恨みざらまし", kanaKami:"あふことの たえてしなくは なかなかに", kanaShimo:"ひとをもみをも うらみざらまし"},
-  {id:45, kami:"あはれとも いふべき人は 思ほえで", shimo:"身のいたづらに なりぬべきかな", kanaKami:"あはれとも いふべきひとは おもほえで", kanaShimo:"みのいたづらに なりぬべきかな"},
-  {id:46, kami:"由良の門を 渡る舟人 かぢをたえ", shimo:"ゆくへも知らぬ 恋の道かな", kanaKami:"ゆらのとを わたるふなびと かぢをたえ", kanaShimo:"ゆくへもしらぬ こひのみちかな"},
-  {id:47, kami:"八重むぐら しげれる宿の さびしきに", shimo:"人こそ見えね 秋は来にけり", kanaKami:"やへむぐら しげれるやどの さびしきに", kanaShimo:"ひとこそみえね あきはきにけり"},
-  {id:48, kami:"風をいたみ 岩うつ波の おのれのみ", shimo:"くだけて物を 思ふころかな", kanaKami:"かぜをいたみ いはうつなみの おのれのみ", kanaShimo:"くだけてものを おもふころかな"},
-  {id:49, kami:"みかきもり 衛士のたく火の 夜は燃え", shimo:"昼は消えつつ ものをこそ思へ", kanaKami:"みかきもり ゑじのたくひの よるはもえ", kanaShimo:"ひるはきえつつ ものをこそおもへ"},
-  {id:50, kami:"君がため 惜しからざりし 命さへ", shimo:"長くもがなと 思ひけるかな", kanaKami:"きみがため をしからざりし いのちさへ", kanaShimo:"ながくもがなと おもひけるかな"},
-  {id:51, kami:"かくとだに えやはいぶきの さしも草", shimo:"さしも知らじな 燃ゆる思ひを", kanaKami:"かくとだに えやはいぶきの さしもぐさ", kanaShimo:"さしもしらじな もゆるおもひを"},
-  {id:52, kami:"明けぬれば 暮るるものとは 知りながら", shimo:"なほ恨めしき 朝ぼらけかな", kanaKami:"あけぬれば くるるものとは しりながら", kanaShimo:"なほうらめしき あさぼらけかな"},
-  {id:53, kami:"嘆きつつ ひとり寝る夜の 明くる間は", shimo:"いかに久しき ものとかは知る", kanaKami:"なげきつつ ひとりねるよの あくるまは", kanaShimo:"いかにひさしき ものとかはしる"},
-  {id:54, kami:"忘れじの 行末までは かたければ", shimo:"今日を限りの 命ともがな", kanaKami:"わすれじの ゆくすゑまでは かたければ", kanaShimo:"けふをかぎりの いのちともがな"},
-  {id:55, kami:"滝の音は 絶えて久しく なりぬれど", shimo:"名こそ流れて なほ聞こえけれ", kanaKami:"たきのおとは たえてひさしく なりぬれど", kanaShimo:"なこそながれて なほきこえけれ"},
-  {id:56, kami:"あらざらむ この世のほかの 思ひ出に", shimo:"いまひとたびの 逢ふこともがな", kanaKami:"あらざらむ このよのほかの おもひでに", kanaShimo:"いまひとたびの あふこともがな"},
-  {id:57, kami:"めぐりあひて 見しやそれとも わかぬ間に", shimo:"雲がくれにし 夜半の月かな", kanaKami:"めぐりあひて みしやそれとも わかぬまに", kanaShimo:"くもがくれにし よはのつきかな"},
-  {id:58, kami:"有馬山 猪名の笹原 風吹けば", shimo:"いでそよ人を 忘れやはする", kanaKami:"ありまやま ゐなのささはら かぜふけば", kanaShimo:"いでそよひとを わすれやはする"},
-  {id:59, kami:"やすらはで 寝なましものを さ夜ふけて", shimo:"かたぶくまでの 月を見しかな", kanaKami:"やすらはで ねなましものを さよふけて", kanaShimo:"かたぶくまでの つきをみしかな"},
-  {id:60, kami:"大江山 いく野の道の 遠ければ", shimo:"まだふみもみず 天の橋立", kanaKami:"おほえやま いくののみちの とほければ", kanaShimo:"まだふみもみず あまのはしだて"},
-  {id:61, kami:"いにしへの 奈良の都の 八重桜", shimo:"けふ九重に にほひぬるかな", kanaKami:"いにしへの ならのみやこの やへざくら", kanaShimo:"けふここのへに にほひぬるかな"},
-  {id:62, kami:"夜をこめて 鳥のそら音は はかるとも", shimo:"よに逢坂の 関はゆるさじ", kanaKami:"よをこめて とりのそらねは はかるとも", kanaShimo:"よにあふさかの せきはゆるさじ"},
-  {id:63, kami:"今はただ 思ひ絶えなむ とばかりを", shimo:"人づてならで いふよしもがな", kanaKami:"いまはただ おもひたえなむ とばかりを", kanaShimo:"ひとづてならで いふよしもがな"},
-  {id:64, kami:"朝ぼらけ 宇治の川霧 たえだえに", shimo:"あらはれわたる 瀬々の網代木", kanaKami:"あさぼらけ うぢのかはぎり たえだえに", kanaShimo:"あらはれわたる せぜのあじろぎ"},
-  {id:65, kami:"恨みわび ほさぬ袖だに あるものを", shimo:"恋に朽ちなむ 名こそ惜しけれ", kanaKami:"うらみわび ほさぬそでだに あるものを", kanaShimo:"こひにくちなむ なこそをしけれ"},
-  {id:66, kami:"もろともに あはれと思へ 山桜", shimo:"花よりほかに 知る人もなし", kanaKami:"もろともに あはれとおもへ やまざくら", kanaShimo:"はなよりほかに しるひともなし"},
-  {id:67, kami:"春の夜の 夢ばかりなる 手枕に", shimo:"かひなく立たむ 名こそ惜しけれ", kanaKami:"はるのよの ゆめばかりなる たまくらに", kanaShimo:"かひなくたたむ なこそをしけれ"},
-  {id:68, kami:"心にも あらでうき世に ながらへば", shimo:"恋しかるべき 夜半の月かな", kanaKami:"こころにも あらでうきよに ながらへば", kanaShimo:"こひしかるべき よはのつきかな"},
-  {id:69, kami:"嵐吹く 三室の山の もみぢ葉は", shimo:"竜田の川の 錦なりけり", kanaKami:"あらしふく みむろのやまの もみぢばは", kanaShimo:"たつたのかはの にしきなりけり"},
-  {id:70, kami:"さびしさに 宿を立ち出でて ながむれば", shimo:"いづこも同じ 秋の夕暮", kanaKami:"さびしさに やどをたちいでて ながむれば", kanaShimo:"いづこもおなじ あきのゆふぐれ"},
-  {id:71, kami:"夕されば 門田の稲葉 おとづれて", shimo:"蘆のまろやに 秋風ぞ吹く", kanaKami:"ゆふされば かどたのいなば おとづれて", kanaShimo:"あしのまろやに あきかぜぞふく"},
-  {id:72, kami:"音に聞く 高師の浜の あだ波は", shimo:"かけじや袖の 濡れもこそすれ", kanaKami:"おとにきく たかしのはまの あだなみは", kanaShimo:"かけじやそでの ぬれもこそすれ"},
-  {id:73, kami:"高砂の 尾の上の桜 咲きにけり", shimo:"外山の霞 たたずもあらなむ", kanaKami:"たかさごの をのへのさくら さきにけり", kanaShimo:"とやまのかすみ たたずもあらなむ"},
-  {id:74, kami:"うかりける 人を初瀬の 山おろしよ", shimo:"はげしかれとは 祈らぬものを", kanaKami:"うかりける ひとをはつせの やまおろしよ", kanaShimo:"はげしかれとは いのらぬものを"},
-  {id:75, kami:"ちぎりおきし させもが露を いのちにて", shimo:"あはれ今年の 秋もいぬめり", kanaKami:"ちぎりおきし させもがつゆを いのちにて", kanaShimo:"あはれことしの あきもいぬめり"},
-  {id:76, kami:"わたの原 漕ぎ出でて見れば ひさかたの", shimo:"雲居にまがふ 沖つ白波", kanaKami:"わたのはら こぎいでてみれば ひさかたの", kanaShimo:"くもゐにまがふ おきつしらなみ"},
-  {id:77, kami:"瀬をはやみ 岩にせかるる 滝川の", shimo:"われても末に 逢はむとぞ思ふ", kanaKami:"せをはやみ いはにせかるる たきがはの", kanaShimo:"われてもすゑに あはむとぞおもふ"},
-  {id:78, kami:"淡路島 かよふ千鳥の 鳴く声に", shimo:"いく夜寝ざめぬ 須磨の関守", kanaKami:"あはぢしま かよふちどりの なくこゑに", kanaShimo:"いくよねざめぬ すまのせきもり"},
-  {id:79, kami:"秋風に たなびく雲の 絶え間より", shimo:"もれ出づる月の 影のさやけさ", kanaKami:"あきかぜに たなびくくもの たえまより", kanaShimo:"もれいづるつきの かげのさやけさ"},
-  {id:80, kami:"長からむ 心も知らず 黒髪の", shimo:"みだれて今朝は ものをこそ思へ", kanaKami:"ながからむ こころもしらず くろかみの", kanaShimo:"みだれてけさは ものをこそおもへ"},
-  {id:81, kami:"ほととぎす 鳴きつる方を ながむれば", shimo:"ただ有明の 月ぞ残れる", kanaKami:"ほととぎす なきつるかたを ながむれば", kanaShimo:"ただありあけの つきぞのこれる"},
-  {id:82, kami:"思ひわび さても命は あるものを", shimo:"憂きに堪へぬは 涙なりけり", kanaKami:"おもひわび さてもいのちは あるものを", kanaShimo:"うきにたへぬは なみだなりけり"},
-  {id:83, kami:"世の中よ 道こそなけれ 思ひ入る", shimo:"山の奥にも 鹿ぞ鳴くなる", kanaKami:"よのなかよ みちこそなけれ おもひいる", kanaShimo:"やまのおくにも しかぞなくなる"},
-  {id:84, kami:"ながらへば またこのごろや しのばれむ", shimo:"憂しと見し世ぞ 今は恋しき", kanaKami:"ながらへば またこのごろや しのばれむ", kanaShimo:"うしとみしよぞ いまはこひしき"},
-  {id:85, kami:"夜もすがら もの思ふころは 明けやらで", shimo:"ねやのひまさへ つれなかりけり", kanaKami:"よもすがら ものおもふころは あけやらで", kanaShimo:"ねやのひまさへ つれなかりけり"},
-  {id:86, kami:"嘆けとて 月やはものを 思はする", shimo:"かこち顔なる わが涙かな", kanaKami:"なげけとて つきやはものを おもはする", kanaShimo:"かこちがほなる わがなみだかな"},
-  {id:87, kami:"村雨の 露もまだひぬ 槇の葉に", shimo:"霧たちのぼる 秋の夕暮", kanaKami:"むらさめの つゆもまだひぬ まきのはに", kanaShimo:"きりたちのぼる あきのゆふぐれ"},
-  {id:88, kami:"難波江の 蘆のかりねの ひとよゆゑ", shimo:"みをつくしてや 恋ひわたるべき", kanaKami:"なにはえの あしのかりねの ひとよゆゑ", kanaShimo:"みをつくしてや こひわたるべき"},
-  {id:89, kami:"玉の緒よ 絶えなば絶えね ながらへば", shimo:"忍ぶることの 弱りもぞする", kanaKami:"たまのをよ たえなばたえね ながらへば", kanaShimo:"しのぶることの よわりもぞする"},
-  {id:90, kami:"見せばやな 雄島のあまの 袖だにも", shimo:"ぬれにぞぬれし 色はかはらず", kanaKami:"みせばやな をじまのあまの そでだにも", kanaShimo:"ぬれにぞぬれし いろはかはらず"},
-  {id:91, kami:"きりぎりす 鳴くや霜夜の さむしろに", shimo:"衣かたしき ひとりかも寝む", kanaKami:"きりぎりす なくやしもよの さむしろに", kanaShimo:"ころもかたしき ひとりかもねむ"},
-  {id:92, kami:"わが袖は 潮干に見えぬ 沖の石の", shimo:"人こそ知らね 乾く間もなし", kanaKami:"わがそでは しほひにみえぬ おきのいしの", kanaShimo:"ひとこそしらね かわくまもなし"},
-  {id:93, kami:"世の中は 常にもがもな 渚こぐ", shimo:"あまの小舟の 綱手かなしも", kanaKami:"よのなかは つねにもがもな なぎさこぐ", kanaShimo:"あまのをぶねの つなでかなしも"},
-  {id:94, kami:"み吉野の 山の秋風 小夜ふけて", shimo:"ふるさと寒く 衣うつなり", kanaKami:"みよしのの やまのあきかぜ さよふけて", kanaShimo:"ふるさとさむく ころもうつなり"},
-  {id:95, kami:"おほけなく うき世の民に おほふかな", shimo:"わが立つ杣に 墨染の袖", kanaKami:"おほけなく うきよのたみに おほふかな", kanaShimo:"わがたつそまに すみぞめのそで"},
-  {id:96, kami:"花さそふ 嵐の庭の 雪ならで", shimo:"ふりゆくものは わが身なりけり", kanaKami:"はなさそふ あらしのにはの ゆきならで", kanaShimo:"ふりゆくものは わがみなりけり"},
-  {id:97, kami:"来ぬ人を まつほの浦の 夕なぎに", shimo:"焼くや藻塩の 身もこがれつつ", kanaKami:"こぬひとを まつほのうらの ゆふなぎに", kanaShimo:"やくやもしほの みもこがれつつ"},
-  {id:98, kami:"風そよぐ ならの小川の 夕暮は", shimo:"みそぎぞ夏の しるしなりける", kanaKami:"かぜそよぐ ならのをがはの ゆふぐれは", kanaShimo:"みそぎぞなつの しるしなりける"},
-  {id:99, kami:"人もをし 人も恨めし あぢきなく", shimo:"世を思ふゆゑに もの思ふ身は", kanaKami:"ひともをし ひともうらめし あぢきなく", kanaShimo:"よをおもふゆゑに ものおもふみは"},
-  {id:100, kami:"ももしきや 古き軒端の しのぶにも", shimo:"なほあまりある 昔なりけり", kanaKami:"ももしきや ふるきのきばの しのぶにも", kanaShimo:"なほあまりある むかしなりけり"}
+  {id:1, kami:"秋の田の かりほの庵の 苫をあらみ", shimo:"わが衣手は 露にぬれつつ", kanaKami:"あきのたの かりほのいほの とまをあらみ", kanaShimo:"わがころもでは つゆにぬれつつ", kimarijiKami:"あきの", kimarijiShimo:"わがころもでは"},
+  {id:2, kami:"春すぎて 夏来にけらし 白妙の", shimo:"衣ほすてふ 天の香具山", kanaKami:"はるすぎて なつきにけらし しろたへの", kanaShimo:"ころもほすてふ あまのかぐやま", kimarijiKami:"はるす", kimarijiShimo:"ころもほ"},
+  {id:3, kami:"あしびきの 山鳥の尾の しだり尾の", shimo:"ながながし夜を ひとりかも寝む", kanaKami:"あしびきの やまどりのおの しだりをの", kanaShimo:"ながながしよを ひとりかもねむ", kimarijiKami:"あし", kimarijiShimo:"ながな"},
+  {id:4, kami:"田子の浦に うち出でてみれば 白妙の", shimo:"富士の高嶺に 雪はふりつつ", kanaKami:"たごのうらに うちいでてみれば しろたへの", kanaShimo:"ふじのたかねに ゆきはふりつつ", kimarijiKami:"たご", kimarijiShimo:"ふじ"},
+  {id:5, kami:"奥山に 紅葉ふみわけ 鳴く鹿の", shimo:"声きく時ぞ 秋は悲しき", kanaKami:"おくやまに もみぢふみわけ なくしかの", kanaShimo:"こゑきくときぞ あきはかなしき", kimarijiKami:"おく", kimarijiShimo:"こゑ"},
+  {id:6, kami:"かささぎの 渡せる橋に おく霜の", shimo:"白きを見れば 夜ぞふけにける", kanaKami:"かささぎの わたせるはしに おくしもの", kanaShimo:"しろきをみれば よぞふけにける", kimarijiKami:"かさ", kimarijiShimo:"しろ"},
+  {id:7, kami:"天の原 ふりさけ見れば 春日なる", shimo:"三笠の山に いでし月かも", kanaKami:"あまのはら ふりさけみれば かすがなる", kanaShimo:"みかさのやまに いでしつきかも", kimarijiKami:"あまの", kimarijiShimo:"みか"},
+  {id:8, kami:"わが庵は 都のたつみ しかぞすむ", shimo:"世をうぢ山と 人はいふなり", kanaKami:"わがいほは みやこのたつみ しかぞすむ", kanaShimo:"よをうぢやまと ひとはいふなり", kimarijiKami:"わがい", kimarijiShimo:"よをう"},
+  {id:9, kami:"花の色は うつりにけりな いたづらに", shimo:"わが身世にふる ながめせしまに", kanaKami:"はなのいろは うつりにけりな いたづらに", kanaShimo:"わがみよにふる ながめせしまに", kimarijiKami:"はなの", kimarijiShimo:"わがみよ"},
+  {id:10, kami:"これやこの 行くも帰るも 別れては", shimo:"知るも知らぬも 逢坂の関", kanaKami:"これやこの いくもかへるも わかれては", kanaShimo:"しるもしらぬも あふさかのせき", kimarijiKami:"これ", kimarijiShimo:"しる"},
+  {id:11, kami:"わたの原 八十島かけて 漕ぎ出でぬと", shimo:"人には告げよ 海人の釣舟", kanaKami:"わたのはら やそしまかけて こぎいでぬと", kanaShimo:"ひとにはつげよ あまのつりぶね", kimarijiKami:"わたのはらや", kimarijiShimo:"ひとには"},
+  {id:12, kami:"天つ風 雲の通ひ路 吹きとぢよ", shimo:"をとめの姿 しばしとどめむ", kanaKami:"あまつかぜ くものかよひぢ ふきとぢよ", kanaShimo:"をとめのすがた しばしとどめむ", kimarijiKami:"あまつ", kimarijiShimo:"を"},
+  {id:13, kami:"筑波嶺の 峰より落つる みなの川", shimo:"恋ぞつもりて 淵となりぬる", kanaKami:"つくばねの みねよりおつる みなのがは", kanaShimo:"こひぞつもりて ふちとなりぬる", kimarijiKami:"つく", kimarijiShimo:"こひぞ"},
+  {id:14, kami:"陸奥の しのぶもぢずり 誰ゆゑに", shimo:"乱れそめにし われならなくに", kanaKami:"みちのくの しのぶもぢずり たれゆゑに", kanaShimo:"みだれそめにし われならなくに", kimarijiKami:"みち", kimarijiShimo:"みだれそ"},
+  {id:15, kami:"君がため 春の野に出でて 若菜つむ", shimo:"わが衣手に 雪はふりつつ", kanaKami:"きみがため はるののにいでて わかなつむ", kanaShimo:"わがころもでに ゆきはふりつつ", kimarijiKami:"きみがためは", kimarijiShimo:"わがころもでに"},
+  {id:16, kami:"立ち別れ いなばの山の 峰に生ふる", shimo:"まつとし聞かば 今帰り来む", kanaKami:"たちわかれ いなばのやまの みねにおふる", kanaShimo:"まつとしきかば いまかへりこむ", kimarijiKami:"たち", kimarijiShimo:"まつと"},
+  {id:17, kami:"ちはやぶる 神代も聞かず 竜田川", shimo:"からくれなゐに 水くくるとは", kanaKami:"ちはやぶる かみよもきかず たつたがは", kanaShimo:"からくれなゐに みづくくるとは", kimarijiKami:"ちは", kimarijiShimo:"から"},
+  {id:18, kami:"住の江の 岸による波 よるさへや", shimo:"夢の通ひ路 人めよくらむ", kanaKami:"すみのえの きしによるなみ よるさへや", kanaShimo:"ゆめのかよひぢ ひとめよくらむ", kimarijiKami:"す", kimarijiShimo:"ゆめ"},
+  {id:19, kami:"難波潟 みじかき芦の ふしのまも", shimo:"あはでこの世を すぐしてよとや", kanaKami:"なにはがた みじかきあしの ふしのまも", kanaShimo:"あはでこのよを すぐしてよとや", kimarijiKami:"なにはが", kimarijiShimo:"あはで"},
+  {id:20, kami:"わびぬれば 今はた同じ 難波なる", shimo:"みをつくしても 逢はむとぞ思ふ", kanaKami:"わびぬれば いまはたおなじ なにはなる", kanaShimo:"みをつくしても あはむとぞおもふ", kimarijiKami:"わび", kimarijiShimo:"みをつくしても"},
+  {id:21, kami:"今来むと いひしばかりに 長月の", shimo:"有明の月を 待ち出でつるかな", kanaKami:"いまこむと いひしばかりに ながつきの", kanaShimo:"ありあけのつきを まちいでつるかな", kimarijiKami:"いまこ", kimarijiShimo:"あり"},
+  {id:22, kami:"吹くからに 秋の草木の しをるれば", shimo:"むべ山風を 嵐といふらむ", kanaKami:"ふくからに あきのくさきの しをるれば", kanaShimo:"むべやまかぜを あらしといふらむ", kimarijiKami:"ふ", kimarijiShimo:"むべ"},
+  {id:23, kami:"月見れば ちぢに物こそ 悲しけれ", shimo:"わが身ひとつの 秋にはあらねど", kanaKami:"つきみれば ちぢにものこそ かなしけれ", kanaShimo:"わがみひとつの あきにはあらねど", kimarijiKami:"つき", kimarijiShimo:"わがみひ"},
+  {id:24, kami:"このたびは ぬさもとりあへず 手向山", shimo:"紅葉のにしき 神のまにまに", kanaKami:"このたびは ぬさもとりあへず たむけやま", kanaShimo:"もみぢのにしき かみのまにまに", kimarijiKami:"この", kimarijiShimo:"もみ"},
+  {id:25, kami:"名にし負はば 逢坂山の さねかづら", shimo:"人に知られで くるよしもがな", kanaKami:"なにしおはば あふさかやまの さねかづら", kanaShimo:"ひとにしられで くるよしもがな", kimarijiKami:"なにし", kimarijiShimo:"ひとにし"},
+  {id:26, kami:"小倉山 峰のもみぢ葉 心あらば", shimo:"今ひとたびの みゆき待たなむ", kanaKami:"をぐらやま みねのもみぢば こころあらば", kanaShimo:"いまひとたびの みゆきまたなむ", kimarijiKami:"をぐ", kimarijiShimo:"いまひとたびのみ"},
+  {id:27, kami:"みかの原 わきて流るる いづみ川", shimo:"いつ見きとてか 恋しかるらむ", kanaKami:"みかのはら わきてながるる いづみがは", kanaShimo:"いつみきとてか こひしかるらむ", kimarijiKami:"みかの", kimarijiShimo:"いつみ"},
+  {id:28, kami:"山里は 冬ぞ寂しさ まさりける", shimo:"人めも草も かれぬと思へば", kanaKami:"やまざとは ふゆぞさびしさ まさりける", kanaShimo:"ひとめもくさも かれぬとおもへば", kimarijiKami:"やまざ", kimarijiShimo:"ひとめ"},
+  {id:29, kami:"心あてに 折らばや折らむ 初霜の", shimo:"おきまどはせる 白菊の花", kanaKami:"こころあてに をらばやをらむ はつしもの", kanaShimo:"おきまどはせる しらぎくのはな", kimarijiKami:"こころあ", kimarijiShimo:"お"},
+  {id:30, kami:"有明の つれなく見えし 別れより", shimo:"暁ばかり 憂きものはなし", kanaKami:"ありあけの つれなくみえし わかれより", kanaShimo:"あかつきばかり うきものはなし", kimarijiKami:"ありあ", kimarijiShimo:"あか"},
+  {id:31, kami:"朝ぼらけ 有明の月と 見るまでに", shimo:"吉野の里に ふれる白雪", kanaKami:"あさぼらけ ありあけのつきと みるまでに", kanaShimo:"よしののさとに ふれるしらゆき", kimarijiKami:"あさぼらけあ", kimarijiShimo:"よし"},
+  {id:32, kami:"山川に 風のかけたる しがらみは", shimo:"流れもあへぬ 紅葉なりけり", kanaKami:"やまがはに かぜのかけたる しがらみは", kanaShimo:"ながれもあへぬ もみぢなりけり", kimarijiKami:"やまが", kimarijiShimo:"ながれ"},
+  {id:33, kami:"ひさかたの 光のどけき 春の日に", shimo:"しづ心なく 花の散るらむ", kanaKami:"ひさかたの ひかりのどけき はるのひに", kanaShimo:"しづこころなく はなのちるらむ", kimarijiKami:"ひさ", kimarijiShimo:"しづ"},
+  {id:34, kami:"誰をかも 知る人にせむ 高砂の", shimo:"松も昔の 友ならなくに", kanaKami:"たれをかも しるひとにせむ たかさごの", kanaShimo:"まつもむかしの ともならなくに", kimarijiKami:"たれ", kimarijiShimo:"まつも"},
+  {id:35, kami:"人はいさ 心も知らず ふるさとは", shimo:"花ぞ昔の 香ににほひける", kanaKami:"ひとはいさ こころもしらず ふるさとは", kanaShimo:"はなぞむかしの かににほひける", kimarijiKami:"ひとは", kimarijiShimo:"はなぞ"},
+  {id:36, kami:"夏の夜は まだ宵ながら 明けぬるを", shimo:"雲のいづこに 月やどるらむ", kanaKami:"なつのよは まだよひながら あけぬるを", kanaShimo:"くものいづこに つきやどるらむ", kimarijiKami:"なつ", kimarijiShimo:"くもの"},
+  {id:37, kami:"白露に 風の吹きしく 秋の野は", shimo:"つらぬきとめぬ 玉ぞ散りける", kanaKami:"しらつゆに かぜのふきしく あきののは", kanaShimo:"つらぬきとめぬ たまぞちりける", kimarijiKami:"しら", kimarijiShimo:"つ"},
+  {id:38, kami:"忘らるる 身をば思はず 誓ひてし", shimo:"人の命の 惜しくもあるかな", kanaKami:"わすらるる みをばおもはず ちかひてし", kanaShimo:"ひとのいのちの をしくもあるかな", kimarijiKami:"わすら", kimarijiShimo:"ひとの"},
+  {id:39, kami:"浅茅生の 小野の篠原 しのぶれど", shimo:"あまりてなどか 人の恋しき", kanaKami:"あさぢふの をののしのはら しのぶれど", kanaShimo:"あまりてなどか ひとのこひしき", kimarijiKami:"あさぢ", kimarijiShimo:"あまり"},
+  {id:40, kami:"忍ぶれど 色に出でにけり わが恋は", shimo:"ものや思ふと 人の問ふまで", kanaKami:"しのぶれど いろにいでにけり わがこひは", kanaShimo:"ものやおもふと ひとのとふまで", kimarijiKami:"しの", kimarijiShimo:"もの"},
+  {id:41, kami:"恋すてふ わが名はまだき 立ちにけり", shimo:"人知れずこそ 思ひそめしか", kanaKami:"こひすてふ わがなはまだき たちにけり", kanaShimo:"ひとしれずこそ おもひそめしか", kimarijiKami:"こひ", kimarijiShimo:"ひとし"},
+  {id:42, kami:"契りきな かたみに袖を しぼりつつ", shimo:"末の松山 波こさじとは", kanaKami:"ちぎりきな かたみにそでを しぼりつつ", kanaShimo:"すゑのまつやま なみこさじとは", kimarijiKami:"ちぎりき", kimarijiShimo:"す"},
+  {id:43, kami:"逢ひ見ての のちの心に くらぶれば", shimo:"昔はものを 思はざりけり", kanaKami:"あひみての のちのこころに くらぶれば", kanaShimo:"むかしはものを おもはざりけり", kimarijiKami:"あひ", kimarijiShimo:"むか"},
+  {id:44, kami:"逢ふことの 絶えてしなくば なかなかに", shimo:"人をも身をも 恨みざらまし", kanaKami:"あふことの たえてしなくは なかなかに", kanaShimo:"ひとをもみをも うらみざらまし", kimarijiKami:"あふこ", kimarijiShimo:"ひとを"},
+  {id:45, kami:"あはれとも いふべき人は 思ほえで", shimo:"身のいたづらに なりぬべきかな", kanaKami:"あはれとも いふべきひとは おもほえで", kanaShimo:"みのいたづらに なりぬべきかな", kimarijiKami:"あはれ", kimarijiShimo:"みの"},
+  {id:46, kami:"由良の門を 渡る舟人 かぢをたえ", shimo:"ゆくへも知らぬ 恋の道かな", kanaKami:"ゆらのとを わたるふなびと かぢをたえ", kanaShimo:"ゆくへもしらぬ こひのみちかな", kimarijiKami:"ゆら", kimarijiShimo:"ゆく"},
+  {id:47, kami:"八重むぐら しげれる宿の さびしきに", shimo:"人こそ見えね 秋は来にけり", kanaKami:"やへむぐら しげれるやどの さびしきに", kanaShimo:"ひとこそみえね あきはきにけり", kimarijiKami:"やへ", kimarijiShimo:"ひとこそみ"},
+  {id:48, kami:"風をいたみ 岩うつ波の おのれのみ", shimo:"くだけて物を 思ふころかな", kanaKami:"かぜをいたみ いはうつなみの おのれのみ", kanaShimo:"くだけてものを おもふころかな", kimarijiKami:"かぜを", kimarijiShimo:"くだ"},
+  {id:49, kami:"みかきもり 衛士のたく火の 夜は燃え", shimo:"昼は消えつつ ものをこそ思へ", kanaKami:"みかきもり ゑじのたくひの よるはもえ", kanaShimo:"ひるはきえつつ ものをこそおもへ", kimarijiKami:"みかき", kimarijiShimo:"ひる"},
+  {id:50, kami:"君がため 惜しからざりし 命さへ", shimo:"長くもがなと 思ひけるかな", kanaKami:"きみがため をしからざりし いのちさへ", kanaShimo:"ながくもがなと おもひけるかな", kimarijiKami:"きみがためを", kimarijiShimo:"ながく"},
+  {id:51, kami:"かくとだに えやはいぶきの さしも草", shimo:"さしも知らじな 燃ゆる思ひを", kanaKami:"かくとだに えやはいぶきの さしもぐさ", kanaShimo:"さしもしらじな もゆるおもひを", kimarijiKami:"かく", kimarijiShimo:"さ"},
+  {id:52, kami:"明けぬれば 暮るるものとは 知りながら", shimo:"なほ恨めしき 朝ぼらけかな", kanaKami:"あけぬれば くるるものとは しりながら", kanaShimo:"なほうらめしき あさぼらけかな", kimarijiKami:"あけ", kimarijiShimo:"なほう"},
+  {id:53, kami:"嘆きつつ ひとり寝る夜の 明くる間は", shimo:"いかに久しき ものとかは知る", kanaKami:"なげきつつ ひとりねるよの あくるまは", kanaShimo:"いかにひさしき ものとかはしる", kimarijiKami:"なげき", kimarijiShimo:"いか"},
+  {id:54, kami:"忘れじの 行末までは かたければ", shimo:"今日を限りの 命ともがな", kanaKami:"わすれじの ゆくすゑまでは かたければ", kanaShimo:"けふをかぎりの いのちともがな", kimarijiKami:"わすれ", kimarijiShimo:"けふを"},
+  {id:55, kami:"滝の音は 絶えて久しく なりぬれど", shimo:"名こそ流れて なほ聞こえけれ", kanaKami:"たきのおとは たえてひさしく なりぬれど", kanaShimo:"なこそながれて なほきこえけれ", kimarijiKami:"たき", kimarijiShimo:"なこ"},
+  {id:56, kami:"あらざらむ この世のほかの 思ひ出に", shimo:"いまひとたびの 逢ふこともがな", kanaKami:"あらざらむ このよのほかの おもひでに", kanaShimo:"いまひとたびの あふこともがな", kimarijiKami:"あらざ", kimarijiShimo:"いまひとたびのあ"},
+  {id:57, kami:"めぐりあひて 見しやそれとも わかぬ間に", shimo:"雲がくれにし 夜半の月かな", kanaKami:"めぐりあひて みしやそれとも わかぬまに", kanaShimo:"くもがくれにし よはのつきかな", kimarijiKami:"め", kimarijiShimo:"くもが"},
+  {id:58, kami:"有馬山 猪名の笹原 風吹けば", shimo:"いでそよ人を 忘れやはする", kanaKami:"ありまやま ゐなのささはら かぜふけば", kanaShimo:"いでそよひとを わすれやはする", kimarijiKami:"ありま", kimarijiShimo:"いで"},
+  {id:59, kami:"やすらはで 寝なましものを さ夜ふけて", shimo:"かたぶくまでの 月を見しかな", kanaKami:"やすらはで ねなましものを さよふけて", kanaShimo:"かたぶくまでの つきをみしかな", kimarijiKami:"やす", kimarijiShimo:"かた"},
+  {id:60, kami:"大江山 いく野の道の 遠ければ", shimo:"まだふみもみず 天の橋立", kanaKami:"おほえやま いくののみちの とほければ", kanaShimo:"まだふみもみず あまのはしだて", kimarijiKami:"おほえ", kimarijiShimo:"まだ"},
+  {id:61, kami:"いにしへの 奈良の都の 八重桜", shimo:"けふ九重に にほひぬるかな", kanaKami:"いにしへの ならのみやこの やへざくら", kanaShimo:"けふここのへに にほひぬるかな", kimarijiKami:"いに", kimarijiShimo:"けふこ"},
+  {id:62, kami:"夜をこめて 鳥のそら音は はかるとも", shimo:"よに逢坂の 関はゆるさじ", kanaKami:"よをこめて とりのそらねは はかるとも", kanaShimo:"よにあふさかの せきはゆるさじ", kimarijiKami:"よを", kimarijiShimo:"よに"},
+  {id:63, kami:"今はただ 思ひ絶えなむ とばかりを", shimo:"人づてならで いふよしもがな", kanaKami:"いまはただ おもひたえなむ とばかりを", kanaShimo:"ひとづてならで いふよしもがな", kimarijiKami:"いまは", kimarijiShimo:"ひとづ"},
+  {id:64, kami:"朝ぼらけ 宇治の川霧 たえだえに", shimo:"あらはれわたる 瀬々の網代木", kanaKami:"あさぼらけ うぢのかはぎり たえだえに", kanaShimo:"あらはれわたる せぜのあじろぎ", kimarijiKami:"あさぼらけう", kimarijiShimo:"あら"},
+  {id:65, kami:"恨みわび ほさぬ袖だに あるものを", shimo:"恋に朽ちなむ 名こそ惜しけれ", kanaKami:"うらみわび ほさぬそでだに あるものを", kanaShimo:"こひにくちなむ なこそをしけれ", kimarijiKami:"うら", kimarijiShimo:"こひに"},
+  {id:66, kami:"もろともに あはれと思へ 山桜", shimo:"花よりほかに 知る人もなし", kanaKami:"もろともに あはれとおもへ やまざくら", kanaShimo:"はなよりほかに しるひともなし", kimarijiKami:"もろ", kimarijiShimo:"はなよ"},
+  {id:67, kami:"春の夜の 夢ばかりなる 手枕に", shimo:"かひなく立たむ 名こそ惜しけれ", kanaKami:"はるのよの ゆめばかりなる たまくらに", kanaShimo:"かひなくたたむ なこそをしけれ", kimarijiKami:"はるの", kimarijiShimo:"かひ"},
+  {id:68, kami:"心にも あらでうき世に ながらへば", shimo:"恋しかるべき 夜半の月かな", kanaKami:"こころにも あらでうきよに ながらへば", kanaShimo:"こひしかるべき よはのつきかな", kimarijiKami:"こころに", kimarijiShimo:"こひし"},
+  {id:69, kami:"嵐吹く 三室の山の もみぢ葉は", shimo:"竜田の川の 錦なりけり", kanaKami:"あらしふく みむろのやまの もみぢばは", kanaShimo:"たつたのかはの にしきなりけり", kimarijiKami:"あらし", kimarijiShimo:"たつ"},
+  {id:70, kami:"さびしさに 宿を立ち出でて ながむれば", shimo:"いづこも同じ 秋の夕暮", kanaKami:"さびしさに やどをたちいでて ながむれば", kanaShimo:"いづこもおなじ あきのゆふぐれ", kimarijiKami:"さ", kimarijiShimo:"いづこ"},
+  {id:71, kami:"夕されば 門田の稲葉 おとづれて", shimo:"蘆のまろやに 秋風ぞ吹く", kanaKami:"ゆふされば かどたのいなば おとづれて", kanaShimo:"あしのまろやに あきかぜぞふく", kimarijiKami:"ゆふ", kimarijiShimo:"あし"},
+  {id:72, kami:"音に聞く 高師の浜の あだ波は", shimo:"かけじや袖の 濡れもこそすれ", kanaKami:"おとにきく たかしのはまの あだなみは", kanaShimo:"かけじやそでの ぬれもこそすれ", kimarijiKami:"おと", kimarijiShimo:"かけ"},
+  {id:73, kami:"高砂の 尾の上の桜 咲きにけり", shimo:"外山の霞 たたずもあらなむ", kanaKami:"たかさごの をのへのさくら さきにけり", kanaShimo:"とやまのかすみ たたずもあらなむ", kimarijiKami:"たか", kimarijiShimo:"と"},
+  {id:74, kami:"うかりける 人を初瀬の 山おろしよ", shimo:"はげしかれとは 祈らぬものを", kanaKami:"うかりける ひとをはつせの やまおろしよ", kanaShimo:"はげしかれとは いのらぬものを", kimarijiKami:"うか", kimarijiShimo:"はげ"},
+  {id:75, kami:"ちぎりおきし させもが露を いのちにて", shimo:"あはれ今年の 秋もいぬめり", kanaKami:"ちぎりおきし させもがつゆを いのちにて", kanaShimo:"あはれことしの あきもいぬめり", kimarijiKami:"ちぎりお", kimarijiShimo:"あはれ"},
+  {id:76, kami:"わたの原 漕ぎ出でて見れば ひさかたの", shimo:"雲居にまがふ 沖つ白波", kanaKami:"わたのはら こぎいでてみれば ひさかたの", kanaShimo:"くもゐにまがふ おきつしらなみ", kimarijiKami:"わたのはらこ", kimarijiShimo:"くもゐ"},
+  {id:77, kami:"瀬をはやみ 岩にせかるる 滝川の", shimo:"われても末に 逢はむとぞ思ふ", kanaKami:"せをはやみ いはにせかるる たきがはの", kanaShimo:"われてもすゑに あはむとぞおもふ", kimarijiKami:"せ", kimarijiShimo:"われ"},
+  {id:78, kami:"淡路島 かよふ千鳥の 鳴く声に", shimo:"いく夜寝ざめぬ 須磨の関守", kanaKami:"あはぢしま かよふちどりの なくこゑに", kanaShimo:"いくよねざめぬ すまのせきもり", kimarijiKami:"あはぢ", kimarijiShimo:"いく"},
+  {id:79, kami:"秋風に たなびく雲の 絶え間より", shimo:"もれ出づる月の 影のさやけさ", kanaKami:"あきかぜに たなびくくもの たえまより", kanaShimo:"もれいづるつきの かげのさやけさ", kimarijiKami:"あきか", kimarijiShimo:"もれ"},
+  {id:80, kami:"長からむ 心も知らず 黒髪の", shimo:"みだれて今朝は ものをこそ思へ", kanaKami:"ながからむ こころもしらず くろかみの", kanaShimo:"みだれてけさは ものをこそおもへ", kimarijiKami:"ながか", kimarijiShimo:"みだれて"},
+  {id:81, kami:"ほととぎす 鳴きつる方を ながむれば", shimo:"ただ有明の 月ぞ残れる", kanaKami:"ほととぎす なきつるかたを ながむれば", kanaShimo:"ただありあけの つきぞのこれる", kimarijiKami:"ほ", kimarijiShimo:"ただ"},
+  {id:82, kami:"思ひわび さても命は あるものを", shimo:"憂きに堪へぬは 涙なりけり", kanaKami:"おもひわび さてもいのちは あるものを", kanaShimo:"うきにたへぬは なみだなりけり", kimarijiKami:"おも", kimarijiShimo:"うき"},
+  {id:83, kami:"世の中よ 道こそなけれ 思ひ入る", shimo:"山の奥にも 鹿ぞ鳴くなる", kanaKami:"よのなかよ みちこそなけれ おもひいる", kanaShimo:"やまのおくにも しかぞなくなる", kimarijiKami:"よのなかよ", kimarijiShimo:"やま"},
+  {id:84, kami:"ながらへば またこのごろや しのばれむ", shimo:"憂しと見し世ぞ 今は恋しき", kanaKami:"ながらへば またこのごろや しのばれむ", kanaShimo:"うしとみしよぞ いまはこひしき", kimarijiKami:"ながら", kimarijiShimo:"うし"},
+  {id:85, kami:"夜もすがら もの思ふころは 明けやらで", shimo:"ねやのひまさへ つれなかりけり", kanaKami:"よもすがら ものおもふころは あけやらで", kanaShimo:"ねやのひまさへ つれなかりけり", kimarijiKami:"よも", kimarijiShimo:"ね"},
+  {id:86, kami:"嘆けとて 月やはものを 思はする", shimo:"かこち顔なる わが涙かな", kanaKami:"なげけとて つきやはものを おもはする", kanaShimo:"かこちがほなる わがなみだかな", kimarijiKami:"なげけ", kimarijiShimo:"かこ"},
+  {id:87, kami:"村雨の 露もまだひぬ 槇の葉に", shimo:"霧たちのぼる 秋の夕暮", kanaKami:"むらさめの つゆもまだひぬ まきのはに", kanaShimo:"きりたちのぼる あきのゆふぐれ", kimarijiKami:"む", kimarijiShimo:"き"},
+  {id:88, kami:"難波江の 蘆のかりねの ひとよゆゑ", shimo:"みをつくしてや 恋ひわたるべき", kanaKami:"なにはえの あしのかりねの ひとよゆゑ", kanaShimo:"みをつくしてや こひわたるべき", kimarijiKami:"なにはえ", kimarijiShimo:"みをつくしてや"},
+  {id:89, kami:"玉の緒よ 絶えなば絶えね ながらへば", shimo:"忍ぶることの 弱りもぞする", kanaKami:"たまのをよ たえなばたえね ながらへば", kanaShimo:"しのぶることの よわりもぞする", kimarijiKami:"たま", kimarijiShimo:"しの"},
+  {id:90, kami:"見せばやな 雄島のあまの 袖だにも", shimo:"ぬれにぞぬれし 色はかはらず", kanaKami:"みせばやな をじまのあまの そでだにも", kanaShimo:"ぬれにぞぬれし いろはかはらず", kimarijiKami:"みせ", kimarijiShimo:"ぬ"},
+  {id:91, kami:"きりぎりす 鳴くや霜夜の さむしろに", shimo:"衣かたしき ひとりかも寝む", kanaKami:"きりぎりす なくやしもよの さむしろに", kanaShimo:"ころもかたしき ひとりかもねむ", kimarijiKami:"きり", kimarijiShimo:"ころもか"},
+  {id:92, kami:"わが袖は 潮干に見えぬ 沖の石の", shimo:"人こそ知らね 乾く間もなし", kanaKami:"わがそでは しほひにみえぬ おきのいしの", kanaShimo:"ひとこそしらね かわくまもなし", kimarijiKami:"わがそ", kimarijiShimo:"ひとこそし"},
+  {id:93, kami:"世の中は 常にもがもな 渚こぐ", shimo:"あまの小舟の 綱手かなしも", kanaKami:"よのなかは つねにもがもな なぎさこぐ", kanaShimo:"あまのをぶねの つなでかなしも", kimarijiKami:"よのなかは", kimarijiShimo:"あまの"},
+  {id:94, kami:"み吉野の 山の秋風 小夜ふけて", shimo:"ふるさと寒く 衣うつなり", kanaKami:"みよしのの やまのあきかぜ さよふけて", kanaShimo:"ふるさとさむく ころもうつなり", kimarijiKami:"みよ", kimarijiShimo:"ふる"},
+  {id:95, kami:"おほけなく うき世の民に おほふかな", shimo:"わが立つ杣に 墨染の袖", kanaKami:"おほけなく うきよのたみに おほふかな", kanaShimo:"わがたつそまに すみぞめのそで", kimarijiKami:"おほけ", kimarijiShimo:"わがた"},
+  {id:96, kami:"花さそふ 嵐の庭の 雪ならで", shimo:"ふりゆくものは わが身なりけり", kanaKami:"はなさそふ あらしのにはの ゆきならで", kanaShimo:"ふりゆくものは わがみなりけり", kimarijiKami:"はなさ", kimarijiShimo:"ふり"},
+  {id:97, kami:"来ぬ人を まつほの浦の 夕なぎに", shimo:"焼くや藻塩の 身もこがれつつ", kanaKami:"こぬひとを まつほのうらの ゆふなぎに", kanaShimo:"やくやもしほの みもこがれつつ", kimarijiKami:"こぬ", kimarijiShimo:"やく"},
+  {id:98, kami:"風そよぐ ならの小川の 夕暮は", shimo:"みそぎぞ夏の しるしなりける", kanaKami:"かぜそよぐ ならのをがはの ゆふぐれは", kanaShimo:"みそぎぞなつの しるしなりける", kimarijiKami:"かぜそ", kimarijiShimo:"みそ"},
+  {id:99, kami:"人もをし 人も恨めし あぢきなく", shimo:"世を思ふゆゑに もの思ふ身は", kanaKami:"ひともをし ひともうらめし あぢきなく", kanaShimo:"よをおもふゆゑに ものおもふみは", kimarijiKami:"ひとも", kimarijiShimo:"よをお"},
+  {id:100, kami:"ももしきや 古き軒端の しのぶにも", shimo:"なほあまりある 昔なりけり", kanaKami:"ももしきや ふるきのきばの しのぶにも", kanaShimo:"なほあまりある むかしなりけり", kimarijiKami:"もも", kimarijiShimo:"なほあ"}
 ];
 
 let kamiList = [];   // {id, text, kana}
@@ -307,7 +319,8 @@ let selectedShimoIdx = null;
 let started = false;
 let timerInterval = null;
 let elapsedSec = 0;
-let displayMode = 'kanji'; // 'kanji' or 'kana'
+let kamiDisplayMode = 'kana';   // 'kana' | 'kanji' | 'kimariji'
+let shimoDisplayMode = 'kana';  // 'kana' | 'kanji' | 'kimariji'
 let isJudging = false;
 
 const tbody = document.getElementById('tbody');
@@ -321,8 +334,8 @@ const shuffleBtn = document.getElementById('shuffleBtn');
 const resetBtn = document.getElementById('resetBtn');
 const answerBtn = document.getElementById('answerBtn');
 const rangeSelect = document.getElementById('rangeSelect');
-const modeKanji = document.getElementById('modeKanji');
-const modeKana = document.getElementById('modeKana');
+const kamiModeSelect = document.getElementById('kamiModeSelect');
+const shimoModeSelect = document.getElementById('shimoModeSelect');
 const hideShimoBeforeStart = document.getElementById('hideShimoBeforeStart');
 
 function getUniquePoems() {
@@ -377,11 +390,11 @@ function shuffleArray(arr) {
 
 function initLists() {
   const ids = getRangeIds();
-  const poemsInRange = uniquePoems.filter(p => ids.includes(p.id));
-  
-  kamiList = poemsInRange.map(p => ({id: p.id, text: p.kami, kana: p.kanaKami}));
-  shimoList = poemsInRange.map(p => ({id: p.id, text: p.shimo, kana: p.kanaShimo}));
-  
+  const poemsInRange = ids.map(id => uniquePoems.find(p => p.id === id));
+
+  kamiList = poemsInRange.map(p => ({id: p.id, text: p.kami, kana: p.kanaKami, kimariji: p.kimarijiKami}));
+  shimoList = poemsInRange.map(p => ({id: p.id, text: p.shimo, kana: p.kanaShimo, kimariji: p.kimarijiShimo}));
+
   totalEl.textContent = poemsInRange.length;
 }
 
@@ -391,8 +404,11 @@ function formatTime(sec) {
   return m + ':' + s;
 }
 
-function cellText(item) {
-  return displayMode === 'kana' ? item.kana : item.text;
+function cellText(item, col) {
+  const mode = col === 'kami' ? kamiDisplayMode : shimoDisplayMode;
+  if (mode === 'kimariji') return item.kimariji;
+  if (mode === 'kana') return item.kana;
+  return item.text;
 }
 
 function render() {
@@ -408,7 +424,7 @@ function render() {
 
     const tdKami = document.createElement('td');
     if (i < kamiList.length) {
-      tdKami.textContent = cellText(kamiList[i]);
+      tdKami.textContent = cellText(kamiList[i], 'kami');
       tdKami.dataset.idx = i;
       tdKami.dataset.col = 'kami';
       if (!started || isJudging) tdKami.classList.add('disabled-cell');
@@ -420,7 +436,7 @@ function render() {
     const tdShimo = document.createElement('td');
     if (i < shimoList.length) {
       const isHidden = !started && hideShimoBeforeStart.checked;
-      tdShimo.textContent = isHidden ? '？？？？？' : cellText(shimoList[i]);
+      tdShimo.textContent = isHidden ? '？？？？？' : cellText(shimoList[i], 'shimo');
       tdShimo.dataset.idx = i;
       tdShimo.dataset.col = 'shimo';
       if (isHidden) {
@@ -513,7 +529,7 @@ function showAnswer() {
     const cell = tbody.querySelector('td[data-col="shimo"][data-idx="' + targetIdx + '"]');
     if (cell) {
       cell.classList.add('answer-hint');
-      answerMsg.textContent = '正解の下の句: ' + cellText(shimoList[targetIdx]);
+      answerMsg.textContent = '正解の下の句: ' + cellText(shimoList[targetIdx], 'shimo');
       setTimeout(() => cell.classList.remove('answer-hint'), 2500);
     }
   } else if (selectedShimoIdx !== null && selectedKamiIdx === null) {
@@ -523,7 +539,7 @@ function showAnswer() {
     const cell = tbody.querySelector('td[data-col="kami"][data-idx="' + targetIdx + '"]');
     if (cell) {
       cell.classList.add('answer-hint');
-      answerMsg.textContent = '正解の上の句: ' + cellText(kamiList[targetIdx]);
+      answerMsg.textContent = '正解の上の句: ' + cellText(kamiList[targetIdx], 'kami');
       setTimeout(() => cell.classList.remove('answer-hint'), 2500);
     }
   }
@@ -584,10 +600,9 @@ shuffleBtn.addEventListener('click', () => {
 
   if (rangeSelect.value.startsWith('random')) {
     initLists();
-  } else {
-    shuffleArray(kamiList);
-    shuffleArray(shimoList);
   }
+  shuffleArray(kamiList);
+  shuffleArray(shimoList);
   render();
 });
 
@@ -623,17 +638,13 @@ rangeSelect.addEventListener('change', () => {
   render();
 });
 
-modeKanji.addEventListener('change', () => {
-  if (modeKanji.checked) {
-    displayMode = 'kanji';
-    render();
-  }
+kamiModeSelect.addEventListener('change', () => {
+  kamiDisplayMode = kamiModeSelect.value;
+  render();
 });
-modeKana.addEventListener('change', () => {
-  if (modeKana.checked) {
-    displayMode = 'kana';
-    render();
-  }
+shimoModeSelect.addEventListener('change', () => {
+  shimoDisplayMode = shimoModeSelect.value;
+  render();
 });
 
 hideShimoBeforeStart.addEventListener('change', () => {
